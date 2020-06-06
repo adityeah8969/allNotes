@@ -1,0 +1,17 @@
+
+PROCESS/JOBS/TASK/THREAD/THREAD-POOL
+
+
+Process is a well-defined operating systems concept, as is thread: a process is an instance of a program that is being executed, and is the basic unit of resources: a process consists of or “owns” its image, execution context, memory, files, etc.
+
+A process consists of one or more threads, which are the unit of scheduling, and consist of some subset of a process (possibly shared with other threads): execution context and perhaps more. Traditionally a thread is the unit of execution on a processor (a thread is “what is executing”)
+
+The term “job” traditionally means a “piece of work”.In computing, “job” originates in non-interactive processing on mainframes.Early computers primarily did batch processing and a standard type of one-off job was compiling a program from source, which could then process batches of data. 
+
+In Unix shells, a “job” is the shell’s representation for a process group – a set of processes that can all be sent a signal – concretely a pipeline and its descendent processes; note that running a script starts a job, exactly as in mainframes. The job is not done until the processes complete, and a job can be stopped, resumed, or terminated, which corresponds to suspending, resuming, or terminating the processes. Thus while formally a job is distinct from the process group, this is a subtle distinction and thus people often use “job” to mean “set of processes”.
+
+In computer programming, a thread pool is a software design pattern for achieving concurrency of execution in a computer program. Often also called a replicated workers or worker-crew model,[1] a thread pool maintains multiple threads waiting for tasks to be allocated for concurrent execution by the supervising program. By maintaining a pool of threads, the model increases performance and avoids latency in execution due to frequent creation and destruction of threads for short-lived tasks.[2] The number of available threads is tuned to the computing resources available to the program, such as a parallel task queue after completion of execution.
+
+UNIX has separate concepts "process", "process group", and "session".The shell creates a process group within the current session for each "job" it launches, and places each process it starts into the appropriate process group. For example, ls | head is a pipeline of two processes, which the shell considers a single job, and will belong to a single, new process group.
+
+A process is a (collection of) thread of execution and other context, such as address space and file descriptor table. A process may start other processes; these new processes will belong to the same process group as the parent unless other action is taken. Each process may also have a "controlling terminal", which starts off the same as its parent.

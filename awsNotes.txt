@@ -1,0 +1,120 @@
+
+
+Load Balancers:
+
+General Info -> Listener (port and protocol LB will listen on, for connection) -> Security Group -> Configure Target Group (name, Protocol & Port of instances(target type) behind)+ Advanced Target Group settings -> Register Targets (ADding instances to created target group)
+
+Note:
+
+# Multiple Target Groups can be added to an LB.
+# Generally SGs of instances reference SG of LB.
+
+Auto Scaling Group:
+
+Create Launch Configuration -> create ASG 
+			    -> ASG details (launch config, name, size, network, subnet)+ Advanced details(receive traffic from LB, LB type,
+													  target groups(new instances coming 														  out of scaling out gets 														  automatically registered to the 														  target group ) ) 
+			    -> Configure scaling policies (size b/w min & max, Metric type, Target Value)
+			    -> configure notifications & tags (optional)
+			    -> Launch
+
+
+Elastic Beanstalk:
+
+Name of the app --> platform(NodeJS,Python)--> Zipped Code/ sample code--> Launch Environment (Simple configuration)
+
+This creates an S3 bucket, LB, Elastic IP, ec2 instances, ASG, SG etc.
+
+
+
+All apps -> Name of the app -> Name of the environment (Configurations,Logs,Health,Alarms,Managed Updates,Events,Tags)
+
+
+Creating a new environment:
+
+Elastic Beanstalk-->all apps-->MyWebApp(custom name)-->create a new environment(web server/worker)--> 
+										web server env
+										(Name of the app,Env name(e.g MyWebApp-Prod),
+										Domain(MyWebApp),PLatform,code)
+										
+										--> Configure more options
+										
+										Low Cost/ HA / Custom
+										(Based on above 3 options configurations such as
+										software(nodeJS),instances,capacity(AZ,ASG)      											,LB,Rolling updates& Monitoring,Notifications,
+										Network,DB,Tags)
+
+This creates S3 buckets, LB, Elastic IP, ec2 instances, ASG, SG(for LB,ASG instances), cloudwatch Alarms
+
+Note: Its better to have a separate DB connection as deleting Elastic Beanstalk env leads to deletion of DB as well.
+
+
+
+
+CI/CD:
+
+CodeCommit:
+
+Name of the repository--> Description --> create
+
+CodePipeline:
+
+PipeLine Name --> Attach an IAM role/ create a new one (for interacting with s3 and other resources) --> select artifact store (Default: s3bucket) --> source provider (source where i/p artifact is present e.g AWS CodeCommit)--> select repo name & branch name --> 
+select change detection option (cloudwatch(recommended) or codepipeline) --> add build stage (codeBUild,jenkins etc)
+	 --> add deploy stage (deploy provider(e.g beanstalk) , region , application name inside beanstalk(same as one in repo), environment) 
+	
+
+
+Note : We can extend the number of stages inside the pipeline using EDIT button. A stage can have multiple action groups created sequentially.
+       e.g we can add a new stage to the existing pipeline for manual approval (select action provider = Manual Approval inside action group) 	    before deployment using beanstalk into a prod environment. This will let the user approve the deployment using AWS UI after which it    	     will deploy.
+
+
+CodeBuild:
+
+Select the pipeline --> select codeBuild ->> provide name & description --> select source( source triggers codeBuild e.g AWS CodeCommit)
+--> select repo --> inside environment select Managed/custom image.--> select OS -->select codeBuild sample image --> create role (IAM)
+--> select relevant o/p in additional config like compute sie, duration for which image waits in build queue etc --> use buildspec.yml
+
+
+Note: codeBuild runs a docker image internally to run all the tests present inside the build code. 
+      buildspec.yml file should be in root directory of the project.It contains phases such as install,pre_build,build,post_build.Phases
+      in turn execute commands.  
+
+CodeDeploy:
+
+Create 2 roles, AWSCodeDeployRole (for providing codeDeploy permission to interact with ec2 instances,ASG,LB etc) & an ec2 IAM role for s3 
+read access(sample name EC2Role).
+
+CodeDeploy-->application-->create application --> name app,select compute platform (ec2,ecs,lambda)
+
+launch an ec2 instance using sample role for s3 access ,here, EC2Role. Make sure instance is tagged with 'Environment:Dev'
+
+ssh into ec2 instance and install codeDeploy agent software (can be done using user-data as well)
+
+create a deployment group (set of ec2 instances, can be dev,prod etc)--> name-->role(select AWSCodeDeployRole)--> deployment type(inPLace or blue-green) --> environment configurations (select ec2 among lambda ,ec2& ecs) --> put ec2 tags ans key value pair for picking up the ec2
+instance just created--> deployment settings(all at once,one at a time, half at a time) --> create deployment group
+
+upload apps zip file on s3.
+root folder should have appsec.yml file containing hooks(how to deploy,phases etc)
+
+Inside application --> create a deployment --> select deployment group just created -->resource s3/github.
+
+
+
+
+
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+

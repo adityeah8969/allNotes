@@ -1,0 +1,1982 @@
+Python Data-Types:
+
+Data-Type           e.g
+
+int		
+float
+str
+list		  [20,"sammy",14.46]			       //Ordered sequence of objects.
+dict		  {"myKey":"45","name":"Archer"}               //Unordered Key-Value pairs.
+tup               (10,"hello",23.89)			       //Ordered immutable sequence of objects.
+set		  {"a","b"}				       //Unordered collection of unique objects.
+bool
+
+
+print('hello')
+print(7%4)
+print(4**2)                                // 16   (pow(4,2))
+print(1/2)                                 // 0.5  (pyhton3 returns true divison)
+
+
+
+
+a=5
+print(type(a))                             // <class 'int'>
+a=10.5
+print(type(a))                             // <class 'float'>  same variable can be reassigned a value of different data-type (Dynamic)
+															     Assignment)
+
+
+
+
+
+print('I said "F**k Off!!"')  		  // I said "F**k Off!!"              
+print("I said 'F**k Off!!'")		  // I said 'F**k Off!
+print(len("abcd"))			  // 4
+print("I said \t'F**k Off!!'")		  // I said 	'F**k Off!!'
+print("I said \n'F**k Off!!'")		  // I said 
+					     'F**k Off!!'
+
+
+
+
+
+my_str[start_index:prev_to_stop_index:jump]
+
+my_str="0123456789"			  
+print(my_str[-1])			  //9
+print(my_str[-10])			  //0
+print(my_str[2:])			  //23456789
+print(my_str[:5])			  //01234
+print(my_str[:])			  //0123456789
+print(my_str[::])			  //0123456789
+print(my_str[1:9:1])			  //12345678
+print(my_str[1:9:2])			  //1357
+print(my_str[::-1])			  //9876543210     (Trick to reverse a string)
+
+
+Note:Strings are not mutable! (meaning you can't use indexing to change individual elements of a string)
+
+my_str="abcD efG ef uyt"		  
+print(my_str.upper())		          //ABCD EFG EF UYT	  
+print(my_str.lower())			  //abcd efg ef uyt
+print(my_str.split())			  //['abcD', 'efG', 'ef', 'uyt']  //by default space is used as a delimeter.
+print(my_str.split('e'))		  //['abcD ', 'fG ', 'f uyt']
+
+
+
+
+print('My name is {}'.format('Aditya'))                        //My name is Aditya
+print('The {} {} {}'.format('quick','brown','fox'))	       //The quick brown fox
+print('The {0} {0} {0}'.format('quick','brown','fox'))	       //The quick quick quick
+print('The {f} {q} {b}'.format(q='quick',b='brown',f='fox'))   //The fox quick brown
+result=100/777
+print('The result was {}'.format(result))		       //The result was 0.1287001287001287
+print('The result was {r}'.format(r=result))		       //The result was 0.1287001287001287
+print('The result was {r:1.3f}'.format(r=result))              //The result was 0.129
+print('The result was {r:10.3f}'.format(r=result))             //The result was      0.129
+
+
+name="Jose"
+print(f'The name is {name}')                                   //The name is Jose
+age=89
+print(f'The name is {name} and age {age}')                      //The name is Jose and age 89
+
+
+my_list=["STRING",1,23.3,"one",55,"thirty-two"]
+print(len(my_list))						//6
+print(my_list[0])						//STRING
+print(my_list[-1])						//thirty-two
+print(my_list[1:4])						//[1, 23.3, 'one']
+my_list[0]="abcd"
+my_list.append(56)
+print(my_list)							//['abcd', 1, 23.3, 'one', 55, 'thirty-two', 56]
+my_list.pop()
+a=my_list.pop()
+print(my_list)							//['abcd', 1, 23.3, 'one', 55]
+my_list.pop(0)
+print(my_list)							//[1, 23.3, 'one', 55]
+new_list=[4,1,8,3]
+new_list.sort()							
+print(new_list)							//[1, 3, 4, 8]
+
+
+
+Note:    new_list.sort() will only sort and not return the sorted list. 
+         my_list.pop() will pop as well as return the popped out element.
+
+
+Dictionaries:
+
+
+a={'k1':1,'k2':'abcd','k3':['abc',44,55.89],'k4':{'key1':'Baz','key2':98}}            
+print(a['k1'])									      //1
+print(a['k2'])									      //abcd
+print(a['k3'][2])								      //55.89
+print(a['k4']['key1'].upper())							      //BAZ
+a['k5']='Shyam'
+print(a)		//{'k1': 1, 'k2': 'abcd', 'k3': ['abc', 44, 55.89], 'k4': {'key1': 'Baz', 'key2': 98}, 'k5': 'Shyam'}
+print(a.keys())         //dict_keys(['k1', 'k2', 'k3', 'k4', 'k5'])
+print(a.values())       //dict_values([1, 'abcd', ['abc', 44, 55.89], {'key1': 'Baz', 'key2': 98}, 'Shyam'])
+print(a.items()) //dict_items([('k1', 1), ('k2', 'abcd'), ('k3', ['abc', 44, 55.89]), ('k4', {'key1': 'Baz', 'key2': 98}), ('k5', 'Shyam')])
+
+
+Tuples:
+
+Tuples are used mainly because they are immutable unlike list.
+
+a=(1,'abcd',78.90,22,'Thirty One',1,[9,8])
+print(a)				//(1, 'abcd', 78.9, 22, 'Thirty One', 1)
+print(type(a))				//<class 'tuple'>
+print(a.count(1))			//2
+print(a.index('Thirty One'))		//4
+
+
+Set:
+
+Set is an unordered colletion of unique elements.
+
+mySet=set()
+mySet.add(1)
+mySet.add(2)
+mySet.add('abcd')
+print(mySet)			//{'abcd', 1, 2}
+mySet.add(1)
+print(mySet)			//{'abcd', 1, 2}
+myList={1,1,1,2,2,3,3}
+print(set(myList))		//{1, 2, 3}
+
+
+Booleans:
+
+a=True
+print(a)		//True
+print(1>2)		//False
+print(2 == 2.0)		//True   (As long as value remains the same O/P will be true)
+
+
+Basic I/0:
+
+f=open('myFile.txt')
+print(f.read())			//1 on First
+				  2 on Second
+
+
+print(f.read())			//             // Note: After reading the file the pointer reaches the end of the file.'f.seek(0)' resets
+f.seek(0)                                               the pointer to the beginning.
+print(f.read())			//1 on First
+				  2 on second
+f.seek(0)
+contents=f.read()               
+print(contents)			//1 on First
+                                  2 on second
+				
+f.seek(0)
+print(f.readlines())            //['1 on First\n', '2 in Second']
+f.close()
+
+with open('myFile.txt') as f:                                          // with statement takes care of closing and facilitates use of mode.
+    contents = f.read()
+    print(contents)		//1 on First
+				  2 on second
+with open('myFile.txt',mode='r') as f:                                  // mode='r' specifies only read operation getting permitted
+    print(f.read())             //1 on First
+    f.seek(0)                     2 on second
+
+with open('myFile.txt',mode='a') as f:                                  // mode='a' specifies only append operation getting permitted
+    f.write('\n3 on third')
+with open('myFile.txt',mode='r') as f:
+    print(f.read())			//1 on First
+			                  2 on second
+				          3 on third
+with open('abcdefgh.txt',mode='w') as f:				// mode='w' specifies only write operation getting permitted
+    f.write('Created a file')                                              It overwrites the file or creates it if not present.
+with open('abcdefgh.txt', mode='r') as f:
+    print(f.read())                     //Created a file     
+
+
+
+
+print (1==1 and 2==2)			//True
+print (1==1 and 2==3)			//False
+print (1==1 or 2==3)			//True
+print (not 3==4)			//True
+
+
+
+
+hungry=False
+
+if hungry:
+    print('Khaana de!')
+elif (2>3):
+    print('BC kuch v')
+else:
+    print('Rehne de!')
+
+
+
+myString = 'abcd'
+for c in myString:
+    print(c)
+
+
+O/P:
+
+a
+b
+c
+d
+
+
+myString = 'abcd'
+for _ in myString:
+    print('cool')
+
+o/p:
+
+cool
+cool
+cool
+cool
+
+myList=[(1, 2), (3, 4), (5, 6)]
+for a,b in myList:                                         // Tuple Unpacking 
+    print(a)
+    print(b)
+
+o/p:
+
+1
+2
+3
+4
+5
+6
+
+myDictionaryList={'k1':25, 'k2':"Beautiful", 'k3':34.50}
+for a,b in myDictionaryList.items():
+    print(a)
+    print(b)
+
+o/p:
+
+k1
+25
+k2
+Beautiful
+k3
+34.5
+
+for val in myDictionaryList.values():
+    print(val)
+
+
+o/p:
+
+25
+Beautiful
+34.5
+
+
+
+
+
+x=0
+while x<5 :
+    print(f'current value of x :{x}')
+    x+=1
+else:
+    print("x is now more than 5")
+
+
+O/P:
+
+current value of x :0
+current value of x :1
+current value of x :2
+current value of x :3
+current value of x :4
+x is now more than 5
+
+
+
+myString = 'abcdefg'
+for letter in myString:
+    
+
+print('End of loop')
+
+O/P:
+Throws error (Expects some operations to be done inside the loop)
+
+
+
+myString = 'abcdefg'
+for letter in myString:
+    pass                  //pass suggests 'doing nothing
+
+print('End of loop')
+
+O/P:
+End of loop
+
+
+
+
+myString = 'abcdefg'
+for letter in myString:
+    if letter == 'd':
+        continue
+    print(letter)
+
+
+O/P:
+
+a
+b
+c
+e
+f
+g
+
+
+myString = 'abcdefg'
+for letter in myString:
+    if letter == 'd':
+        break
+    print(letter)
+
+
+O/P:
+
+a
+b
+c
+
+
+
+for num in range(10):
+    print(num)
+
+O/P:
+
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+
+
+for num in range(1,10):
+    print(num)
+
+
+O/P:
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+
+
+for num in range(1,10,2):
+    print(num)
+
+O/P:
+
+1
+3
+5
+7
+9
+
+
+
+myString ='abcdefg'
+
+for item in enumerate(myString):
+    print(item)
+
+O/P:
+
+(0, 'a')
+(1, 'b')
+(2, 'c')
+(3, 'd')
+(4, 'e')
+(5, 'f')
+(6, 'g')
+
+
+
+myString ='abcdefg'
+
+for index,letter in enumerate(myString):
+    print('The character at index {} is {}'.format(index,letter))
+
+
+O/P:
+
+The character at index 0 is a
+The character at index 1 is b
+The character at index 2 is c
+The character at index 3 is d
+The character at index 4 is e
+The character at index 5 is f
+The character at index 6 is g
+
+
+
+
+myList1=[1,2,3,4]
+myList2=['a','b','c']
+
+for item in zip(myList1,myList2):
+    print(item)
+
+O/P:
+
+(1, 'a')
+(2, 'b')
+(3, 'c')
+
+
+
+
+
+myList1=[1,2,3,4]
+myList2=['a','b','c']
+
+for val1,val2 in zip(myList1,myList2):
+    print(val1,val2)
+
+O/P:
+
+1 a
+2 b
+3 c
+
+
+
+
+
+myList1=[1,2,3,4]
+myList2=['a','b','c']
+myList3=[44.5,89.90,67.7678,908.77,65.42]
+
+for item in zip(myList1,myList2,myList3):
+    print(item)
+
+
+O/P:
+
+(1, 'a', 44.5)
+(2, 'b', 89.9)
+(3, 'c', 67.7678)
+
+
+
+myList1=[1,2,3,4]
+myList2=['a','b','c']
+
+print(list(zip(myList1,myList2)))
+
+O/P:
+
+[(1, 'a'), (2, 'b'), (3, 'c')]
+
+
+
+
+myList1=[1,2,3,4]
+print(1 in myList1)                               // True
+print('s' in 'asdf')				  // True
+
+
+myDictionary = {'k1': 1 , 'k2': 2,'k3': 3}
+print (1 in myDictionary.values())		  // True
+print ('k2' in myDictionary.keys())               // True
+
+
+
+
+myList =[1,2,3,4,5]
+
+print(min(myList))
+print(max(myList))
+
+
+O/P:
+
+1
+5
+
+
+
+from random import shuffle
+
+myList =[1,2,3,4,5]
+shuffle(myList)                           // shuffles in place does not return anything
+print(myList)
+
+O/P:
+
+[4, 1, 5, 3, 2]
+
+
+
+
+from random import randint
+print (randint(0,100))
+
+O/P:
+89
+
+result = input('Enter anything')
+print(result)
+print(type(result))
+
+
+O/P:
+
+Enter anything>? 33
+33
+<class 'str'>
+
+
+myList1=[1,2,3,4,5]
+
+myList2=[num for num in myList1]
+print(myList2)                        //[1, 2, 3, 4, 5]
+
+
+myList2=[num**2 for num in myList1]
+print(myList2)			      //[1, 4, 9, 16, 25]
+
+myList3=[num for num in range(0,50) if num%3==0]
+print(myList3)			      //[0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48]
+
+
+
+
+
+def myFunc(num):
+    return num**3
+
+print(myFunc(5))
+
+O/P:
+
+125
+
+
+
+
+
+def myfunc(*args):
+    print(args)			// (1, 2, 3, 4, 5)
+
+def myfunc1(**kwargs):
+    print(kwargs)		//{'k1': 1, 'k2': 2, 'k3': 3}
+
+def myfunc2(*args,**kwargs):
+    print('Value mapped for {} is {}'.format(args[0], kwargs['k2']))      // Value mapped for (1, 2, 3, 4, 5) is 2
+ 
+
+myfunc(1, 2, 3, 4, 5)
+myfunc1(k1=1 , k2=2 , k3=3)
+myfunc2((1,2,3,4,5),k1=1 , k2=2 , k3=3)
+
+
+
+
+
+
+
+def myfunc1(num):
+    return num**2
+
+def myfunc2(num):
+    return num%2==0
+
+arr=[1,2,3,4,5]
+
+print(list(map(myfunc1,arr)))			//[1, 4, 9, 16, 25]
+print(list(filter(myfunc2,arr)))		//[2, 4]
+
+print(list(map(lambda num: num**2,arr)))	//[1, 4, 9, 16, 25]
+print(list(filter(lambda num: num%2==0,arr)))   //[2, 4]
+
+
+
+
+
+Note: LEGB(Local Enclosing Global Built-In) is the priority order which python follows while treating a variable
+      Following is the example of the same
+
+
+x=10
+
+def myfunc():
+    x=50
+    print(x)   
+
+print(x)   //10
+myfunc()   //50
+
+def myfunc1():
+    print(x)
+    def enclosing_func():
+        x=77
+        print(x)
+
+print(x)  //10
+myfunc1() //10
+          //77
+
+print(x)  //10
+
+
+def myfunc2():
+    global x                   // fetches the global variable x(Not a good programming practice)
+    x=50
+    print(x)
+    
+print(x)  //10
+myfunc2() //50
+print(x)  //50
+
+
+
+
+class DogClass():
+    def __init__(self,breed,name,age,spots):
+        self.breed=breed
+        self.name=name
+        self.age=age
+        self.spots=spots
+        
+								     // can also be written as	
+myDog=DogClass(breed="huskie",name="Sujoy",age=1,spots=True)         //myDog=DogClass("huskie","Sujoy",1,True)
+
+print(myDog.breed)
+print(myDog.name)
+print(myDog.age)
+print(myDog.spots)
+
+
+O/P:
+
+huskie
+Sujoy
+1
+True
+
+
+
+
+
+class Circle():
+    
+    pi=3.14                                       // Class Attribiute
+    
+    def __init__(self,radius=1):                  // default value of radius is 1
+        self.radius=radius
+        self.area=radius*radius*Circle.pi         // Class Attribute is accessed using class name, but can be accessed using 'self' as well
+        
+    def getCircumference(self):
+        return self.radius*Circle.pi*2
+
+myCircle1=Circle()
+print(myCircle1.radius)
+print(myCircle1.area)
+print(myCircle1.getCircumference())
+
+print("-----------------")
+
+myCircle1=Circle(100)
+print(myCircle1.radius)
+print(myCircle1.area)
+print(myCircle1.getCircumference())
+
+
+
+O/P:
+
+1
+3.14
+6.28
+-----------------
+100
+31400.0
+628.0
+
+
+
+Inheritance:
+
+
+
+class Animal():
+    def __init__(self):
+        print("I m an animal")
+    
+    def eat(self):
+        print("I m eatin!")
+        
+    def dance(self):
+        print("I m dancin")
+        
+class Dog(Animal):                                  //'Dog' class inheriting from 'Animal' class
+    
+    def __init__(self):
+        Animal.__init__(self)
+        print("I am a Dog")
+    
+    def dance(self):
+        print("I m a Dog dancin")
+        
+
+myDog=Dog()
+myDog.eat()
+myDog.dance()
+
+
+O/P:
+
+I m an animal
+I am a Dog
+I m eatin!
+I m a Dog dancin
+
+
+
+Polymorphism:
+
+
+class Dog():
+    
+    def __init__(self):
+        pass
+    
+    def speak(self):
+        return "I am a dog"
+        
+
+class Cat():
+    
+    def __init__(self):
+        pass
+    
+    def speak(self):
+        return "I am a cat"
+        
+
+def say(pet):
+    print(pet.speak())
+
+
+myDog=Dog()
+myCat=Cat()
+
+say(myDog)
+say(myCat)
+
+O/P:
+
+I am a dog
+I am a cat
+
+
+
+
+Dunder Methods:
+
+__str__,__len__,__del__ are Dunder methods which can be called using syntax str(objectName),len(objectName) etc. 
+
+
+class Book():
+    
+    def __init__(self,title,author,pages):
+        self.title=title
+        self.author=author
+        self.pages=pages
+        
+    def __str__(self):                                               // string representation
+        return f"{self.title} by {self.author}"
+    
+    def __len__(self):                                               // length
+        return self.pages
+        
+    def __del__(self):                                               // for deleting the object
+        print("Deletion in progress")
+
+myBook=Book("Movement","MC",900)
+
+print(str(myBook))
+print(len(myBook))
+del(myBook)                                                          // deleted the object 'myBook'
+print("------------------")
+print(str(myBook))
+
+
+
+O/P:
+
+
+Movement by MC
+900
+Deletion in progress
+------------------
+
+Traceback (most recent call last):
+  File "jdoodle.py", line 23, in <module>
+    print(str(myBook))
+NameError: name 'myBook' is not defined
+Command exited with non-zero status 1
+
+
+
+
+Modules & Packages:
+
+
+A module is just a .py script.
+Package is a collection of modules.
+
+
+'pip' (similar to npm of node.js) is a CLI utilty which helps in installing open-source packages.
+
+Creating custom packages:
+
+Make a normal directory and make sure '__init__.py' is inside the directory. This lets python know that its a python package.
+
+
+
+(my_env) aditya@aditya-HP-Notebook:~/PycharmProjects/firstProject$ ls
+abcdefgh.txt  hello.py  mainPackage  myFile.txt  sample.py  venv
+
+(my_env) aditya@aditya-HP-Notebook:~/PycharmProjects/firstProject$ cd mainPackage
+
+(my_env) aditya@aditya-HP-Notebook:~/PycharmProjects/firstProject/mainPackage$ ls
+__init__.py  mainModule.py  __pycache__  subPackage
+
+(my_env) aditya@aditya-HP-Notebook:~/PycharmProjects/firstProject/mainPackage$ cd subPackage/
+
+(my_env) aditya@aditya-HP-Notebook:~/PycharmProjects/firstProject/mainPackage/subPackage$ ls
+__init__.py  __pycache__  subModule.py
+
+(my_env) aditya@aditya-HP-Notebook:~/PycharmProjects/firstProject/mainPackage/subPackage$ cat subModule.py
+
+def subModuleFunction():
+    print("I came from subModule")
+
+(my_env) aditya@aditya-HP-Notebook:~/PycharmProjects/firstProject/mainPackage$ cat mainModule.py
+
+def mainFunction():
+    print("I came from main package")
+
+(my_env) aditya@aditya-HP-Notebook:~/PycharmProjects/firstProject$ cat sample.py 
+from mainPackage import mainModule
+from mainPackage.subPackage import subModule
+
+subModule.subModuleFunction()
+mainModule.mainFunction()
+
+(my_env) aditya@aditya-HP-Notebook:~/PycharmProjects/firstProject$ python sample.py
+I came from subModule
+I came from main package
+
+
+
+'__name__' attribute:
+
+
+'__name__' attribute of a '.py' file gets assigned the value of "__main__" in case the '.py' script is invoked directly from CLI.
+
+
+
+(base) aditya@aditya-HP-Notebook:~/PycharmProjects/sampleProjects$ ls
+one.py  __pycache__  two.py
+
+
+(base) aditya@aditya-HP-Notebook:~/PycharmProjects/sampleProjects$ cat one.py
+
+
+def func1():
+    print("one.py Ran directly using CLI!")
+
+def func2():
+    print("one.py Imported and ran!")
+
+def func5():
+    print("function executed before import ")
+
+if __name__ == "__main__" :
+    func1()
+else:
+    func5()
+
+
+
+
+(base) aditya@aditya-HP-Notebook:~/PycharmProjects/sampleProjects$ cat two.py
+
+
+import one
+
+def func3():
+    print("two.py Ran directly using CLI!")
+
+def func4():
+    print("two.py Imported and ran!")
+
+one.func2()
+
+if __name__ == "__main__" :
+    func3()
+else:
+    func4()
+
+
+
+
+(base) aditya@aditya-HP-Notebook:~/PycharmProjects/sampleProjects$ python one.py
+one.py Ran directly using CLI!
+
+
+(base) aditya@aditya-HP-Notebook:~/PycharmProjects/sampleProjects$ python two.py
+function executed before import 
+one.py Imported and ran!
+two.py Ran directly using CLI!
+
+
+
+
+Exception Handling:
+
+
+try:
+    print(10+10)
+except TypeError:
+    print("There is a type error")
+finally:
+    print("Finally always gets executed")
+
+
+
+O/P:
+
+20
+Finally always gets executed
+
+
+
+
+try:
+    print(10+'10')
+except TypeError:
+    print("There is a type error")
+finally:
+    print("Finally always gets executed")
+
+
+O/P:
+
+
+There is a type error
+Finally always gets executed
+
+
+
+
+
+try:
+    with open('myFile.txt',mode='r') as f:
+        f.write("Written something")
+except OSError:
+    print("Try only writing, No other modes allowed!")
+finally:
+    print("finally always executes")
+
+
+
+O/P:
+
+Try only writing, No other modes allowed!
+finally always executes
+
+
+
+
+
+
+
+while True:
+    try:
+        num=int(input("Enter any integer: "))
+    except:
+        print("Pls try with an integer")
+        continue
+    else:
+        print("number entered is: ")
+        print(num)
+        break
+    finally:
+        print("Finally always executes even after break :)")
+
+
+
+O/P:
+
+Enter any integer: t
+Pls try with an integer
+Finally always executes even after break :)
+Enter any integer: 8
+number entered is: 
+8
+Finally always executes even after break :)
+
+
+
+pyLint and unittest(built-in) are libraries for testing  scripts.
+
+'pyLint scriptName.py' will log all the errors,warning and many more details in a tabular format. It also rates the code out of 10.
+
+
+
+
+
+
+unittest testing:
+
+
+
+cap.py:
+
+def capitalize(text):
+    return text.title()
+
+
+
+
+sampleTest.py:
+
+
+import cap
+import unittest
+
+class sampleTest(unittest.TestCase):
+
+    def test_one(self):
+        text="python"
+        result=cap.capitalize(text)
+        self.assertEqual(result,"Pthon")
+
+
+if __name__=="__main__":
+    unittest.main()
+
+
+O/P:
+
+
+(base) aditya@aditya-HP-Notebook:~/PycharmProjects/sampleProjects$ python sampleTest.py
+F
+======================================================================
+FAIL: test_one (__main__.sampleTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "sampleTest.py", line 9, in test_one
+    self.assertEqual(result,"Pthon")
+AssertionError: 'Python' != 'Pthon'
+- Python
+?  -
++ Pthon
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
+
+
+
+
+
+
+
+
+Decorators:
+
+
+
+
+def func1():
+    return 'func1';
+
+greet=func1                        // greet is not pointing to func1 , it now has a separate same body as func1
+del func1
+
+print(greet())                               
+
+
+O/P:
+
+func1
+
+
+
+
+
+
+
+def greet(name='Jose'):
+    
+    def greetJose():
+        return 'Welcome Jose'
+    
+    def greetChu():
+        return 'Welcome Chu'
+
+    
+    if(name=='Jose'):
+        return greetJose                        // returning a function
+    else:
+        return greetChu
+
+
+
+func1=greet('Pawan')
+print(func1())
+
+
+
+O/P:
+
+Welcome Chu
+
+
+
+
+
+
+
+
+
+def new_decorator_func(original_func):
+    
+    def wrapper():
+        
+        print('Before Code!')
+        original_func()
+        print('After Code!')
+    
+    return wrapper
+
+def func1():
+    print('main func')
+    
+
+sample= new_decorator_func(func1)                            // @new_decorator_func  would have done the same thing                  
+sample()						     // as suggested by lines alongside. (see example below)
+
+
+O/P:
+
+Before Code!
+main func
+After Code!
+
+
+
+
+
+
+
+
+def new_decorator_func(original_func):
+    
+    def wrapper():
+        
+        print('Before Code!')
+        original_func()
+        print('After Code!')
+    
+    return wrapper
+
+@new_decorator_func       				//@new_decorator_func  is a decorator which adds the                        
+def func1():						// functionality provided by 'new_decorator_func' to existing
+    print('main func')					// 'func1'. Added functionality can be removed just by removing  
+							// 'new_decorator_func' annotation. Thus toggling annotation
+func1()							// or decorator helps in adding/rmoving functionalities
+
+
+
+O/P:
+
+Before Code!
+main func
+After Code!
+
+
+
+
+
+Generators:
+
+
+
+def generator_func():
+    
+    for x in range(10):
+        yield x**3                            // yielding happens one at a time in generators. This is more memory efficient
+					      // as it only makes use of last yielded value and step size to calculate next
+					      // value to be yielded.
+
+for number in generator_func():
+    print(number)
+
+
+O/P:
+
+
+0
+1
+8
+27
+64
+125
+216
+343
+512
+729
+
+
+
+Note: 'list(generator_func()' can be used to cast the result in a list.
+
+
+
+
+def fibonacci_generator():
+    
+    a=1
+    b=1
+    
+    for i in range(10):
+        yield a
+        a,b=b,a+b
+
+for number in fibonacci_generator():
+    print(number)
+
+
+O/P:
+
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+
+
+
+
+Note: 'next' can be used on iterator of generators(see example below).
+
+
+
+
+def fibopnacci_generator():
+    
+    a=1
+    b=1
+    
+    for i in range(10):
+        yield a
+        a,b=b,a+b
+
+
+g=fibonacci_generator()                     // here we had to call the function 'fibonacci_generator'.
+print(next(g))
+print(next(g))
+print(next(g))
+print(next(g))
+print(next(g))
+print(next(g))
+print(next(g))
+print(next(g))
+print(next(g))
+print(next(g))
+
+
+O/P:
+
+1
+1
+2
+3
+5
+8
+13
+21
+34
+55
+
+
+
+
+
+
+
+str='hello'
+
+s=iter(str)                           // getting iterator 's' to iterable 'str'
+
+print(next(s))
+print(next(s))
+print(next(s))
+print(next(s))
+print(next(s))
+
+
+
+O/P:
+
+h
+e
+l
+l
+o
+
+
+
+
+
+Counter:
+
+
+Counter is a dictionalry sub-class which helps count hashable objects.
+
+
+from collections import Counter
+
+l = [1,1,1,1,1,2,3,3,3,3,3,4,4,5,8,7,7,7,9,9]
+s='aaabbbcdddeefffgggggh'
+str='The The abcd abcd abcd up up up up up fox xerox down down down'
+
+print(Counter(l))
+print(Counter(s))
+print(Counter(str.split()))
+print("-----------------------")
+c=Counter(str.split())
+print(c.most_common())
+print(c.values())
+print(c.items())
+
+
+O/P:
+
+
+Counter({1: 5, 3: 5, 7: 3, 4: 2, 9: 2, 2: 1, 5: 1, 8: 1})
+Counter({'g': 5, 'a': 3, 'b': 3, 'd': 3, 'f': 3, 'e': 2, 'c': 1, 'h': 1})
+Counter({'up': 5, 'abcd': 3, 'down': 3, 'The': 2, 'fox': 1, 'xerox': 1})
+-----------------------
+[('up', 5), ('abcd', 3), ('down', 3), ('The', 2), ('fox', 1), ('xerox', 1)]
+dict_values([2, 3, 5, 1, 1, 3])
+dict_items([('The', 2), ('abcd', 3), ('up', 5), ('fox', 1), ('xerox', 1), ('down', 3)])
+
+
+
+
+defaultdict
+
+
+defaultdict returns a default value even for keys not present in the dictionary.
+
+
+
+from collections import defaultdict
+
+d = defaultdict(lambda: 0)
+
+d['two']=2
+
+print(d['one'])
+print(d['two'])
+
+
+
+OrderedDict
+
+
+
+from collections import OrderedDict
+
+d1 = {}
+
+d1['a']=1
+d1['b']=2
+d1['c']=3
+d1['d']=4
+d1['e']=5
+
+d2 = {}
+
+d2['b']=2
+d2['c']=3
+d2['a']=1
+d2['e']=5
+d2['d']=4
+
+
+for x,y in d1.items():
+    print (x,y)
+
+
+print("---------------------------")
+
+
+for x,y in d2.items():
+    print (x,y)
+
+print("---------------------------")
+
+print(d1==d2)
+
+
+print("---------------------------")
+d1 = OrderedDict()
+
+d1['a']=1
+d1['b']=2
+d1['c']=3
+d1['d']=4
+d1['e']=5
+
+d2 = OrderedDict()
+
+d2['b']=1
+d2['c']=2
+d2['a']=3
+d2['e']=4
+d2['d']=5
+
+
+for x,y in d1.items():
+    print (x,y)
+
+print("---------------------------")
+
+for x,y in d2.items():
+    print (x,y)
+
+print("---------------------------")
+print(d1==d2)
+
+
+
+
+O/P:
+
+
+a 1
+b 2
+c 3
+d 4
+e 5
+---------------------------
+b 2
+c 3
+a 1
+e 5
+d 4
+---------------------------
+True
+---------------------------
+a 1
+b 2
+c 3
+d 4
+e 5
+---------------------------
+b 1
+c 2
+a 3
+e 4
+d 5
+---------------------------
+False
+
+
+
+
+namedtuple:
+
+
+
+from collections import namedtuple
+
+Dog = namedtuple('Dog','breed name age')
+sam= Dog(breed='pup',name='sammy',age=5)
+
+print(sam[0])
+print(sam[1])
+print(sam[2])
+
+print("--------------------")
+
+print(sam.breed)
+print(sam.name)
+print(sam.age)
+
+
+
+
+
+
+O/P:
+
+pup
+sammy
+5
+--------------------
+pup
+sammy
+5
+
+
+
+
+
+deque:
+
+
+from collections import deque
+
+d = deque('abcdef') 
+
+print(d)
+d.append('h')
+d.pop()
+print(d)
+d.popleft()
+print(d)
+d.clear()
+print(d)
+
+
+
+O/P:
+
+deque(['a', 'b', 'c', 'd', 'e', 'f'])
+deque(['a', 'b', 'c', 'd', 'e', 'f'])
+deque(['b', 'c', 'd', 'e', 'f'])
+deque([])
+
+
+
+
+
+Datetime:
+
+
+import datetime
+
+t = datetime.time(5,25,35)
+print(t)
+print(datetime.time.min)
+print(datetime.time.max)
+print(datetime.time.resolution)
+
+print("---------------------------")
+today=datetime.date.today()
+print(today.day)
+print(today.month)
+print(today.year)
+print(datetime.date.resolution)
+
+print("---------------------------")
+d1=datetime.date(2018,3,15)
+d2=d1.replace(year=2000)
+print(d2)
+print("---------------------------")
+print(datetime.date.min)
+print(datetime.date.max)
+print(datetime.date.resolution)
+print("---------------------------")
+
+
+
+O/P:
+
+
+05:25:35
+00:00:00
+23:59:59.999999
+0:00:00.000001
+---------------------------
+2
+6
+2019
+1 day, 0:00:00
+---------------------------
+2000-03-15
+---------------------------
+0001-01-01
+9999-12-31
+1 day, 0:00:00
+---------------------------
+
+
+
+Python debugger:
+
+
+
+import pdb
+
+x=2;
+y='abcd'
+
+pdb.set_trace()                    // debuggers console opens up here
+print(x+y)
+
+
+O/P:
+
+> /home/jdoodle.py(8)<module>()
+-> print(x+y)
+(Pdb) x                           // checking for values manually
+2
+(Pdb) y
+'abcd'
+(Pdb) x+y			  // operations can be done manually
+*** TypeError: unsupported operand type(s) for +: 'int' and 'str'
+(Pdb) Traceback (most recent call last):
+  File "jdoodle.py", line 8, in <module>
+    print(x+y)
+  File "jdoodle.py", line 8, in <module>
+    print(x+y)
+  File "/usr/lib/python3.6/bdb.py", line 51, in trace_dispatch
+    return self.dispatch_line(frame)
+quit
+  File "/usr/lib/python3.6/bdb.py", line 70, in dispatch_line
+    if self.quitting: raise BdbQuit
+bdb.BdbQuit
+
+
+
+timeit library:
+
+
+import timeit
+
+print(timeit.timeit('"-".join(str(n) for n in range(100))', number=10000))
+print(timeit.timeit('"-".join([str(n) for n in range(100)])', number=10000))
+print(timeit.timeit('"-".join(map(str, range(100)))', number=10000))
+
+O/P:
+
+0.3653870513662696
+0.33263495843857527
+0.2765413261950016
+
+
+
+REGEX  // To be done later
+
+
+
+print(hex(56))
+print(bin(56))
+print(abs(-2))
+print(pow(5,3))
+print(pow(5,3,2))
+
+
+O/P:
+
+
+0x38
+0b111000
+2
+125
+1
+
+
+
+s='Hello suresh'
+print(s.upper())
+print(s.lower())
+print(s.capitalize())
+print("-----------------")
+print(s.title())
+print(s.count('e'))
+print(s.isalnum())
+print("-----------------")
+print(s.isalpha())
+print(s.split(' '))
+print(s.partition(' '))
+print("-----------------")
+print(s.endswith('h'))
+print(s.islower())
+
+
+
+0/P:
+
+HELLO SURESH
+hello suresh
+Hello suresh
+-----------------
+Hello Suresh
+2
+False
+-----------------
+False
+['Hello', 'suresh']
+('Hello', ' ', 'suresh')
+-----------------
+True
+False
+
+
+
+
+
+
+
+
+
+
+print("clear------------------------------")
+
+s = set()
+s={1,2,3,4}
+s.clear()
+print(s)
+
+print("copy------------------------------")
+
+s={1,2,3,4}
+sc=s.copy()
+print(sc)
+
+print("difference------------------------------")
+
+sc.add(5)
+print(sc.difference(s))
+print(sc)
+
+sc.difference_update(s)
+print(sc)
+
+
+print("discard------------------------------")
+
+s1=set()
+s2=set()
+
+s1={1,2,3,4}
+
+s1.discard(2)
+print(s1)
+s1.discard(2)
+
+print("intersection------------------------------")
+
+
+s1={1,2,3,4}
+s2={5,2,3,7}
+
+print(s1.intersection(s2))
+s2.intersection_update(s1)
+print(s2)
+
+print("isdisjoint------------------------------")
+
+s1={1,2}
+s2={3,4}
+s3={1,5}
+
+print(s1.isdisjoint(s2))
+print(s1.isdisjoint(s3))
+
+print("issubset------------------------------")
+
+s1={1,2}
+s2={1,2,3}
+
+print(s1.issubset(s2))
+print(s2.issuperset(s1))
+
+print("symmetric_difference------------------------------")
+s1={1,2,3,101}
+s2={1,2,3,105}
+
+print(s1.symmetric_difference(s2))
+
+print("union------------------------------")
+
+
+s1={1,2,3}
+s2={3,4}
+
+print(s1.union(s2))
+s1.update(s2)
+print(s1)
+
+
+
+O/P:
+
+
+clear------------------------------
+set()
+copy------------------------------
+{1, 2, 3, 4}
+difference------------------------------
+{5}
+{1, 2, 3, 4, 5}
+{5}
+discard------------------------------
+{1, 3, 4}
+intersection------------------------------
+{2, 3}
+{2, 3}
+isdisjoint------------------------------
+True
+False
+issubset------------------------------
+True
+True
+symmetric_difference------------------------------
+{101, 105}
+union------------------------------
+{1, 2, 3, 4}
+{1, 2, 3, 4}
+
+
+
+
+
+
+d={'k1':1,'k2':2}
+
+for k in d.items():
+    print(k)
+    
+for k in d.keys():
+    print(k)
+
+for k in d.values():
+    print(k)
+
+print(d.items())
+print(d.keys())
+print(d.values())
+
+
+O/P:
+
+
+('k1', 1)
+('k2', 2)
+k1
+k2
+1
+2
+dict_items([('k1', 1), ('k2', 2)])
+dict_keys(['k1', 'k2'])
+dict_values([1, 2])
+
+
+
+
+
+l=[1,2,3,4]
+
+print("append------------------------")
+l.append(5)
+print(l)
+
+
+
+print("append([6,7,8])------------------------")
+l.append([6,7,8])
+print(l)
+
+print("extend------------------------")
+
+l.remove([6,7,8])
+l.extend([6,7,8])
+print(l)
+
+print("insert remove------------------------")
+
+l.insert(3,'inserted')
+print(l)
+l.remove('inserted')
+print(l)
+print("pop------------------------")
+
+l.pop()
+print(l)
+print("pop(0)------------------------")
+l.pop(0)
+print(l)
+print("reverse------------------------")
+
+l.reverse()
+print(l)
+print("sort------------------------")
+l.sort()
+print(l)
+
+
+
+
+O/P:
+
+append------------------------
+[1, 2, 3, 4, 5]
+append([6,7,8])------------------------
+[1, 2, 3, 4, 5, [6, 7, 8]]
+extend------------------------
+[1, 2, 3, 4, 5, 6, 7, 8]
+insert remove------------------------
+[1, 2, 3, 'inserted', 4, 5, 6, 7, 8]
+[1, 2, 3, 4, 5, 6, 7, 8]
+pop------------------------
+[1, 2, 3, 4, 5, 6, 7]
+pop(0)------------------------
+[2, 3, 4, 5, 6, 7]
+reverse------------------------
+[7, 6, 5, 4, 3, 2]
+sort------------------------
+[2, 3, 4, 5, 6, 7]
+
+
+
+
+
+
+

@@ -1,0 +1,1527 @@
+The moment we ran 'sudo docker run hello-world', docker client started 
+processing the command.
+
+Steps undertaken by Docker Client:
+
+i>   Reports the request to run the image 'hello-world' to Docker Server.
+ii>  Docker Server later checks for the image in the local image cache.
+iii> If image not found locally, Docker tries to fetch it from Docker Hub
+     (a public repository of Docker images).
+iv>  A container(running instance of the image fetched) is created with
+     the sole purpose of running the specific program contained inside the
+     image.
+
+
+Understanding basics of OS:
+
+Kernel: Its a running software process that governs actions between all the programs running on PC
+        and all the physical resources avilable(hardisk,memory,CPU).
+
+Running programs make calls to kernel which get redirected to proper hardware locations by Kernel.
+
+Think of a hypothetical situation where 2 different programs are running on a PC. One of them makes
+use of Python V2 and other Python V3. As system is going to install either V2 or V3. One of the 2 programs is going to face errors.
+
+To get rid of above mentioned issue 'namespace' were introduced. The sole purpose of 'namespace'
+is to isolate resources per process. So in our case there will be two different namepaces(sections
+within hardware) with both the versions(V2 & V3) installed separately. Kernel now maps the request accordingly to different namespaces.
+
+Control Group(cgroups) are used alongwith Namespacing. cgroups have the role limiting the amount of
+resources made available to a namespcase. It takes care of amount of memory,CPU usage, HD I/0, Network Bandwidth etc made available to namespace.
+
+
+Container can be thought of as a sandbox for a runing process(or program) having all the pre-
+requisite built into it. The pre-requisite include portions of Hard DRive, RAM, Network, CPU etc 
+being made available to a container. Image contains snapshots(File system or hierarchy) of 
+dependencies(programs and the main program as well) and a startup program(driver) to run. All these are put into the container and later container is run.
+
+
+###########################################################################################
+
+Sudo docker run command can be modified. Start-up program can be passed in as an argument which 
+overrides the main start-up(driver) program of the container just created.
+
+e.g
+
+sudo docker run busybox echo Hi There
+
+O/P:
+
+[sudo] password for aditya: 
+Unable to find image 'busybox:latest' locally
+latest: Pulling from library/busybox
+57c14dd66db0: Pull complete 
+Digest: sha256:7964ad52e396a6e045c39b5a44438424ac52e12e4d5a25d94895f2058cb863a0
+Status: Downloaded newer image for busybox:latest
+HI there
+
+sudo docker run busybox ls          (listing of home directory of busybox container is done)
+
+O/P:
+
+bin
+dev
+etc
+home
+proc
+root
+sys
+tmp
+usr
+var
+
+Note: The driver programs which we supplied as arguments should have a definintion inside the
+      container. Executables of 'ls' or 'echo' were present in some of the files mentioned in
+      FS Snapshot of busybox. 
+
+
+sudo docker run hello-world ls
+
+O/P:
+
+docker: Error response from daemon: OCI runtime create failed: container_linux.go:344: starting container process caused "exec: \"ls\": executable file not found in $PATH": unknown.
+
+This happened because there was no definintion of 'ls' inside the hello-world container.
+
+###########################################################################################
+
+sudo docker ps 
+
+This command is used to list out the running containers and some specific details associated with them like port no., container ID etc.
+
+Note: containers like busybox or hello-world finish there execution as soon as they start.
+      To get rid of that 'sudo docker run busybox ping www.google.com' is run. In a separate
+      terminal 'sudo docker ps' is run.
+      
+O/P:
+
+CONTAINER ID        IMAGE               COMMAND                 CREATED             STATUS              PORTS               NAMES
+1e49b5534faa        busybox             "ping www.google.com"   6 seconds ago       Up 4 seconds                            cranky_shtern
+
+Note: The fields are empty in case no containers are running.
+
+sudo docker ps --all
+
+The above command is used to list out all the containers ran in the past.
+
+O/P:
+
+CONTAINER ID        IMAGE               COMMAND                 CREATED             STATUS                      PORTS               NAMES
+1e49b5534faa        busybox             "ping www.google.com"   33 seconds ago      Exited (0) 21 seconds ago                       cranky_shtern
+9874a4ffd110        hello-world         "ls"                    13 minutes ago      Created                                         cranky_aryabhata
+971292a74ff2        busybox             "ls"                    14 minutes ago      Exited (0) 14 minutes ago                       focused_galois
+99f315e44bdf        busybox             "echo HI there"         19 minutes ago      Exited (0) 19 minutes ago                       blissful_einstein
+a187649a3799        hello-world         "/hello"                2 days ago          Exited (0) 2 days ago                           mystifying_euler
+55f6b132e99e        hello-world         "/hello"                2 days ago          Exited (0) 2 days ago                           quirky_jones
+a3b3357fcc96        hello-world         "/hello"                2 days ago          Exited (0) 2 days ago                           elegant_newton
+d50cb780a9e6        hello-world         "/hello"                2 days ago          Exited (0) 2 days ago                           frosty_ardinghelli
+
+###########################################################################################
+
+docker run= docker create + docker start
+
+create and start are two docker commands which run behind the scenes when we use 'run' command.
+
+We can use both of them explicitly as well.
+
+
+sudo docker create hello-world                          // ouputs the ID of the container created
+
+O/P:
+
+442cc3bcc6c3d561ef154479c00587d2dcc2231bdc30f59245bd53b574354ecf
+
+
+sudo docker start -a 442cc3bcc6c3d561ef154479c00587d2dcc2231bdc30f59245bd53b574354ecf
+
+O/P:
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+
+sudo docker start -a ID                 // -a will prompt the CLI to throw the O/P
+sudo docker start ID                    // will simply run the container without any O/P
+
+
+###########################################################################################
+
+'sudo docker ps --all' will list down all the containers that ran in past. We can re-start them using their container IDs.
+
+sudo docker ps --all
+
+O/P:
+
+CONTAINER ID        IMAGE               COMMAND                 CREATED             STATUS                     PORTS               NAMES
+
+99f315e44bdf        busybox             "echo HI there"         16 hours ago        Exited (0) 16 hours ago                        blissful_ei
+
+
+
+sudo docker start -a 99f315e44bdf
+
+O/P:
+
+HI there
+
+
+###########################################################################################
+
+sudo docker system prune                              // this will delete all the stopped containers
+
+O/P:
+
+WARNING! This will remove:
+        - all stopped containers
+        - all networks not used by at least one container
+        - all dangling images
+        - all dangling build cache
+Are you sure you want to continue? [y/N] y
+Deleted Containers:
+442cc3bcc6c3d561ef154479c00587d2dcc2231bdc30f59245bd53b574354ecf
+dcc22ed15ce93c676e8ee43612b4d18e60caf626c414fb73e048254c2ce443ae
+1e49b5534faaa868049adfad415275512f099cd60946bd4f3b1b581537cf6564
+9874a4ffd110b63fa413f918d1feb10111b73226a8fe7e2a506c9fb553dfe753
+971292a74ff2f1b70a3d17a3588369d65dc847ffc2fd0df42f51f07046368202
+99f315e44bdf6eb5876cf12860e95cdb61b3483e057ac9f8c3341fca08a36e04
+a187649a3799def4910c432c05154f9681ae84632fee3bcd1b6e45de93c01dd7
+55f6b132e99ecd6e143de29815e3b1f7b36adfa142b5a69de5b979ef341a7b40
+a3b3357fcc9678eb4a8a801aa640eb9cf3b47517260f73a7d13523317e6450b1
+d50cb780a9e6a5bd38c1a915e3803a401dadee0c01ad19f78291063a39cb844f
+
+Total reclaimed space: 0B
+
+###########################################################################################
+
+'sudo docker start ID' will run the container with that ID but wont print out the O/P.
+
+sudo docker logs ID will log out the O/P of the same. 
+
+Note: 'logs' will not run the container again, it will simply logs all the records emitted from the container when it was ran.
+
+
+aditya@aditya-HP-Notebook:~$ sudo docker ps --all
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                     PORTS               NAMES
+f6a096ddaba6        hello-world         "/hello"            9 minutes ago       Exited (0) 9 minutes ago                       priceless_cray
+aditya@aditya-HP-Notebook:~$ sudo docker start f6a096ddaba6
+f6a096ddaba6
+aditya@aditya-HP-Notebook:~$ sudo docker logs f6a096ddaba6
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+ 1. The Docker client contacted the Docker daemon.
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+    (amd64)
+ 3. The Docker daemon created a new container from that image which runs the
+    executable that produces the output you are currently reading.
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+ https://docs.docker.com/get-started/
+
+
+Note: logs clearly show that the same container got ran twice thats why logged the same O/P twice.
+
+
+###########################################################################################
+
+
+'sudo docker stop ID' will stop the running container.
+
+'sudo docker kill ID' will kill the running container.
+
+
+
+While stopping a container a SIGTERM or a termination signal is issued to the running process. This signal prompts the running process
+to wind things up(some cleaning or checkup etc) and terminate ASAP.
+
+While killing a container a SIGKILL signal is issued to the running process. This signal terminates the running running process immediately.
+
+
+Note: If we happen to use 'stop' command Docker gives the process a 10 second window to shut itself down. If that window is over, Docker
+      switches to 'kill' command.
+
+  
+###########################################################################################
+
+Say we installed 'Redis-server' using docker. For using 'Redis-CLI'(a separate program to interact with Redis-server), 'Redis-CLI' should
+be installed or present inside the container itself.
+
+To make another command run inside a running process we use 'exec'.
+
+
+sudo docker exec -it ID COMMAND
+
+e.g 
+
+sudo docker exec -it 093ffeACd redis-cli
+
+'-it' is used for interactive mode.
+
+###########################################################################################
+
+For creating a terminal in the context of a running process inside a container, we use the following command,
+
+sudo docker exec -it 7990ae2951b3 sh                  // 'sh' at the end suggests the creation of a trerminal
+
+
+Here is a snapshot of the O/P of the above command ran on a busybox running container.
+
+aditya@aditya-HP-Notebook:~$ sudo docker exec -it 7990ae2951b3 sh
+/ # ls
+bin   dev   etc   home  proc  root  sys   tmp   usr   var
+/ # ^C
+
+
+###########################################################################################
+
+'sh' can be appended to docker run command as well to have the same result.
+
+aditya@aditya-HP-Notebook:~$ sudo docker run -it busybox sh
+[sudo] password for aditya: 
+/ # ls
+bin   dev   etc   home  proc  root  sys   tmp   usr   var
+/ # ^C
+
+
+Note: The downside of using this command is that we cannot have any other processes running then. Thats why 'exec' command is
+preferred.
+
+###########################################################################################
+
+creating custom image:
+
+
+for creating a custom image 'Dockerfile' is created with some key-words which serve as instructions to Docker.
+
+Contents of Dockerfile:
+
+
+FROM alpine                        
+RUN apk add --update redis
+CMD ["redis-server"]
+
+
+ 
+
+CREATING CUSTOM IMAGE:
+
+
+aditya@aditya-HP-Notebook:~$ mkdir redis
+aditya@aditya-HP-Notebook:~$ cd redis/
+aditya@aditya-HP-Notebook:~/redis$ touch Dockerfile
+aditya@aditya-HP-Notebook:~/redis$ sudo nano Dockerfile 
+[sudo] password for aditya: 
+aditya@aditya-HP-Notebook:~/redis$ sudo docker build .
+Sending build context to Docker daemon  2.048kB
+Step 1/3 : FROM alpine
+latest: Pulling from library/alpine
+6c40cc604d8e: Pull complete 
+Digest: sha256:b3dbf31b77fd99d9c08f780ce6f5282aba076d70a513a8be859d8d3a4d0c92b8
+Status: Downloaded newer image for alpine:latest
+ ---> caf27325b298                                                      
+Step 2/3 : RUN apk add --update redis
+ ---> Running in 198eb1865cb7
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/x86_64/APKINDEX.tar.gz
+(1/1) Installing redis (4.0.12-r0)
+Executing redis-4.0.12-r0.pre-install
+Executing redis-4.0.12-r0.post-install
+Executing busybox-1.29.3-r10.trigger
+OK: 7 MiB in 15 packages
+Removing intermediate container 198eb1865cb7
+ ---> 7fd2f71da9ce
+Step 3/3 : CMD ["redis-server"]
+ ---> Running in 51a6d01f207c
+Removing intermediate container 51a6d01f207c
+ ---> 6c13ccc02c44
+Successfully built 6c13ccc02c44
+
+
+
+Process:
+
+First of all base image is mentioned alongside 'FROM'. The base image (generally OS) gives a starting point to work with.
+
+(Step 1/3 ) Inside 'sudo docker build .' O/P , base image of alpine gets pulled from docker repository with image ID caf27325b298.
+
+(Step 2/3) 'apk' is a package manager for alpine. 'RUN apk add --update redis' instructs alpine to install redis. For installation 
+            first a temorary container is created with 'RUN apk add --update redis' as its startup(driver) command. After the container 
+            run is over, FS Snapshot of the container now contains redis as well. Now the container itself is removed(198eb1865cb7) but
+            the snapshot(7fd2f71da9ce) is set to be transferred to next step.
+
+(Step 3/3) CMD puts in the command mentioned in the "" to be the startup or driver command of the final image. For doing this, a container
+           is first created (51a6d01f207c). The startup command is set to be the one inside ""(here 'redis-server'). Later the container
+           gets removed but the image with a new start-up command is saved and now built for use (6c13ccc02c44)
+
+###########################################################################################
+
+Building from cache:
+
+In case we put a new RUN command 'RUN apk add --update gcc' inside previous Dockerfile. Docker build is going to build the previous
+RUN Commands (other than the latest one) from the build cache. This makes docker get rid of unnecessary pulling. In case we dont modify our Dockerfile at all, entire image will get built from cache itself.
+
+
+New Dockerfile:
+
+FROM alpine
+RUN apk add --update redis
+RUN apk add --update gcc                            // Added command
+CMD ["redis-server"]
+
+ 
+
+
+O/P:
+
+Sending build context to Docker daemon  2.048kB
+Step 1/4 : FROM alpine
+ ---> caf27325b298
+Step 2/4 : RUN apk add --update redis
+ ---> Using cache
+ ---> 7fd2f71da9ce                                              // uptill 'RUN apk add --update redis' cache got used
+Step 3/4 : RUN apk add --update gcc
+ ---> Running in f9fa570a620f
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.9/community/x86_64/APKINDEX.tar.gz
+(1/10) Installing binutils (2.31.1-r2)
+(2/10) Installing gmp (6.1.2-r1)
+(3/10) Installing isl (0.18-r0)
+(4/10) Installing libgomp (8.2.0-r2)
+(5/10) Installing libatomic (8.2.0-r2)
+(6/10) Installing libgcc (8.2.0-r2)
+(7/10) Installing mpfr3 (3.1.5-r1)
+(8/10) Installing mpc1 (1.0.3-r1)
+(9/10) Installing libstdc++ (8.2.0-r2)
+(10/10) Installing gcc (8.2.0-r2)
+Executing busybox-1.29.3-r10.trigger
+OK: 93 MiB in 25 packages
+Removing intermediate container f9fa570a620f
+ ---> 20a28570d426
+Step 4/4 : CMD ["redis-server"]
+ ---> Running in 2042eb7dfa6b
+Removing intermediate container 2042eb7dfa6b
+ ---> ecfc3c6f65e5
+Successfully built ecfc3c6f65e5
+
+  
+
+
+Note: In case the ordering of the commands in our dockerfile gets changed, cache cannot be of any use. Docker will keep on using cache
+      till the oredering of commands are the same as built in the cache.
+
+
+###########################################################################################
+
+Tagging:
+
+'Sudo docker build .' generates a final image ID that needs to be run in order to create a container. Instead of doing that
+we can tag a name to the final ID created and use traditional 'sudo docker run name' command.
+
+Convention to be followed for that is as follows,
+
+yourDockerID/yourProjectName:version                (generally the verison set to be latest)
+
+
+'sudo docker build .' gets modified to,
+
+sudo docker build -t ABCD/redis:latest .                          //-t for tagging
+sudo docker run ABCD/redis                                        // to create and run a container
+
+###########################################################################################
+
+Images can be built from containers as well, using commit command. (Not a preferred practice though)
+
+###########################################################################################
+
+Making a simple nodejs project:
+
+let this be the folder structure,
+
+aditya@aditya-HP-Notebook:~/simpleweb$ ls
+Dockerfile  index.js  package.json
+
+
+
+index.js:
+
+const express = require('express');
+const app = express();
+
+app.get('/',(req,res)=>{
+   res.send('HI there');
+});
+
+app.listen(8080, () => {
+  console.log('Listening on port 8080');
+});
+
+
+
+package.json:
+
+{
+  "dependencies":{
+    "express": "*"
+   },
+  "scripts":{
+    "start": "node index.js"
+   }
+}
+
+
+
+Dockerfile:
+
+FROM node:alpine                           // docker has alpine version of many programs (here its alpine version of node)
+COPY ./ ./                                 // first './' specifies 'simpleweb' (project directory), second './' specifies working directory
+RUN npm install                            // or FS snapshot directory of the container. This is done so that the project contents can be made
+CMD ["npm", "start"]                       // avilable to docker container which we are working upon.
+
+
+
+
+sudo docker build -t aditya/simpleweb .
+sudo docker run -p 5000:8080 aditya/simpleweb  // This step is for port-forwarding. All the requests coming to localhost on port 5000 will get 
+                                               // redirected to port 8080 of the container.
+
+O/P:
+
+on localhost:5000/
+
+HI there
+
+
+Note:
+
+Because we directly copied the contents of our project directory into root directory of docker container. All our files would be lying
+around scattered. We can check the above using 'sh' command in a different terminal,
+
+aditya@aditya-HP-Notebook:~$ sudo docker exec -it eb0b13c5c019 sh
+/ # ls
+Dockerfile         lib                package.json       sys
+bin                media              proc               tmp
+dev                mnt                root               usr
+etc                node_modules       run                var
+home               opt                sbin
+index.js           package-lock.json  srv
+
+package-lock.json gets created automatically by 'npm', package.json,node_modules etc are all present inside the root directory of the container which is not a good practice.
+
+instead we can specify a workspace for the same.
+
+'WORKDIR /usr/app' will create an app folder inside usr directory for all our files. More importantly, this statement also makes '/usr/app'
+to be the relative path to all the commands executed inside the container. e.g if 'sh' gets used now to get into a terminal with the context
+of our container, it will get us into /usr/app by default.
+
+In our modified Dockerfile the second './' would now be relative to /usr/app.
+
+Modified Dockerfile:
+
+
+FROM node:alpine 
+WORKDIR /usr/app                          
+COPY ./ ./                                 
+RUN npm install                            
+CMD ["npm", "start"]  
+
+
+Rebuilding and checking the folder structure in the new container,
+
+aditya@aditya-HP-Notebook:~$ sudo docker exec -it 7bdb82c0b70f sh
+/usr/app # ls
+Dockerfile         index.js           node_modules       package-lock.json  package.json
+/usr/app # cd ../../
+/ # ls
+bin    dev    etc    home   lib    media  mnt    opt    proc   root   run    sbin   srv    sys    tmp    usr    var
+/ # 
+
+
+Note:
+
+The order in which commands run in Dockerfile matters a lot. In case there is any modification to any file inside the project directory
+'COPY ./ ./' will be the command from where no cache will be used. This in turn means 'RUN npm install ' will keep installing from the scratch.
+To avoid this we may modify the Dockerfile as follows:
+
+FROM node:alpine 
+WORKDIR /usr/app                          
+COPY ./package.json ./                                 
+RUN npm install    
+COPY ./ ./                       
+CMD ["npm", "start"] 
+
+The modifications done above will make sure that 'RUN npm install' almost always uses cache (except when there is modification in package.json)
+This is important as there are a good number of dependencies mentioned in case of a real world project.
+                    
+###########################################################################################
+
+Docker Compose:
+
+Suppose we have a app making use of 2 separate conatiners. These 2 containers need to interact in some fashion. For that to happen there are 
+2 ways:
+
+i>  Manually configuring networking properties of both the containers using Docker-CLI.
+ii> Docker Compose
+
+
+Configuring networking between containers is very hectic and its not used at all. Docker Compose on the other hand makes use of a file named
+'docker-compose.yml' which has all the information of the containers to be made. Docker Compose takes care of all the information sharing
+to be done between the containers without any additional line of code.
+
+Docker compose can be used to start/stop multiple containers and it also automates some of the long-winded arguments passage to docker-run.
+
+Following are the commands to start/stop multiple containers mentioned inside 'docker-compose.yml' file.
+
+sudo docker-compose up             // starting all the containers with no changes made inside
+sudo docker-compose up --build     // starting all the containers with changes made 
+sudo docker-compose down           // stopping all the containers
+
+
+Note: Any command related to docker-compose should be run inside the directory having 'docker-compose.yml' inside. 
+
+
+Project: THe app basically creates a webpage and keeps a track of the total no. of hits it gets.
+
+
+aditya@aditya-HP-Notebook:~/visits$ cat package.json 
+{
+ "dependencies":{
+    "express":"*",
+    "redis":"2.8.0"                                          // redis-server will be used to store information regarding totals no. of visits
+  },
+ "scripts":{
+    "start":"node index.js"
+  }
+}
+
+
+
+aditya@aditya-HP-Notebook:~/visits$ cat Dockerfile 
+FROM node:alpine
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+CMD ["npm", "start"]
+
+
+
+
+aditya@aditya-HP-Notebook:~/visits$ cat index.js 
+const express = require('express');
+const redis = require('redis');
+
+
+
+const app = express();
+const client = redis.createClient({                              // host conatins location to the server(URL in general), here 'redis-server'
+  host:'redis-server',                                           // will make the node-app to point to redis image inside the other container. 
+  port: 6379                                                     // Default port of operation of redis-server
+});
+client.set('visits', 0);
+
+
+
+app.get('/', (req, res) => {
+  client.get('visits', (err, visits) => {
+    res.send('Number of visits is ' + visits);
+    client.set('visits', parseInt(visits) + 1);
+  });
+});
+
+
+
+app.listen(8081, () => {
+  console.log('Listening on port 4001');
+});
+
+
+
+aditya@aditya-HP-Notebook:~/visits$ cat docker-compose.yml 
+version: '3'
+services:
+   redis-server:
+     image: 'redis'
+   node-app:
+     build: .
+     ports:
+       - "4001:8081"
+
+
+
+
+sudo docker-compose up
+
+O/P:
+
+Building node-app
+Step 1/6 : FROM node:alpine
+ ---> ebbf98230a82
+Step 2/6 : WORKDIR '/app'
+ ---> Using cache
+ ---> 2bd1d489cc4f
+Step 3/6 : COPY package.json .
+ ---> Using cache
+ ---> 4440cf295b94
+Step 4/6 : RUN npm install
+ ---> Using cache
+ ---> b87864df43a9
+Step 5/6 : COPY . .
+ ---> Using cache
+ ---> fef7f178366f
+Step 6/6 : CMD ["npm", "start"]
+ ---> Using cache
+ ---> 1d5d47cd34fc
+Successfully built 1d5d47cd34fc
+Successfully tagged visits_node-app:latest
+Starting visits_node-app_1     ... done
+Starting visits_redis-server_1 ... done
+Attaching to visits_node-app_1, visits_redis-server_1
+redis-server_1  | 1:C 16 Feb 2019 12:02:51.719 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-server_1  | 1:C 16 Feb 2019 12:02:51.719 # Redis version=5.0.3, bits=64, commit=00000000, modified=0, pid=1, just started
+redis-server_1  | 1:C 16 Feb 2019 12:02:51.719 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+redis-server_1  | 1:M 16 Feb 2019 12:02:51.721 * Running mode=standalone, port=6379.
+node-app_1      | 
+node-app_1      | > @ start /app
+node-app_1      | > node index.js
+node-app_1      | 
+redis-server_1  | 1:M 16 Feb 2019 12:02:51.721 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+redis-server_1  | 1:M 16 Feb 2019 12:02:51.721 # Server initialized
+redis-server_1  | 1:M 16 Feb 2019 12:02:51.721 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+node-app_1      | Listening on port 8081
+redis-server_1  | 1:M 16 Feb 2019 12:02:51.721 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+redis-server_1  | 1:M 16 Feb 2019 12:02:51.721 * DB loaded from disk: 0.000 seconds
+redis-server_1  | 1:M 16 Feb 2019 12:02:51.721 * Ready to accept connections
+
+
+aditya@aditya-HP-Notebook:~/visits$ sudo docker-compose ps 
+        Name                    Command           State           Ports         
+--------------------------------------------------------------------------------
+visits_node-app_1       npm start                 Up      0.0.0.0:4001->8081/tcp
+visits_redis-server_1   docker-entrypoint.sh      Up      6379/tcp              
+                        redis ...                                               
+
+
+aditya@aditya-HP-Notebook:~/visits$ sudo docker-compose down
+Removing visits_node-app_1     ... done
+Removing visits_redis-server_1 ... done
+Removing network visits_default
+
+
+aditya@aditya-HP-Notebook:~/visits$ sudo docker-compose ps
+Name   Command   State   Ports
+------------------------------
+
+
+Say we modify 'index.js' file and make it crash purposefully. 
+
+Modified index.js:
+
+const express = require('express');
+const redis = require('redis');
+const process= require('process');
+
+const app = express();
+const client = redis.createClient({
+  host:'redis-server',
+  port: 6379
+});
+client.set('visits', 0);
+
+app.get('/', (req, res) => {
+  process.exit(0);                                          // 'process.exit(0)' suggests clean/purposefull exit. Any other error would have
+  client.get('visits', (err, visits) => {                   //  had different exit codes.
+    res.send('Number of visits is ' + visits);
+    client.set('visits', parseInt(visits) + 1);
+  });
+});
+
+app.listen(8081, () => {
+  console.log('Listening on port 8081');
+});
+
+
+aditya@aditya-HP-Notebook:~/visits$ sudo docker-compose up --build
+Creating network "visits_default" with the default driver
+Building node-app
+Step 1/6 : FROM node:alpine
+ ---> ebbf98230a82
+Step 2/6 : WORKDIR '/app'
+ ---> Using cache
+ ---> 2bd1d489cc4f
+Step 3/6 : COPY package.json .
+ ---> Using cache
+ ---> 4440cf295b94
+Step 4/6 : RUN npm install
+ ---> Using cache
+ ---> b87864df43a9
+Step 5/6 : COPY . .
+ ---> 6252c16ebbd0
+Step 6/6 : CMD ["npm", "start"]
+ ---> Running in 445f08a9b9da
+Removing intermediate container 445f08a9b9da
+ ---> 3befef795e52
+Successfully built 3befef795e52
+Successfully tagged visits_node-app:latest
+Creating visits_node-app_1     ... done
+Creating visits_redis-server_1 ... done
+Attaching to visits_redis-server_1, visits_node-app_1
+redis-server_1  | 1:C 17 Feb 2019 08:31:17.747 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-server_1  | 1:C 17 Feb 2019 08:31:17.747 # Redis version=5.0.3, bits=64, commit=00000000, modified=0, pid=1, just started
+redis-server_1  | 1:C 17 Feb 2019 08:31:17.747 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+redis-server_1  | 1:M 17 Feb 2019 08:31:17.749 * Running mode=standalone, port=6379.
+redis-server_1  | 1:M 17 Feb 2019 08:31:17.749 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+redis-server_1  | 1:M 17 Feb 2019 08:31:17.749 # Server initialized
+redis-server_1  | 1:M 17 Feb 2019 08:31:17.749 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+redis-server_1  | 1:M 17 Feb 2019 08:31:17.749 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+redis-server_1  | 1:M 17 Feb 2019 08:31:17.750 * Ready to accept connections
+node-app_1      | 
+node-app_1      | > @ start /app
+node-app_1      | > node index.js
+node-app_1      | 
+node-app_1      | Listening on port 8081
+visits_node-app_1 exited with code 0
+
+
+
+aditya@aditya-HP-Notebook:~/visits$ sudo docker-compose ps
+[sudo] password for aditya: 
+        Name                       Command               State     Ports  
+--------------------------------------------------------------------------
+visits_node-app_1       npm start                        Exit 0           
+visits_redis-server_1   docker-entrypoint.sh redis ...   Up       6379/tcp
+
+
+
+Note:
+
+exit status codes                       Interpretation
+
+    0                                  Done purposefully
+1 , 2 , 3 etc                   Exited because something went wrong
+
+
+
+There are some re-start policies which can be mentioned inside 'docker-compose.yml' file. Following are the different types of re-start
+policies:
+
+
+Policy                                   Effect
+ 
+"no"                    Never attempt to restart this container if it stops
+always                  Always attempt to restart this container if it stops
+on-failure              Restart only if container stopped with an error code
+unless-stopped          Always re-start unless forcibly stopped
+
+
+
+Let the following be docker-compose.yml file:
+
+version: '3'
+services:
+   redis-server:
+     image: 'redis'
+   node-app:
+     restart: always                                // node-app container will attemp to restart everytime it fails
+     build: .
+     ports:
+       - "4001:8081"
+
+
+
+
+aditya@aditya-HP-Notebook:~/visits$ sudo docker-compose up --build 
+[sudo] password for aditya: 
+Building node-app
+Step 1/6 : FROM node:alpine
+ ---> ebbf98230a82
+Step 2/6 : WORKDIR '/app'
+ ---> Using cache
+ ---> 2bd1d489cc4f
+Step 3/6 : COPY package.json .
+ ---> Using cache
+ ---> 4440cf295b94
+Step 4/6 : RUN npm install
+ ---> Using cache
+ ---> b87864df43a9
+Step 5/6 : COPY . .
+ ---> 2530d9151083
+Step 6/6 : CMD ["npm", "start"]
+ ---> Running in a9435eac5a8a
+Removing intermediate container a9435eac5a8a
+ ---> e803b205dce0
+Successfully built e803b205dce0
+Successfully tagged visits_node-app:latest
+Recreating visits_node-app_1   ... done
+Starting visits_redis-server_1 ... done
+Attaching to visits_redis-server_1, visits_node-app_1
+redis-server_1  | 1:C 17 Feb 2019 09:40:12.920 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+redis-server_1  | 1:C 17 Feb 2019 09:40:12.920 # Redis version=5.0.3, bits=64, commit=00000000, modified=0, pid=1, just started
+redis-server_1  | 1:C 17 Feb 2019 09:40:12.920 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+redis-server_1  | 1:M 17 Feb 2019 09:40:12.922 * Running mode=standalone, port=6379.
+redis-server_1  | 1:M 17 Feb 2019 09:40:12.923 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
+redis-server_1  | 1:M 17 Feb 2019 09:40:12.923 # Server initialized
+redis-server_1  | 1:M 17 Feb 2019 09:40:12.923 # WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+redis-server_1  | 1:M 17 Feb 2019 09:40:12.923 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
+redis-server_1  | 1:M 17 Feb 2019 09:40:12.923 * DB loaded from disk: 0.000 seconds
+redis-server_1  | 1:M 17 Feb 2019 09:40:12.923 * Ready to accept connections
+node-app_1      | 
+node-app_1      | > @ start /app
+node-app_1      | > node index.js
+node-app_1      | 
+node-app_1      | Listening on port 8081
+node-app_1      | 
+node-app_1      | > @ start /app
+node-app_1      | > node index.js
+node-app_1      | 
+node-app_1      | Listening on port 8081
+visits_node-app_1 exited with code 0                                        // failed
+node-app_1      | 
+node-app_1      | > @ start /app
+node-app_1      | > node index.js
+node-app_1      | 
+node-app_1      | Listening on port 8081                                    // attempted to restart
+
+
+
+###########################################################################################
+
+
+Development Workflow:
+
+
+
+DEV------------------------------------------------------------->TEST-------------------------------------------------->DEPLOYMENT
+
+ 
+Create/change features					Code gets pushed to TRAVIS CI                              Final Deployment
+Update the same on a non-master branch			for testing						   on cloud
+push it to github
+Create pull request to merge with master
+
+
+
+
+###########################################################################################
+
+Making a REACT project:
+
+
+npm install -g create-react-app                   // installing react using npm
+create-react-app frontend                         // making a new directory with all the necessary files and dependencies for the react 						  // project.
+
+cd frontend
+
+npm run test					  // Runs a simple test on our project
+npm run build                                     // Makes the project production ready
+npm run start                                     // Makes the project development ready
+
+ls                                                // build  package  package.json  public  src
+touch Dockerfile.dev                              // We will have 2 separate Dockerfile (Dockerfile.dev & Dockerfile)
+						  // one for development and other production respectively.
+nano Dockerfile.dev
+
+FROM node:alpine
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+CMD ["npm", "run", "start"]
+
+sudo docker build -f Dockerfile.dev .
+
+Sending build context to Docker daemon    554kB
+Step 1/6 : FROM node:alpine
+ ---> ebbf98230a82
+Step 2/6 : WORKDIR '/app'
+ ---> Using cache
+ ---> 2bd1d489cc4f
+Step 3/6 : COPY package.json .
+ ---> Using cache
+ ---> f5306d8c99f2
+Step 4/6 : RUN npm install
+ ---> Using cache
+ ---> bf7f2c883edc
+Step 5/6 : COPY . .
+ ---> Using cache
+ ---> bf61cdf7a839
+Step 6/6 : CMD ["npm", "run", "start"]
+ ---> Using cache
+ ---> eeaf06bea798
+Successfully built eeaf06bea798
+
+
+Note: For any changes to get reflected inside the docker container, 'docker build' needs to be run. To get rid of this 'volumes' can
+      be used. Its a feature of docker whereby we set up references inside the docker container pointing to project directory on host
+      machine.
+
+
+sudo docker run -p 3000:3000 -v /app/node_modules -v $(pwd):/app eeaf06bea798  // '-v /app/node_modules' suggests skipping reference pointing
+									       // in case of node_modules folder cause we deleted it from host
+									       // '-v $(pwd):/app' suggests reference pointing every folder
+									       // form container to host project directory.
+
+
+O/P:
+
+
+modules -v $(pwd):/app eeaf06bea798
+
+> frontend@0.1.0 start /app
+> react-scripts start
+
+Starting the development server...
+
+Compiled successfully!
+
+You can now view frontend in the browser.
+
+  Local:            http://localhost:3000/
+  On Your Network:  http://172.17.0.2:3000/
+
+Note that the development build is not optimized.
+To create a production build, use npm run build.
+
+
+
+###########################################################################################
+
+Last command used for 'volumes' i.e
+'sudo docker run -p 3000:3000 -v /app/node_modules -v $(pwd):/app eeaf06bea798'
+makes use of too many variales which can easily be simplified using docker-compose.yml file.
+
+
+aditya@aditya-HP-Notebook:~/frontend$ sudo touch docker-compose.yml
+aditya@aditya-HP-Notebook:~/frontend$ sudo nano docker-compose.yml
+
+version: '3'
+services:
+   web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      -"3000:3000"
+    volumes:
+      - /app/node_modules
+      - .:/app
+
+
+aditya@aditya-HP-Notebook:~/frontend$ sudo docker-compose up
+Creating network "frontend_default" with the default driver
+Building web
+Step 1/6 : FROM node:alpine
+ ---> ebbf98230a82
+Step 2/6 : WORKDIR '/app'
+ ---> Using cache
+ ---> 2bd1d489cc4f
+Step 3/6 : COPY package.json .
+ ---> cce6911e1220
+Step 4/6 : RUN npm install
+ ---> Running in 21e060385468
+Removing intermediate container 21e060385468
+ ---> f50a2721c219
+Step 5/6 : COPY . .
+ ---> dba0756c62ae
+Step 6/6 : CMD ["npm", "run", "start"]
+ ---> Running in b1da4a750291
+Removing intermediate container b1da4a750291
+ ---> 5a7f564d56ed
+Successfully built 5a7f564d56ed
+Successfully tagged frontend_web:latest
+WARNING: Image for service web was built because it did not already exist. To rebuild this image you must use `docker-compose build` or `docker-compose up --build`.
+Creating frontend_web_1 ... done
+Attaching to frontend_web_1
+web_1  | 
+web_1  | > frontend@0.1.0 start /app
+web_1  | > react-scripts start
+web_1  | 
+web_1  | Starting the development server...
+web_1  | 
+web_1  | Compiled successfully!
+web_1  | 
+web_1  | You can now view frontend in the browser.
+web_1  | 
+web_1  |   Local:            http://localhost:3000/
+web_1  |   On Your Network:  http://172.19.0.2:3000/
+web_1  | 
+web_1  | Note that the development build is not optimized.
+web_1  | To create a production build, use npm run build.
+web_1  | 
+
+
+###########################################################################################
+
+For running tests ('npm run test') inside the container, 'exec' command can be used.
+
+sudo docker exec -it 154qustw125 npm run test
+
+###########################################################################################
+
+For deployment NGINX will be used.
+
+The 'build' folder which got created inside the project directory is the only folder required for the app to be run on the NGINX server.
+
+In short , following are the two phases which need to be worked upon
+
+
+BUILD Phase                                     RUN Phase
+
+Use node:alpine					Use NGINX
+copy package.json				Copy over the result of 'npm run build'
+Install dependencies				Start NGINX
+Run 'npm run build'
+
+
+aditya@aditya-HP-Notebook:~/frontend$ touch Dockerfile
+aditya@aditya-HP-Notebook:~/frontend$ sudo nano Dockerfile
+aditya@aditya-HP-Notebook:~/frontend$ sudo cat Dockerfile
+
+FROM node:alpine as builder
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx
+COPY --from=builder /app/build /usr/share/nginx/html
+
+
+'Dockerfile.dev' was used for serving development purpose. 'Dockerfile' will be used in production phase. 
+
+Understanding the content of Dockerfile:
+
+
+FROM node:alpine as builder                       // Every 'FROM' statement declares starting of a block (or phase). In here there are  
+WORKDIR '/app'					  // 2 phases BUILD Phase(current) and RUN Phase(starting from next FROM). 'as builder'
+COPY package.json .				  // tags the phase with the name 'builder'. Later this phase can be referred to with
+RUN npm install					  // 'builder'. As described above, the purpose of 'BUILD' phase is to create the 'build'
+COPY . .					  // folder needed for final deployment.
+RUN npm run build
+
+
+FROM nginx                                           // Every FROM statement ends the last phase and begins the new phase(here RUN Phase).
+COPY --from=builder /app/build /usr/share/nginx/html // '--from=builder' specifies copying the contents of the 'builder' phase.
+						     // '/app/build /usr/share/nginx/html' signifies from : /app/build
+						     //                                               to  : /usr/share/nginx/html
+						     // '/usr/share/nginx/html' is the default location for serving static contents 
+						     // in nginx server.
+
+
+
+
+aditya@aditya-HP-Notebook:~/frontend$ sudo docker build .
+[sudo] password for aditya: 
+Sending build context to Docker daemon  556.5kB
+Step 1/8 : FROM node:alpine as builder
+ ---> ebbf98230a82
+Step 2/8 : WORKDIR '/app'
+ ---> Using cache
+ ---> 2bd1d489cc4f
+Step 3/8 : COPY package.json .
+ ---> Using cache
+ ---> f5306d8c99f2
+Step 4/8 : RUN npm install
+ ---> Using cache
+ ---> bf7f2c883edc
+Step 5/8 : COPY . .
+ ---> 644a268e7f7c
+Step 6/8 : RUN npm run build
+ ---> Running in 12e8374eee8f
+
+> frontend@0.1.0 build /app
+> react-scripts build
+
+Creating an optimized production build...
+Compiled successfully.
+
+File sizes after gzip:
+
+  36.79 KB       build/static/js/2.ba1ca5ba.chunk.js
+  761 B          build/static/js/runtime~main.fdfcfda2.js
+  690 B (-21 B)  build/static/js/main.826bcd5a.chunk.js
+  540 B (+1 B)   build/static/css/main.01534e8c.chunk.css
+
+The project was built assuming it is hosted at the server root.
+You can control this with the homepage field in your package.json.
+For example, add this to build it for GitHub Pages:
+
+  "homepage" : "http://myname.github.io/myapp",
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+
+  npm install -g serve
+  serve -s build
+
+Find out more about deployment here:
+
+  http://bit.ly/CRA-deploy
+
+Removing intermediate container 12e8374eee8f
+ ---> f92ce75dbf9f
+Step 7/8 : FROM nginx
+latest: Pulling from library/nginx
+6ae821421a7d: Already exists 
+da4474e5966c: Pull complete 
+eb2aec2b9c9f: Pull complete 
+Digest: sha256:dd2d0ac3fff2f007d99e033b64854be0941e19a2ad51f174d9240dda20d9f534
+Status: Downloaded newer image for nginx:latest
+ ---> f09fe80eb0e7
+Step 8/8 : COPY --from=builder /app/build /usr/share/nginx/html
+ ---> f318ae5d0c9b
+Successfully built f318ae5d0c9b
+
+
+
+
+aditya@aditya-HP-Notebook:~/frontend$ sudo docker run -p 8080:80 f318ae5d0c9b             // '80' is the default port for nginx
+                                                                                          // app is available on http://localhost:8080
+											  											  																		
+
+
+###########################################################################################
+
+
+
+git init                                     (Initializing empty git repository) 
+git add .                                    (Adding all the work done so far to the repository)
+git commit -m "initial commit"               (commit the work with the comment 'initial commit')
+git remote add origin git@github.com:adityeah8969/docker-react.git   (creating a remote named 'origin' to tie the local repo to github)
+git push origin master	                     ( Pushing all the work done )
+
+
+###########################################################################################
+
+
+Travis-CI (Continuous Integration) is a tool which works in coordination with Github and helps in testing,deploying etc.
+Travis-CI is given permission to access the Github repo and then keeps a note of changes made to the repo. Later Travis-CI
+can test the code, remove the repo, deploy in on to AWS etc. In the following example , a test is being ran on the existing repo.
+
+A '.travis.yml' file is created which contains the series of steps required to be performed (here testing).
+
+Note: Testing is performed on the development folder and therefore 'Dockerfile.dev' is used.
+
+
+
+.travis.yml: 
+
+
+sudo : required                                                     // A copy of docker container is going to run for which sudo
+services:							    // permissions are needed.
+  - docker
+
+before_install:
+  - docker build -t adityeah8969/docker-react -f Dockerfile.dev .
+
+script:
+  - docker run adityeah8969/docker-react npm run test -- --coverage //-- --coverage puts affirmative response to terminal interactive mode
+
+
+
+
+
+We push the changes made to github, using the following commands:
+
+git init
+git add .
+git commit -m "added travis file" 
+git push origin master
+
+
+Travis-CI page corresponding to our repo run tests upon any changes made to the repo and shows successfull build.
+
+###########################################################################################
+Kubernetes
+###########################################################################################
+
+
+Kubernetes:
+
+Its a container management tool for running multiple different containers over several different nodes(VMs). Its primarily used when 
+different images are to be run in different quantities(numbers) for an application to run.
+
+
+Minikube is the software / tool used for managing the VM itself (creation, deletion etc). Kubectl is the command line tool used for managing the containers inside the nodes of the VM.
+
+Minikube is used only for testing things locally (in prod environment, EKS or Google's GKE etc get used).
+
+###########################################################################################
+
+K8s expects:
+
+i> 	all images to be already built.
+ii> 	one config file per object.
+iii> 	manual set up of networking.
+
+###########################################################################################
+
+apiVersion: v1
+kind: Service
+
+
+'kind' inside the config yaml file refers to the object type. It could be StatefulSet, ReplicaController, Pod, Service etc.
+Each object type serves a different purpose, for e.g 'Pod' is used for runnig containers, 'Service' for networking etc.
+
+'apiVersion' scopes the number of object types we can use.
+
+###########################################################################################
+
+apiVersion: v1
+kind: Pod
+
+Pod object type is used for running different number of containers which have a tightly coupled relation with each other.
+
+
+metadata:
+  name: client-pod			// name of the pod
+  labels:
+    component: web
+spec:
+  containers:
+    - name: client
+      image: stephengrider/multi-client
+      ports:
+        - containerPort: 3000             // exposing container's 3000 port
+
+###########################################################################################
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-node-port
+spec:
+  type: NodePort
+  ports:
+    - port: 3050		// If there is another [pod trying to access 'client-pod' , then this port can be used (Irrelevant here).
+      targetPort: 3000		// The target port of node. (here client-pod containers)
+      nodePort: 31515		// The service gets exposed to outside world using this port.
+  selector:			// selector is used to route traffic to all the pods having the same label (here component: web)
+    component: web		// Note: the key value pair used inside selector / label can be anything (x: y), but it should
+				// match the contents of a label.
+
+###########################################################################################
+
+kubectl apply -f client-pod.yaml
+kubectl apply -f client-node-port.yaml
+
+kubectl get pods
+kubectl get services
+
+minikube ip
+http://ip:nodePort
+
+###########################################################################################
+
+* Kubernetes is a system to deploy containerized apps
+* Nodes are individual machines (or vm's) that run containers
+* Masters are machines (or vm's) with a set of programs to manage nodes 
+* Kubernetes gets images from somewhere else
+* kubernetes (master) decided where to run each container, each node can run a dissimilar set of containers
+* To deploy something, we update the desired state of master with a config file
+* The master works constantly to meet the desired state
+
+Imperative approach:
+
+Here we use commands to modify the state manually(imperatively).
+
+Declarative approach:
+
+Here we use commands(or config files at times) to state the expected changes and let k8s master handle it. (Preferred)
+
+###########################################################################################
+
+Declarative approach demo:
+
+k8s master identifies any object using {object kind, oibject name}, here {pod, client-pod}
+
+
+step 1:
+
+Edit the client-pod.yaml:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: client-pod
+  labels:
+    component: web
+spec:
+  containers:
+    - name: client
+      image: stephengrider/multi-worker               // pulling a different image
+      ports:
+        - containerPort: 3000
+
+
+
+step 2:
+
+kubectl apply -f client-pod.yaml
+
+step 3:
+
+kubectl describe pod client-pod      (kubectl describe <object kind> <object name> )
+
+
+O/P:
+
+Name:         client-pod
+Namespace:    default
+Priority:     0
+Node:         minikube/192.168.99.100
+Start Time:   Mon, 01 Jun 2020 10:08:14 +0530
+Labels:       component=web
+Annotations:  Status:  Running
+IP:           172.17.0.4
+IPs:
+  IP:  172.17.0.4
+Containers:
+  client:
+    Container ID:   docker://88516ad792134b219b050e09aa0291e2f4436a7e836f3aa875ef5dd826a9f43d
+    Image:          stephengrider/multi-worker
+    Image ID:       docker-pullable://stephengrider/multi-worker@sha256:5fbab5f86e6a4d499926349a5f0ec032c42e7f7450acc98b053791df26dc4d2b
+    Port:           3000/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Fri, 05 Jun 2020 23:35:35 +0530
+    Last State:     Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Fri, 05 Jun 2020 23:30:43 +0530
+      Finished:     Fri, 05 Jun 2020 23:35:20 +0530
+    Ready:          True
+    Restart Count:  2
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-mkq22 (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  default-token-mkq22:
+    Type:        Secret (a volume populated by a Secret)
+    SecretName:  default-token-mkq22
+    Optional:    false
+QoS Class:       BestEffort
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
+                 node.kubernetes.io/unreachable:NoExecute for 300s
+Events:
+  Type    Reason          Age                 From               Message
+  ----    ------          ----                ----               -------
+  Normal  Scheduled       4d13h               default-scheduler  Successfully assigned default/client-pod to minikube
+  Normal  Pulling         4d13h               kubelet, minikube  Pulling image "stephengrider/multi-client"
+  Normal  Pulled          4d13h               kubelet, minikube  Successfully pulled image "stephengrider/multi-client"
+  Normal  Created         4d13h               kubelet, minikube  Created container client
+  Normal  Started         4d13h               kubelet, minikube  Started container client
+  Normal  SandboxChanged  5m25s               kubelet, minikube  Pod sandbox changed, it will be killed and re-created.
+  Normal  Pulling         5m14s               kubelet, minikube  Pulling image "stephengrider/multi-client"
+  Normal  Pulled          5m11s               kubelet, minikube  Successfully pulled image "stephengrider/multi-client"
+  Normal  Killing         25s                 kubelet, minikube  Container client definition changed, will be restarted
+  Normal  Pulling         25s                 kubelet, minikube  Pulling image "stephengrider/multi-worker"
+  Normal  Pulled          11s                 kubelet, minikube  Successfully pulled image "stephengrider/multi-worker"  // starting the 
+  Normal  Created         10s (x2 over 5m7s)  kubelet, minikube  Created container client				 // the same pod with
+  Normal  Started         10s (x2 over 5m2s)  kubelet, minikube  Started container client				 // a diff image.
+
+
+###########################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

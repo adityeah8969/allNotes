@@ -1,0 +1,1627 @@
+Angular's Architecture:
+
+i> Modules:
+
+A module represents a feature area in the application. Angular apps are modular in nature. Modules are simply lines of code which can be imported/exported. e.g 'user-module' interacting with 'admin-module'.
+
+Angular application always has one root module in it. By convention called as 'AppModule'.
+
+
+ii> Components:
+
+Modules are in turn made up of components and services. Components control the view of the page e.g horizontal side bar, content etc.
+
+Angular application always has one root component in it. By convention called as 'AppComponent'.
+
+Services have the business logic of the modules.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Components are made up of:
+
+Template                +              Class              +           Meta-Data
+
+
+View                                   Code			      Information
+(HTML)				       (typescript)                   (uses Decorator feature)
+
+
+Command for generating a new component:
+
+ng g c test      ('test' is the name of the component)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+ng serve                            // serves the app on localhost:4200
+
+
+
+
+
+
+main.ts:                            // 'main.ts' is the starting point of control (Basically kickstarts AppModule)
+
+
+import { enableProdMode } from '@angular/core';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
+import { AppModule } from './app/app.module';
+import { environment } from './environments/environment';
+
+if (environment.production) {
+  enableProdMode();
+}
+
+platformBrowserDynamic().bootstrapModule(AppModule)              // kickstarts AppModule
+  .catch(err => console.error(err));
+
+
+
+
+
+
+app.module.ts:                                                                // (Basically kickstarts AppComponent)
+
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { TestComponent } from './test/test.component';                        // app module imports the component
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    TestComponent                                                             // declarations array has all the components to be used by app 
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]                                                    // kickstarts AppComponent
+})
+export class AppModule { }
+
+
+
+
+test.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({ 								      // Decorator (Meta-Data)
+  selector: 'app-test',							      // To be used as customized HTML tags in app.component.html
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.scss']
+})
+export class TestComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+app.component.html:
+
+
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    Welcome to {{ title }}!
+  </h1>
+  <app-test></app-test>							    // <app-test> getting used as HTML tag
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Interpolation is the property of binding data from class to template.
+
+{{}} is used .
+
+
+
+test.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: []
+})
+export class TestComponent implements OnInit {
+   
+  constructor() { }
+  
+  public name="ADITYA";
+
+  public greetUser(){
+    return "HI" + this.name;
+  }
+
+  ngOnInit() {
+  }
+
+
+test.component.html:
+
+<h2>
+    WELCOME {{name}}
+</h2>
+<h2>
+    {{2+2}}
+</h2>
+<h2>
+    {{name.toUpperCase()}}
+</h2>
+<h2>
+    {{greetUser()}}
+</h2>
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Property Binding:
+
+
+Interpolation only works on String values. To get the things done for other data-types, Property-Binding is used. 
+
+Property Binding sets the value of DOM property itself and not the attribute(attribute retains its initialized value).
+
+
+
+
+test.component.ts:
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: []
+})
+export class TestComponent implements OnInit {
+   
+  constructor() { }
+  
+  public name="Aditya";
+  public myId="abcd";
+  public isDisabled= true;
+
+  public greetUser(){
+    return "HI" + this.name;
+  }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+
+test.component.html:
+
+
+<input [id]="myId" type="text" value="Vishwas">
+<input [disabled]="isDisabled" [id]="myId" type="text" value="Vishwas">
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Class Binding:
+
+
+
+test.component.css:
+
+.text-success{
+    color:green;
+}
+
+.text-danger{
+    color:red;
+}
+
+.text-special{
+    font-style: italic;
+}
+
+
+
+test.component.html:
+
+<h2 class=text-special>{{name}}</h2>
+<h2 [class]="specialClass">{{name}}</h2>
+<h2 [class.text-special]="isSpecial">{{name}}</h2>
+<h2 [ngClass]="messageClass">{{name}}</h2>                  //ngClass Directive is used to apply attributes of multiple classes in one go.
+
+
+
+
+test.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+   
+  constructor() { }
+  
+  public name="ADITYA";
+  public specialClass="text-special";
+  public isSpecial = true;
+
+  public messageClass= {
+    "text-danger": !this.isSpecial,
+    "text-success": this.isSpecial,
+    "text-special": this.isSpecial
+  }
+
+  ngOnInit() {
+  }
+
+}
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Style-Binding:
+
+
+
+test.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+   
+  constructor() { }
+  
+  public name="ADITYA";
+  public highlightedColor="brown";
+  public isSpecial = true;
+
+ public titleStyles={
+   color: "blue",
+   fontStyle: "italic"
+ }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+
+
+test.component.html:
+
+<h2 [style.color]="isSpecial ? 'black' : 'blue'">{{name}}<h2>
+<h2 [style.color]="highlightedColor">{{name}}<h2>
+<h2 [ngStyle]="titleStyles">{{name}}<h2>
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Event Binding:
+
+Capturing events is called Event Binding. Here dinding is done from template to class.
+
+
+
+test.component.ts:
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+   
+  constructor() { }
+  
+ public onClick(){
+   console.log("Welocme to Codevolution!");
+ }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+test.component.html:
+
+<button (click)="onClick()">GREET</button>                         // Mouse click invokes 'onClick()'
+
+
+
+
+
+
+'$event' is a special parameter in angular which refers to the DOM event raised.
+
+
+test.component.ts:
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+   
+  constructor() { }
+  
+ public onClick(event){
+   console.log(event);
+ }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+test.component.html:
+
+<button (click)="onClick($event)">GREET</button>                // $event(here 'click') is passed on to onClick method.
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Template Reference Variable:
+
+Template Reference Variable can be used to refer to an HTML tag. Using it all the attributes of the tag can be accessed.
+
+
+
+test.component.ts:
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+   
+  constructor() { }
+  
+ public onClick(val){
+   console.log(val);
+ }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+test.component.html:
+
+<input #myInput type="text">                                     // 'myInput' is a template reference variable used to refer to  
+<button (click)="onClick(myInput.value)">GREET</button>          // '<input #myInput type="text">'  tag. 'myInput.value' will grab
+  								 // the input value put inside and pass it as a parameter to onCLick().
+  								 
+  
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Two-Way Binding:
+
+This happens when the variables inside the template and class are in complete sync with each other. 
+
+[(ngModel)] is used against the variable for 2-way binding.
+
+
+test.component.ts:
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+   
+  constructor() { }
+
+  public name="";
+
+  ngOnInit() {
+  }
+
+}
+
+
+test.component.html:
+
+<input [(ngModel)]="name" type="text">                       // '[(ngModel)]' (ngModel Directive) getting used against 'name' variable 
+{{name}}						     // wiil make input value to be in sync with the value of 'name' variable.
+
+
+Note: FormsModule need to be imported.
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Structural Directives:
+
+Structural Directives lets us add HTML elements to the DOM.
+
+Following are the three common structural directives.
+
+i>    ngIf
+ii>   ngSwitch
+iii>  ngFor
+
+ 
+
+ngIf Directive:
+
+
+test.component.ts:
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+
+  val=false;
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+test.component.html:
+
+<h2 *ngIf="val; else elseBlock">Codevolution</h2>      // Here 'val' is false so entire <h2> tag will get removed out of the 							       // DOM.                  
+
+<ng-template #elseBlock>
+  <h2>Codevolution is hidden</h2>
+</ng-template>
+
+
+
+
+
+
+
+
+
+test.component.ts:
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+
+  val=false;
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+test.component.html:
+
+<div *ngIf="val; then thenBlock; else elseBlock"></div>
+
+<ng-template #thenBlock>
+    <h2>Codevolution is here</h2>
+  </ng-template>
+
+
+<ng-template #elseBlock>
+  <h2>Codevolution is hidden</h2>
+</ng-template>
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+ngSwitch Directive:
+
+
+
+test.component.ts:
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+
+  public color="red";
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+test.component.html:
+
+
+<div [ngSwitch]="color">
+  <div *ngSwitchCase="'red'">RED</div>
+  <div *ngSwitchCase="'blue'">BLUE</div>
+  <div *ngSwitchCase="'green'">GREEN</div>
+  <div *ngSwitchDefaultCase>pick something</div>
+</div>
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+ngFor Directive
+
+
+test.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+
+  public colors=["red","green","black","yellow"];
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+test.component.html:
+
+
+<div *ngFor="let color of colors; index as i">
+  <h2>{{i}} {{color}}</h2>
+</div>
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Component Interaction:
+
+Data transfer between parent (app component) to child (here 'test' component) and vice-versa is termed as 'Component Interaction'.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+SENDING DATA FROM APP TO TEST COMPONENT:
+
+
+app.component.ts:
+
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'structural-directives';
+  public name="Aditya";
+}
+
+
+app.component.html:
+
+<app-test [parentData]="name"></app-test>                   // Sending data in a variable named 'parentData'
+
+
+test.component.ts:
+
+import { Component, OnInit, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+
+  @Input() public parentData;                               // Receiving data using '@Input()' tag
+                                                            // '@Input('parentData') public name;' would have fetched the data inside 'name'
+						            // variable.
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+
+test.component.html:
+
+<h2>{{parentData}}</h2>
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+SENDING DATA FROM TEST BACK TO APP COMPONENT
+
+
+app.component.ts:
+
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'structural-directives';
+  public name="Kajal";
+  public message="";
+}
+
+
+
+app.component.html:
+
+<h2>{{message}}</h2>
+<app-test (childEvent)="message=$event"[parentData]="name"></app-test>
+
+
+
+
+test.component.ts:
+
+
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+
+
+@Component({
+  selector: 'app-test',
+  templateUrl: './test.component.html',
+  styleUrls: ['./test.component.css']
+})
+export class TestComponent implements OnInit {
+
+  @Input() public parentData;
+  @Output() public childEvent=new EventEmitter();
+
+  constructor() { }
+
+  public fireEvent(){
+    return this.childEvent.emit("Hi Beautiful");
+  }
+
+  ngOnInit() {
+  }
+
+}
+
+
+test.component.html:
+
+<h2>{{parentData}}</h2>
+
+<button (click)="fireEvent()">Send Event</button>
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Services as DI:
+
+
+
+app.module.ts:
+
+
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { EmployeeService } from './employee.service';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    EmployeeListComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule
+  ],
+  providers: [EmployeeService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+
+
+app.comoponent.html:
+
+<app-employee-list></app-employee-list>
+
+
+
+
+
+employee.service.ts:
+
+import { Injectable } from '@angular/core';
+
+@Injectable({                                                             // Injectable helps in notifying angular that this service may
+  providedIn: 'root'							  // inturn depend on other services and so on. 
+})
+export class EmployeeService {
+  
+  constructor() { }
+  
+  getEmployees(){
+    return [
+      {"id": 1, "name":"jkj", "age":30},
+      {"id": 2, "name":"nkhkw", "age":30},
+      {"id": 3, "name":"djco", "age":30},
+      {"id": 4, "name":"cjoij", "age":30}
+    ];
+  }
+
+}
+
+
+
+
+employee-list.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+import { EmployeeService } from '../employee.service';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent implements OnInit {
+  
+  public employees = [];
+
+  constructor(private _employeeService: EmployeeService) { }                     // syntax for getting an instance of the service
+
+  ngOnInit() {
+    this.employees= this._employeeService.getEmployees();                        // using the service
+  }
+
+}
+
+
+
+
+employee-list.component.html:
+
+
+<ul *ngFor="let employee of employees">
+   <li>{{employee.name}}</li>
+</ul>
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+employee.ts:									// src/app/employee.ts
+
+
+export interface IEmployee{
+    id : number,
+    name: string,
+    age : number
+}
+
+
+ 
+employees.json:                                                                  // src/assets/data/employees.json (Instead of hosting a DB)
+
+[
+    {"id": 1, "name":"I", "age":30},
+    {"id": 2, "name":"LOVE", "age":30},
+    {"id": 3, "name":"ABC", "age":30},
+    {"id": 4, "name":"DEF", "age":30}
+]
+
+
+app.module.ts:
+
+
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { EmployeeService } from './employee.service';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    EmployeeListComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule
+  ],
+  providers: [EmployeeService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+
+
+app.comoponent.html:
+
+<app-employee-list></app-employee-list>
+
+
+
+
+
+employee.service.ts:
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { IEmployee } from './employee';
+import { Observable } from 'rxjs-compat/Observable'';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeService {
+  
+private _url: string ="/assets/data/employees.json";
+
+  constructor(private http: HttpClient) { }                                // got an instance of HttpClient
+  
+  getEmployees(): Observable<IEmployee[]>{
+    return this.http.get<IEmployee[]>(this._url);                          // .get() returns object of type observable so 'get<IEmployee[]>'
+  }									   // casts incoming observable into 'IEmployee' object. 
+									   // 'getEmployees(): Observable<IEmployee[]>' suggests that we 
+}									   // are returning an Observable object of type 'IEmployee[]'.
+
+
+employee-list.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+import { EmployeeService } from '../employee.service';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent implements OnInit {
+  
+  public employees = [];
+
+  constructor(private _employeeService: EmployeeService) { }
+
+  ngOnInit() {
+    this._employeeService.getEmployees()
+        .subscribe(data => this.employees = data);                           // subscribing 'employee-list.component' to the service.
+  }								             // 'data' is the object received.
+
+}
+
+
+employee-list.component.html:
+
+
+<ul *ngFor="let employee of employees">
+   <li>{{employee.name}}</li>
+</ul>
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+employee.service.ts:
+
+
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { IEmployee } from './employee';
+import { Observable } from 'rxjs-compat/Observable';
+import 'rxjs-compat/add/operator/catch';
+import 'rxjs-compat/add/observable/throw';
+
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeService {
+  
+private _url: string = "/assets/data/employees1.json";                            // intentionally giving wrong url to catch exception.
+
+  constructor(private http: HttpClient) { } 					  
+  
+  getEmployees(): Observable<IEmployee[]>{
+    return this.http.get<IEmployee[]>(this._url)
+                    .catch(this.errorHandler);                                   // passes the error as an argument to 'errorHandler' function
+  }
+
+  errorHandler(error: HttpErrorResponse){
+    return Observable.throw(error.message || "Server Error");                    // Observable is made to throw the error mesaage to its subs-
+    										 // cribers to be dispalyed on their .html.
+  }
+
+}
+
+
+
+employee-list.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+import { EmployeeService } from '../employee.service';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent implements OnInit {
+  
+  public employees = [];
+  public errorMessage;
+
+  constructor(private _employeeService: EmployeeService) { }
+
+  ngOnInit() {
+    this._employeeService.getEmployees()
+        .subscribe(data => this.employees = data,
+                   error => this.errorMessage = error);                 
+  }
+
+}
+
+
+
+employee-list.component.html:
+
+
+
+<h3>{{errorMessage}}</h3>
+<ul *ngFor="let employee of employees">
+   <li>{{employee.name}}</li>
+</ul>
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+ROUTING AND NAVIGATION:
+
+
+
+app-routing.module.ts:                                                                  // this module is incharge of all the routing and
+											// navigation.
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { DepartmentListComponent } from './department-list/department-list.component';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+
+const routes: Routes = [                                                                 // Routes definintion
+   { path: 'departments', component: DepartmentListComponent },                          // path: departments suggests rendering 'Department-
+   { path: 'employees' , component: EmployeeListComponent}				 // ListComponent' component on visiting 'localhost
+];											 // :4200/departments'
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+export const routingComponents = [DepartmentListComponent, EmployeeListComponent]         // Specifying all the routing components in one    
+											  // place , so that it can be exported easily.
+
+
+	
+
+app.module.ts:
+
+
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+import { AppRoutingModule, routingComponents } from './app-routing.module';               // all the routing components and their paths getting
+import { AppComponent } from './app.component';						  // imported to root module.
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    routingComponents
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+
+
+
+app.component.html:
+
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    ADITYA JHA
+  </h1>
+
+</div>
+
+<nav>
+  <a routerLink="/departments">Departments</a>               
+  <a routerLink="/employees">Employees</a>
+</nav>
+
+<router-outlet></router-outlet>
+
+
+
+
+
+
+
+department-list.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-department-list',
+  template: `
+    <p>
+      department-list works!
+    </p>
+  `,
+  styles: []
+})
+export class DepartmentListComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+
+
+
+
+
+employee-list.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-employee-list',
+  template: `
+    <p>
+      employee-list works!
+    </p>
+  `,
+  styles: []
+})
+export class EmployeeListComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit() {
+  }
+
+}
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+app-routing.module.ts:
+
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { DepartmentListComponent } from './department-list/department-list.component';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+
+const routes: Routes = [
+   { path:'', redirectTo: '/departments', pathMatch: 'full'},		            // default route
+   { path: 'departments', component: DepartmentListComponent },
+   { path: 'employees' , component: EmployeeListComponent},
+   { path: "**", component: PageNotFoundComponent }                                 // Wild Card route in case nothing matches
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+export const routingComponents = [DepartmentListComponent, EmployeeListComponent,PageNotFoundComponent]
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+paramMap OBSERVABLE:
+
+
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+
+@Component({
+  selector: 'app-department-detail',
+  template: `
+   <h3>You have selected department with id = {{departmentId}}</h3>
+   <a (click)="goPrevious()">Previous</a>                                                // 'goPrevious' & 'goNext' have been implemented
+   <a (click)="goNext()">Next</a>							 // to go back and forth (w.r.t indices)
+  `,
+  styles: []
+})
+export class DepartmentDetailComponent implements OnInit {
+  
+  public departmentId;
+  constructor(private route: ActivatedRoute, private router: Router) { }
+
+  ngOnInit() {								      // 'this.route.snapshot' works only when view gets
+    // let id = parseInt(this.route.snapshot.paramMap.get('id'));             // changed. Since 'goPrevious' and 'goNext' both have            
+    // this.departmentId=id;						      // the same view, 'paramMap' observable is used.
+    this.route.paramMap.subscribe((params: ParamMap) => { 		      // 'ParamMap' is the observable                              
+        let id= parseInt(params.get('id'));				      // getting subscribed to route.		
+        this.departmentId = id;                                                         
+    });
+
+  }
+  
+  goPrevious(){
+   let previousId=this.departmentId-1;
+   this.router.navigate(['/departments',previousId]);
+  }
+  
+  goNext(){
+   let nextId=this.departmentId+1;
+   this.router.navigate(['/departments',nextId]);  
+  }
+
+}
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Optional Route Prameters:
+
+
+department-detail.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+
+@Component({
+  selector: 'app-department-detail',
+  template: `
+   <h3>You have selected department with id = {{departmentId}}</h3>
+   <a (click)="goPrevious()">Previous</a>
+   <a (click)="goNext()">Next</a>
+   <div>
+     <button (click)="goToDepartments()">Back</button>
+   </div>
+  `,
+  styles: []
+})
+export class DepartmentDetailComponent implements OnInit {
+  
+  public departmentId;
+  constructor(private route: ActivatedRoute, private router: Router) { }
+
+  ngOnInit() {
+    // let id = parseInt(this.route.snapshot.paramMap.get('id'));
+    // this.departmentId=id;
+    this.route.paramMap.subscribe((params: ParamMap) => {
+        let id= parseInt(params.get('id'));
+        this.departmentId = id;
+    });
+
+  }
+  
+  goPrevious(){
+   let previousId=this.departmentId-1;
+   this.router.navigate(['/departments',previousId]);
+  }
+  
+  goNext(){
+   let nextId=this.departmentId+1;
+   this.router.navigate(['/departments',nextId]);  
+  }
+
+  goToDepartments(){
+    let selectedId = this.departmentId ? this.departmentId : null;
+    this.router.navigate(['/departments', {id: selectedId}]);                     // '{id: selectedId}'is the Optional route parameter
+  }										  // URL looks like 'http://localhost:4200/departments;id=3'
+
+}
+
+
+
+
+department-list.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+
+
+//In the *ngFor loop, additional check has been made to see if the optional parameter passed matched with the dept. ID.
+//If match happens then the <li> item gets highlighted using '[class.selected]'.
+
+@Component({
+  selector: 'app-department-list',
+  template: `
+    <h3>Department List</h3>
+    <ul>
+       <li (click)="onSelect(department)" [class.selected]="isSelected(department)" *ngFor="let department of departments">
+          {{department.id}} {{department.name}}
+       </li>
+    </ul>
+  `,
+  styles: []
+})
+export class DepartmentListComponent implements OnInit {
+  
+public selectedId;
+
+  departments = [
+    {"id": 1, "name": "Angular"},
+    {"id": 2, "name": "Node"},
+    {"id": 3, "name": "MongoDB"},
+    {"id": 4, "name": "Ruby"},
+    {"id": 5, "name": "Bootstrap"}
+  ]
+
+  constructor(private router: Router, private route: ActivatedRoute) { }
+
+  ngOnInit() {
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      let id= parseInt(params.get('id'));
+      this.selectedId = id;
+    });
+  }
+
+  onSelect(department){
+     this.router.navigate(['/departments',department.id]);
+  }
+  
+  isSelected(department){
+    return department.id === this.selectedId;                                             // Checking the match
+  }
+}
+
+
+
+
+styles.css:
+
+.selected{
+   background-color: #CFD8DC;
+   color: white;
+}
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+department-list.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+
+@Component({
+  selector: 'app-department-list',
+  template: `
+    <h3>Department List</h3>
+    <ul>
+       <li (click)="onSelect(department)" [class.selected]="isSelected(department)" *ngFor="let department of departments">
+          {{department.id}} {{department.name}}
+       </li>
+    </ul>
+  `,
+  styles: []
+})
+export class DepartmentListComponent implements OnInit {
+  
+public selectedId;
+
+  departments = [
+    {"id": 1, "name": "Angular"},
+    {"id": 2, "name": "Node"},
+    {"id": 3, "name": "MongoDB"},
+    {"id": 4, "name": "Ruby"},
+    {"id": 5, "name": "Bootstrap"}
+  ]
+
+  constructor(private router: Router, private route: ActivatedRoute) { }
+
+  ngOnInit() {
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      let id= parseInt(params.get('id'));
+      this.selectedId = id;
+    });
+  }
+
+  onSelect(department){
+    //  this.router.navigate(['/departments',department.id]);
+    this.router.navigate([department.id], {relativeTo: this.route});        // appending 'department.id' to 'this.route'(or current URL)
+  }
+  
+  isSelected(department){
+    return department.id === this.selectedId; 
+  }
+}
+
+
+
+department-detail.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+
+@Component({
+  selector: 'app-department-detail',
+  template: `
+   <h3>You have selected department with id = {{departmentId}}</h3>
+   <a (click)="goPrevious()">Previous</a>
+   <a (click)="goNext()">Next</a>
+   <div>
+     <button (click)="goToDepartments()">Back</button>
+   </div>
+  `,
+  styles: []
+})
+export class DepartmentDetailComponent implements OnInit {
+  
+  public departmentId;
+  constructor(private route: ActivatedRoute, private router: Router) { }
+
+  ngOnInit() {
+    // let id = parseInt(this.route.snapshot.paramMap.get('id'));
+    // this.departmentId=id;
+    this.route.paramMap.subscribe((params: ParamMap) => {
+        let id= parseInt(params.get('id'));
+        this.departmentId = id;
+    });
+
+  }
+  
+  goPrevious(){
+   let previousId=this.departmentId-1;
+   this.router.navigate(['/departments',previousId]);
+  }
+  
+  goNext(){
+   let nextId=this.departmentId+1;
+   this.router.navigate(['/departments',nextId]);  
+  }
+
+  goToDepartments(){
+    let selectedId = this.departmentId ? this.departmentId : null;
+    // this.router.navigate(['/departments', {id: selectedId}]);
+    this.router.navigate(['../',{id: selectedId}], {relativeTo:this.route});    // '../' suggests moving a slash back w.r.t 'this.route'
+  }
+
+}
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Child Routes:
+
+// 2 new components have been generated 'DepartmentOverviewComponent' & 'DepartmentContactComponent'.
+
+
+app.routing.module.ts:
+
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { DepartmentListComponent } from './department-list/department-list.component';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { DepartmentDetailComponent } from './department-detail/department-detail.component';
+import { DepartmentOverviewComponent } from './department-overview/department-overview.component';
+import { DepartmentContactComponent } from './department-contact/department-contact.component';
+
+const routes: Routes = [
+   { path:'', redirectTo: '/departments', pathMatch: 'full'},
+   { path: 'departments', component: DepartmentListComponent },
+   { 
+     path: 'departments/:id', 
+     component: DepartmentDetailComponent ,
+     children: [                                                                 // way to declare child component routes
+       {path : 'overview', component: DepartmentOverviewComponent},
+       {path: 'contact' , component: DepartmentContactComponent}
+     ]
+    },
+   { path: 'employees' , component: EmployeeListComponent},
+   { path: "**", component: PageNotFoundComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+export const routingComponents = [DepartmentListComponent, EmployeeListComponent,
+                                  PageNotFoundComponent,DepartmentDetailComponent,
+                                  DepartmentOverviewComponent,DepartmentContactComponent]
+
+
+
+
+department-detail.component.ts:
+
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+
+@Component({
+  selector: 'app-department-detail',
+  template: `
+   <h3>You have selected department with id = {{departmentId}}</h3>
+   
+   <p>
+     <button (click)="showOverview()">Overview</button>
+     <button (click)="showContact()">Contact</button>
+   </p>
+   <router-outlet></router-outlet>
+
+   <p>
+     <button (click)="goPrevious()">Previous</button>
+     <button (click)="goNext()">Next</button>
+   </p>
+   <div>
+     <button (click)="goToDepartments()">Back</button>
+   </div>
+  `,
+  styles: []
+})
+export class DepartmentDetailComponent implements OnInit {
+  
+  public departmentId;
+  constructor(private route: ActivatedRoute, private router: Router) { }
+
+  ngOnInit() {
+    // let id = parseInt(this.route.snapshot.paramMap.get('id'));
+    // this.departmentId=id;
+    this.route.paramMap.subscribe((params: ParamMap) => {
+        let id= parseInt(params.get('id'));
+        this.departmentId = id;
+    });
+
+  }
+  
+  goPrevious(){
+   let previousId=this.departmentId-1;
+   this.router.navigate(['/departments',previousId]);
+  }
+  
+  goNext(){
+   let nextId=this.departmentId+1;
+   this.router.navigate(['/departments',nextId]);  
+  }
+
+  goToDepartments(){
+    let selectedId = this.departmentId ? this.departmentId : null;
+    // this.router.navigate(['/departments', {id: selectedId}]);
+    this.router.navigate(['../',{id: selectedId}], {relativeTo:this.route});
+  }
+
+  showOverview(){
+    this.router.navigate(['overview'],{relativeTo:this.route});
+  }
+
+  showContact(){
+    this.router.navigate(['contact'],{relativeTo:this.route});
+  }
+
+}
+
+---------------------------------------------------------------------------------------------------------------------------------------------

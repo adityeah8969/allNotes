@@ -1,0 +1,2393 @@
+package com.tutorialspoint.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+
+public class DemoApplication {
+   public static void main(String[] args) {
+      SpringApplication.run(DemoApplication.class, args);
+   }
+   @RequestMapping(value = "/")
+   public String hello() {
+      return "Hello World";
+   }
+}
+
+
+-----------------------------------------
+
+
+package com.tutorialspoint.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+public class DemoApplication  extends SpringBootServletInitializer {			  // Spring Boot Servlet Initializer class 
+   @Override										  // file allows you to configure the application
+   protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {   // when it is launched by using Servlet Container.
+      return application.sources(DemoApplication.class);				  // Here to support WAR file deployment.
+   }
+   public static void main(String[] args) {
+      SpringApplication.run(DemoApplication.class, args);
+   }
+   
+   @RequestMapping(value = "/")
+   public String hello() {
+      return "Hello World from Tomcat";
+   }
+}
+
+
+
+For Maven, add the start class in pom.xml properties as shown below −
+
+<start-class>com.tutorialspoint.demo.DemoApplication</start-class>
+
+<packaging>war</packaging>
+
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+
+use the command 'mvn package' for packaging your application
+run the Tomcat Server, and deploy the WAR file
+
+-----------------------------------------
+
+Dependency Management:
+
+Spring Boot team provides a list of dependencies to support the Spring Boot version for its every release. You do not need to provide a version for dependencies in the build configuration file. Spring Boot automatically configures the dependencies version based on the release. Remember that when you upgrade the Spring Boot version, dependencies also will upgrade automatically.
+
+For Maven configuration, we should inherit the Spring Boot Starter parent project to manage the Spring Boot Starters dependencies. For this, simply we can inherit the starter parent in our pom.xml file as shown below.
+
+<parent>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-parent</artifactId>
+   <version>1.5.8.RELEASE</version>
+</parent>
+
+We should specify the version number for Spring Boot Parent Starter dependency. Then for other starter dependencies, we do not need to specify the Spring Boot version number. Observe the code given below −
+
+<dependencies>
+   <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+   </dependency>
+</dependencies>
+
+------------------------------------------
+
+In Spring Boot, we can use Spring Framework to define our beans and their dependency injection. The @ComponentScan annotation is used to find beans and the corresponding injected with @Autowired annotation.
+
+If you followed the Spring Boot typical layout (having @SpringBootApplication on top of main class inside the default package), no need to specify any arguments for @ComponentScan annotation. All component class files are automatically registered with Spring Beans.
+
+The following example provides an idea about Auto wiring the Rest Template object and creating a Bean for the same −
+
+@Bean
+public RestTemplate getRestTemplate() {
+   return new RestTemplate();
+}
+The following code shows the code for auto wired Rest Template object and Bean creation object in main Spring Boot Application class file −
+
+package com.tutorialspoint.demo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
+@SpringBootApplication
+public class DemoApplication {
+   @Autowired
+   RestTemplate restTemplate;
+   
+   public static void main(String[] args) {
+      SpringApplication.run(DemoApplication.class, args);
+   }
+
+}
+
+------------------------------------------
+
+The @Value annotation is used to read the environment or application property value in Java code. 
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+public class DemoApplication {
+   @Value("${spring.application.name}")
+   private String name;
+   public static void main(String[] args) {
+      SpringApplication.run(DemoApplication.class, args);
+   }
+   @RequestMapping(value = "/")
+   public String name() {
+      return name;
+   }
+}
+
+
+application.properties
+
+server.port = 8080
+spring.application.name = demoservice
+
+
+application-dev.properties
+
+server.port = 9090
+spring.application.name = demoservice
+
+
+application-prod.properties
+
+server.port = 4431
+spring.application.name = demoservice
+
+
+java -jar abcd.jar
+java -jar abcd.jar --spring.profiles.active=dev
+java -jar abcd.jar --spring.profiles.active=prod
+
+
+
+single application.yml file:
+
+spring:
+   application:
+      name: demoservice
+server:
+   port: 8080
+
+---
+spring:
+   profiles: dev
+   application:
+      name: demoservice
+server:
+   port: 9090
+
+---
+spring: 
+   profiles: prod
+   application:
+      name: demoservice
+server: 
+   port: 4431
+
+------------------------------------------
+
+Logging:
+
+
+include the following dependency:
+
+<dependency>
+  <groupId>log4j</groupId>
+  <artifactId>log4j</artifactId>
+  <version>1.2.17</version>
+</dependency>
+
+
+log4j.properties file:
+
+# Root logger
+log4j.rootLogger=INFO, file
+ 
+Direct log messages to a log file
+log4j.appender.file=org.apache.log4j.RollingFileAppender
+ 
+log4j.appender.file.File= /home/aditya/springWorkspace/projects/demo/src/main/resources/logFile.log
+log4j.appender.file.MaxFileSize=100MBs
+log4j.appender.file.MaxBackupIndex=10
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.layout.ConversionPattern=%d{MM/dd/yyyy hh:mm:ss a}|%-5p|%-30c{1}| %m%n
+
+
+
+
+package com.tutorialspoint.demo;
+
+import org.apache.log4j.Logger;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+public class DemoApplication {
+	
+	final Logger logger = Logger.getLogger(this.getClass());
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+	
+	@RequestMapping(value = "/")
+	   public String hello() {
+			logger.info("This is an info message");
+			logger.warn("This is a warn message");
+			return "How is life??";
+	}
+
+}
+
+------------------------------------------------------------------
+
+@Controller v/s @RestController
+
+
+
+@Controller
+@RequestMapping("employees")
+public class EmployeeController {
+    Employee employee = new Employee();
+
+@RequestMapping(value = "/{name}", method = RequestMethod.GET, produces = "application/json")
+    public @ResponseBody Employee getEmployeeInJSON(@PathVariable String name) {
+       employee.setName(name);
+       employee.setEmail("employee1@genuitec.com");
+       return employee; 
+    }
+}
+
+
+When you use the @ResponseBody annotation on a method, Spring converts the return value and writes it to the HTTP response automatically. Each method in the Controller class must be annotated with @ResponseBody.
+
+Behind the Scenes
+Spring has a list of HttpMessageConverters registered in the background. The responsibility of the HTTPMessageConverter is to convert the request body to a specific class and back to the response body again, depending on a predefined mime type. Every time an issued request hits @ResponseBody, Spring loops through all registered HTTPMessageConverters seeking the first that fits the given mime type and class, and then uses it for the actual conversion.
+
+
+
+Using the @RestController Annotation
+
+By annotating the controller class with @RestController annotation, you no longer need to add @ResponseBody to all the request mapping methods. The @ResponseBody annotation is active by default.
+
+@RestController
+@RequestMapping("employees")
+public class EmployeeController {
+    Employee employee = new Employee();
+    @RequestMapping(value = "/{name}", method = RequestMethod.GET, produces = "application/json")
+    public Employee getEmployeeInJSON(@PathVariable String name) {
+       employee.setName(name);
+       employee.setEmail("employee1@genuitec.com");
+       return employee;
+    }
+}
+
+
+------------------------------------------------------------------
+
+Basics of spring MVC, servlet:
+
+https://www.tutorialspoint.com/spring/spring_web_mvc_framework.htm
+https://dzone.com/articles/what-servlet-container
+
+------------------------------------------------------------------
+
+ResponseEntity represents the whole HTTP response: status code, headers, and body. Because of it, we can use it to fully configure the HTTP response.
+
+If we want to use it, we have to return it from the endpoint; Spring takes care of the rest.
+
+ResponseEntity is a generic type. As a result, we can use any type as the response body:
+
+@GetMapping("/hello")
+ResponseEntity<String> hello() {
+    return new ResponseEntity<>("Hello World!", HttpStatus.OK);
+}
+
+------------------------------------------------------------------
+
+
+@RestController examples:
+
+
+package com.tutorialspoint.demo.model;
+
+public class Product {
+	   private String id;
+	   private String name;
+
+	   public String getId() {
+	      return id;
+	   }
+	   public void setId(String id) {
+	      this.id = id;
+	   }
+	   public String getName() {
+	      return name;
+	   }
+	   public void setName(String name) {
+	      this.name = name;
+	   }
+}
+
+
+
+
+package com.tutorialspoint.demo.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.tutorialspoint.demo.model.Product;
+
+@RestController
+public class ProductServiceController {
+   private static Map<String, Product> productRepo = new HashMap<>();
+   static {
+      Product honey = new Product();
+      honey.setId("1");
+      honey.setName("Honey");
+      productRepo.put(honey.getId(), honey);
+      
+      Product almond = new Product();
+      almond.setId("2");
+      almond.setName("Almond");
+      productRepo.put(almond.getId(), almond);
+   }
+   
+   @RequestMapping(value = "/products/{id}", method = RequestMethod.DELETE)
+   public ResponseEntity<Object> delete(@PathVariable("id") String id) { 
+      productRepo.remove(id);
+      return new ResponseEntity<>("Product is deleted successsfully", HttpStatus.OK);
+   }
+   
+   @RequestMapping(value = "/products/{id}", method = RequestMethod.PUT)
+   public ResponseEntity<Object> updateProduct(@PathVariable("id") String id, @RequestBody Product product) { 
+      productRepo.remove(id);
+      product.setId(id);
+      productRepo.put(id, product);
+      return new ResponseEntity<>("Product is updated successsfully", HttpStatus.OK);
+   }
+   
+   @RequestMapping(value = "/products", method = RequestMethod.POST)
+   public ResponseEntity<Object> createProduct(@RequestBody Product product) {
+      productRepo.put(product.getId(), product);
+      return new ResponseEntity<>("Product is created successfully", HttpStatus.CREATED);
+   }
+   
+   @RequestMapping(value = "/products")
+   public ResponseEntity<Object> getProduct() {
+      return new ResponseEntity<>(productRepo.values(), HttpStatus.OK);
+   }
+}
+
+
+------------------------------------------------------------------
+
+Handling exceptions and errors in APIs and sending the proper response to the client is good for enterprise applications.
+
+Controller Advice
+The @ControllerAdvice is an annotation, to handle the exceptions globally.
+
+
+Exception Handler
+The @ExceptionHandler is an annotation used to handle the specific exceptions and sending the custom responses to the client.
+
+
+
+
+package com.tutorialspoint.demo.exception;
+public class ProductNotfoundException extends RuntimeException {                        // exception class extending 'RuntimeException'
+   private static final long serialVersionUID = 1L;
+}
+
+
+
+
+
+
+package com.tutorialspoint.demo.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+@ControllerAdvice									// handling all exce[tions globally
+public class ProductExceptionController {
+   @ExceptionHandler(value = ProductNotfoundException.class)				// @ExceptionHandler handlinf specific exceptions
+   public ResponseEntity<Object> exception(ProductNotfoundException exception) {
+      return new ResponseEntity<>("Product not found here", HttpStatus.NOT_FOUND);
+   }
+}
+
+
+
+
+
+
+package com.tutorialspoint.demo.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.tutorialspoint.demo.exception.ProductNotfoundException;
+import com.tutorialspoint.demo.model.Product;
+
+@RestController
+public class ProductServiceController {
+   private static Map<String, Product> productRepo = new HashMap<>();
+   static {
+      Product honey = new Product();
+      honey.setId("1");
+      honey.setName("Honey");
+      productRepo.put(honey.getId(), honey);
+      
+      Product almond = new Product();
+      almond.setId("2");
+      almond.setName("Almond");
+      productRepo.put(almond.getId(), almond);
+   }
+   
+   @RequestMapping(value = "/products/{id}", method = RequestMethod.PUT)
+   public ResponseEntity<Object> updateProduct(@PathVariable("id") String id, @RequestBody Product product) { 
+      if(!productRepo.containsKey(id))throw new ProductNotfoundException();                             // Exception handling 
+      productRepo.remove(id);
+      product.setId(id);
+      productRepo.put(id, product);
+      return new ResponseEntity<>("Product is updated successfully", HttpStatus.OK);
+   }
+}
+
+
+
+------------------------------------------------------------------
+
+Interceptors
+
+
+package com.tutorialspoint.demo.interceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+@Component										// To work with interceptor, you need to create
+public class ProductServiceInterceptor implements HandlerInterceptor {			// @Component class that supports it and it should
+	final Logger logger = Logger.getLogger(this.getClass());			// implement the HandlerInterceptor interface.
+		
+   @Override
+   public boolean preHandle
+      (HttpServletRequest request, HttpServletResponse response, Object handler) 
+      throws Exception {
+      
+	  logger.info("Pre Handle method is getting executed\n");
+
+      return true;
+   }
+   @Override
+   public void postHandle(HttpServletRequest request, HttpServletResponse response, 
+      Object handler, ModelAndView modelAndView) throws Exception {   
+	   
+	  logger.info("Post Handle method is getting executed\n");
+	  
+   }
+   @Override
+   public void afterCompletion
+      (HttpServletRequest request, HttpServletResponse response, Object 
+      handler, Exception exception) throws Exception {
+      
+	  logger.info("Request and Response is completed");
+   }
+}
+
+
+
+
+package com.tutorialspoint.demo.interceptor;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+@Component										 
+public class ProductServiceInterceptorAppConfig extends WebMvcConfigurerAdapter {	 // register this Interceptor with InterceptorRegistry 
+   @Autowired										 // by using WebMvcConfigurerAdapter  		
+   ProductServiceInterceptor productServiceInterceptor;
+
+   @Override
+   public void addInterceptors(InterceptorRegistry registry) {
+      registry.addInterceptor(productServiceInterceptor);
+   }
+}
+
+
+------------------------------------------------------------------
+
+If the server.port number is 0 while starting the Spring Boot application, Tomcat uses the random port number.
+
+------------------------------------------------------------------
+
+Rest Template is used to create applications that consume RESTful Web Services. You can use the exchange() method to consume the web services for all HTTP methods. The code given below shows how to create Bean for Rest Template to auto wiring the Rest Template object.
+
+
+
+
+
+package com.tutorialspoint.demo;
+
+import org.apache.log4j.Logger;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
+@SpringBootApplication										// Entry Point
+@RestController
+public class DemoApplication {
+	
+	final Logger logger = Logger.getLogger(this.getClass());
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+	
+	@RequestMapping(value = "/")
+	   public String hello() {
+			logger.info("This is an info message");
+			logger.warn("This is a warn message");
+			return "How is life??";
+	}
+	
+	@Bean									// registering a RestTemplate bean to be autowired later.
+	   public RestTemplate getRestTemplate() {
+	      return new RestTemplate();
+	 }
+
+}
+
+
+
+
+
+
+package com.tutorialspoint.demo.controller;
+
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import com.tutorialspoint.demo.model.Product;
+
+@RestController
+public class ConsumeWebService {
+   @Autowired											// Autowiring
+   RestTemplate restTemplate;
+
+   @RequestMapping(value = "/template/products")
+   public String getProductList() {
+      HttpHeaders headers = new HttpHeaders();
+      headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+      HttpEntity<String> entity = new HttpEntity<String>(headers);
+      
+      return restTemplate.exchange(
+         "http://localhost:8085/products", HttpMethod.GET, entity, String.class).getBody();
+   }
+   @RequestMapping(value = "/template/products", method = RequestMethod.POST)
+   public String createProducts(@RequestBody Product product) {
+      HttpHeaders headers = new HttpHeaders();
+      headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+      HttpEntity<Product> entity = new HttpEntity<Product>(product,headers);
+      
+      return restTemplate.exchange(
+         "http://localhost:8085/products", HttpMethod.POST, entity, String.class).getBody();
+   }
+   @RequestMapping(value = "/template/products/{id}", method = RequestMethod.PUT)
+   public String updateProduct(@PathVariable("id") String id, @RequestBody Product product) {
+      HttpHeaders headers = new HttpHeaders();
+      headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+      HttpEntity<Product> entity = new HttpEntity<Product>(product,headers);
+      
+      return restTemplate.exchange(
+         "http://localhost:8085/products/"+id, HttpMethod.PUT, entity, String.class).getBody();
+   }	
+   @RequestMapping(value = "/template/products/{id}", method = RequestMethod.DELETE)
+   public String deleteProduct(@PathVariable("id") String id) {
+      HttpHeaders headers = new HttpHeaders();
+      headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+      HttpEntity<Product> entity = new HttpEntity<Product>(headers);
+      
+      return restTemplate.exchange(
+         "http://localhost:8085/products/"+id, HttpMethod.DELETE, entity, String.class).getBody();
+   }
+}
+
+
+
+------------------------------------------------------------------
+
+Service Components are the class file which contains @Service annotation. These class files are used to write business logic in a different layer, separated from @RestController class file. 
+
+
+
+
+
+
+package com.tutorialspoint.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.tutorialspoint.demo.model.Product;
+import com.tutorialspoint.demo.service.ProductService;
+
+@RestController
+public class ProductServiceController {
+   @Autowired
+   ProductService productService;
+
+   @RequestMapping(value = "/products")
+   public ResponseEntity<Object> getProduct() {
+      return new ResponseEntity<>(productService.getProducts(), HttpStatus.OK);
+   }
+   @RequestMapping(value = "/products/{id}", method = RequestMethod.PUT)
+   public ResponseEntity<Object> 
+      updateProduct(@PathVariable("id") String id, @RequestBody Product product) {
+      
+      productService.updateProduct(id, product);
+      return new ResponseEntity<>("Product is updated successsfully", HttpStatus.OK);
+   }
+   @RequestMapping(value = "/products/{id}", method = RequestMethod.DELETE)
+   public ResponseEntity<Object> delete(@PathVariable("id") String id) {
+      productService.deleteProduct(id);
+      return new ResponseEntity<>("Product is deleted successsfully", HttpStatus.OK);
+   }
+   @RequestMapping(value = "/products", method = RequestMethod.POST)
+   public ResponseEntity<Object> createProduct(@RequestBody Product product) {
+      productService.createProduct(product);
+      return new ResponseEntity<>("Product is created successfully", HttpStatus.CREATED);
+   }
+}
+
+
+
+
+
+package com.tutorialspoint.demo.service;
+
+import java.util.Collection;
+import com.tutorialspoint.demo.model.Product;
+
+public interface ProductService {
+   public abstract void createProduct(Product product);
+   public abstract void updateProduct(String id, Product product);
+   public abstract void deleteProduct(String id);
+   public abstract Collection<Product> getProducts();
+}
+
+
+
+
+package com.tutorialspoint.demo.service;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.stereotype.Service;
+import com.tutorialspoint.demo.model.Product;
+
+@Service
+public class ProductServiceImpl implements ProductService {
+   private static Map<String, Product> productRepo = new HashMap<>();
+   static {
+      Product honey = new Product();
+      honey.setId("1");
+      honey.setName("Honey");
+      productRepo.put(honey.getId(), honey);
+
+      Product almond = new Product();
+      almond.setId("2");
+      almond.setName("Almond");
+      productRepo.put(almond.getId(), almond);
+   }
+   @Override
+   public void createProduct(Product product) {
+      productRepo.put(product.getId(), product);
+   }
+   @Override
+   public void updateProduct(String id, Product product) {
+      productRepo.remove(id);
+      product.setId(id);
+      productRepo.put(id, product);
+   }
+   @Override
+   public void deleteProduct(String id) {
+      productRepo.remove(id);
+
+   }
+   @Override
+   public Collection<Product> getProducts() {
+      return productRepo.values();
+   }
+}
+
+
+------------------------------------------------------------------
+
+Cross-Origin Resource Sharing (CORS) is a security concept that allows restricting the resources implemented in web browsers. It prevents the JavaScript code producing or consuming the requests against different origin.
+
+For example, your web application is running on 8080 port and by using JavaScript you are trying to consuming RESTful web services from 9090 port. Under such situations, you will face the Cross-Origin Resource Sharing security issue on your web browsers.
+
+Two requirements are needed to handle this issue −
+
+RESTful web services should support the Cross-Origin Resource Sharing.
+
+RESTful web service application should allow accessing the API(s) from the 8080 port.
+
+
+
+
+Enable CORS in Controller Method
+We need to set the origins for RESTful web service by using @CrossOrigin annotation for the controller method. This @CrossOrigin annotation supports specific REST API, and not for the entire application.
+
+@RequestMapping(value = "/products")
+@CrossOrigin(origins = "http://localhost:8080")
+public ResponseEntity<Object> getProduct() {
+   return null;
+}
+
+
+
+
+
+Global CORS Configuration
+We need to define the shown @Bean configuration to set the CORS configuration support globally to your Spring Boot application.
+
+
+package com.tutorialspoint.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+@SpringBootApplication
+public class DemoApplication {
+   public static void main(String[] args) {
+      SpringApplication.run(DemoApplication.class, args);
+   }
+   @Bean
+   public WebMvcConfigurer corsConfigurer() {
+      return new WebMvcConfigurerAdapter() {
+         @Override
+         public void addCorsMappings(CorsRegistry registry) {
+            registry.addMapping("/products").allowedOrigins("http://localhost:8080");
+         }
+      };
+   }
+}
+
+
+------------------------------------------------------------------
+
+@Bean v/s @Component
+
+
+@Bean is used to explicitly declare a single bean, rather than letting Spring do it automatically like we did with @Controller. It decouples the declaration of the bean from the class definition and lets you create and configure beans exactly how you choose. With @Bean you aren't placing this annotation at the class level.
+
+
+Typically, @Bean methods are declared within @Configuration classes. In this example, we have a user class that we needed to instantiate and then create a bean using that instance. This is where I said earlier that we have a little more control over how the bean is defined. 
+
+
+package com.therealdanvega;
+
+public class User {
+
+    private String first;
+    private String last;
+
+    public User(String first, String last) {
+        this.first = first;
+        this.last = last;
+    }
+}
+
+
+
+package com.therealdanvega;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ApplicationConfig {
+
+    @Bean
+    public User superUser() {
+        return new User("Dan","Vega");
+    }
+
+}
+
+
+//Getting Bean by Class
+
+AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+context.scan("com.therealdanvega");
+context.refresh();
+	
+User user = context.getBean(User.class);
+
+
+@Component
+
+If we mark a class with @Component or one of the other Stereotype annotations these classes will be auto-detected using classpath scanning. As long as these classes are in under our base package or Spring is aware of another package to scan, a new bean will be created for each of these classes. 
+
+
+package com.therealdanvega.controller;
+
+import org.springframework.stereotype.Controller;
+
+@Controller
+public class HomeController {
+
+    public String home(){
+        return "Hello, World!";
+    }
+
+}
+
+
+There's an implicit one-to-one mapping between the annotated class and the bean (i.e. one bean per class). Control of wiring is quite limited with this approach since it's purely declarative.  It is also important to note that the stereotype annotations are class level annotations. 
+
+
+------------------------------------------------------------------
+
+Scheduling
+
+The @EnableScheduling annotation is used to enable the scheduler for your application. This annotation should be added into the main Spring Boot application class file.
+
+@SpringBootApplication
+@EnableScheduling
+
+public class DemoApplication {
+   public static void main(String[] args) {
+      SpringApplication.run(DemoApplication.class, args);
+   }
+}
+
+
+
+package com.tutorialspoint.demo.scheduler;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Scheduler {
+   @Scheduled(cron = "0 * 9 * * ?")		//The @Scheduled annotation is used to trigger the scheduler for a specific time period.
+   public void cronJobSch() {
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+      Date now = new Date();
+      String strDate = sdf.format(now);
+      System.out.println("Java cron job expression:: " + strDate);
+   }
+}
+
+
+------------------------------------------------------------------
+SPRING CLOUD
+------------------------------------------------------------------
+
+Eureka:	(https://howtodoinjava.com/)
+
+
+The transition from Monolithic to Microservice based architecture gives many benefits for future in terms of maintainability, scalability, high availability etc. However at the same time, there are many challenges also while doing this migration. One of them is to maintain individual Microservices addresses. This task can be hugely complex – depending on number of services and their dynamic nature. If whole infrastructure is distributed and there is some replication as well, then maintaining this service addresses becomes harder.
+
+To solve this, in the distributed computing are there is a concept called ‘Service registration and discovery’ where one dedicated server is responsible to maintain the registry of all the Microservice that has been deployed and removed. This will act like a phone book of all other applications/microservices.
+
+Think of it as a lookup service where microservices (clients) can register themselves and discover other registered microservices. When a client microservice registers with Eureka it provides metadata such as host, port, and health indicator thus allowing for other microservices to discover it. The discovery server expects a regular heartbeat message from each microservice instance. If an instance begins to consistently fail to send a heartbeat, the discovery server will remove the instance from his registry. This way we will have a very stable ecosystem of Microservices collaborating among each other, and on top of it we don’t have to manually maintain address of other Microservice, which is a next to impossible task if the scale up/down is very frequent, on demand and we use virtual host to host the services specially in the cloud environment.
+
+
+
+1> Create Eureka Server  (@EnableEurekaServer   is used):
+
+
+package com.example.howtodoinjava.springeurekaserver;
+  
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+  
+@EnableEurekaServer																					
+@SpringBootApplication
+public class SpringEurekaServerApplication {
+  
+    public static void main(String[] args) {
+        SpringApplication.run(SpringEurekaServerApplication.class, args);
+    }
+}
+
+
+
+application.yml:
+
+server:
+  port: ${PORT:8761} # Indicate the default PORT where this service will be started
+ 
+eureka:
+  client:
+    registerWithEureka: false   #telling the server not to register himself in the service registry
+    fetchRegistry: false
+  server:
+    waitTimeInMsWhenSyncEmpty: 0    #wait time for subsequent sync
+
+
+2>  Eureka Client – Student Service (@EnableEurekaClient is used)
+
+
+
+package com.example.howtodoinjava.springeurekaclientstudentservice;
+  
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+  
+@SpringBootApplication
+@EnableEurekaClient
+public class SpringEurekaClientStudentServiceApplication {
+  
+    public static void main(String[] args) {
+        SpringApplication.run(SpringEurekaClientStudentServiceApplication.class, args);
+    }
+}
+
+
+
+package com.example.howtodoinjava.springeurekaclientstudentservice.controller;
+ 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+ 
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+ 
+import com.example.howtodoinjava.springeurekaclientstudentservice.domain.Student;
+ 
+@RestController
+public class StudentServiceController {
+ 
+    private static Map<String, List<Student>> schooDB = new HashMap<String, List<Student>>();
+ 
+    static {
+        schooDB = new HashMap<String, List<Student>>();
+ 
+        List<Student> lst = new ArrayList<Student>();
+        Student std = new Student("Sajal", "Class IV");
+        lst.add(std);
+        std = new Student("Lokesh", "Class V");
+        lst.add(std);
+ 
+        schooDB.put("abcschool", lst);
+ 
+        lst = new ArrayList<Student>();
+        std = new Student("Kajal", "Class III");
+        lst.add(std);
+        std = new Student("Sukesh", "Class VI");
+        lst.add(std);
+ 
+        schooDB.put("xyzschool", lst);
+ 
+    }
+ 
+    @RequestMapping(value = "/getStudentDetailsForSchool/{schoolname}", method = RequestMethod.GET)
+    public List<Student> getStudents(@PathVariable String schoolname) {
+        System.out.println("Getting Student details for " + schoolname);
+ 
+        List<Student> studentList = schooDB.get(schoolname);
+        if (studentList == null) {
+            studentList = new ArrayList<Student>();
+            Student std = new Student("Not Found", "N/A");
+            studentList.add(std);
+        }
+        return studentList;
+    }
+}
+
+
+
+public class Student 
+{
+    private String name;
+    private String className;
+     
+    public Student(String name, String className) {
+        super();
+        this.name = name;
+        this.className = className;
+    }
+ 
+    public String getName() {
+        return name;
+    }
+ 
+    public void setName(String name) {
+        this.name = name;
+    }
+ 
+    public String getClassName() {
+        return className;
+    }
+ 
+    public void setClassName(String className) {
+        this.className = className;
+    }
+}
+
+
+
+
+application.yml:
+
+server:
+  port: 8098    #default port where the service will be started
+ 
+eureka:         #tells about the Eureka server details and its refresh time
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/
+    healthcheck:
+      enabled: true
+    lease:
+      duration: 5
+ 
+spring:     
+  application:
+    name: student-service   #current service name to be used by the eureka server
+     
+management:
+  security:
+    enabled: false  #disable the spring security on the management endpoints like /env, /refresh etc. 
+ 
+logging:
+  level:
+    com.example.howtodoinjava: DEBUG
+
+
+
+3> Eureka Client – School Service (@EnableEurekaClient is used):
+
+
+package com.example.howtodoinjava.springeurekaclientschoolservice;
+ 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+ 
+@SpringBootApplication
+@EnableEurekaClient
+public class SpringEurekaClientSchoolServiceApplication {
+ 
+    public static void main(String[] args) {
+        SpringApplication.run(SpringEurekaClientSchoolServiceApplication.class, args);
+    }
+}
+
+
+
+package com.example.howtodoinjava.springeurekaclientschoolservice.controller;
+ 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+ 
+@RestController
+public class SchoolServiceController {
+    @Autowired
+    RestTemplate restTemplate;
+ 
+    @RequestMapping(value = "/getSchoolDetails/{schoolname}", method = RequestMethod.GET)
+    public String getStudents(@PathVariable String schoolname) 
+    {
+        System.out.println("Getting School details for " + schoolname);
+ 
+        String response = restTemplate.exchange("http://student-service/getStudentDetailsForSchool/{schoolname}",
+                                HttpMethod.GET, null, new ParameterizedTypeReference<String>() {}, schoolname).getBody();
+ 
+        System.out.println("Response Received as " + response);
+ 
+        return "School Name -  " + schoolname + " \n Student Details " + response;
+    }
+ 
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+
+Note:  The URL we have used is http://student-service/getStudentDetailsForSchool/{schoolname}. Clearly we are using only service name student-service in the place of host:port. This will be handled internally by spring framework, eureka server and rest template together.
+
+
+
+application.yml:
+
+server:
+  port: 9098    #port number
+ 
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 2
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8761/eureka/
+    healthcheck:
+      enabled: true
+    lease:
+      duration: 5
+ 
+spring:
+  application:
+    name: school-service    #service name
+ 
+logging:
+  level:
+    com.example.howtodoinjava: DEBUG
+
+
+
+------------------------------------------------------------------
+
+Service Monitoring – Hystrix, Eureka admin and Spring boot admin
+
+
+In this demo, we will create three applications.
+
+# Employee Service – This microservice application is responsible to fetch data of Employees.
+
+# Api-Gateway – This application is to provide common gateway while accessing different microservices. In the following example it will act as a gateway to Employee Service above.
+
+# Eureka Server – This microservice application will provide service discovery and registration of above microservices.
+
+
+package com.howtodoinjava.example.employee;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+ 
+@SpringBootApplication
+@EnableEurekaClient
+public class EmployeeServiceApplication {
+ 
+  public static void main(String[] args) 
+  {
+    SpringApplication.run(EmployeeServiceApplication.class, args);
+  }
+}
+
+
+
+package com.howtodoinjava.example.employee.controller;
+ 
+import java.util.HashMap;
+import java.util.Map;
+ 
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+ 
+import com.howtodoinjava.example.employee.beans.Employee;
+ 
+@RestController
+public class EmployeeServiceController {
+     
+     
+    private static final Map<Integer, Employee> employeeData = new HashMap<Integer,Employee() {
+ 
+        private static final long serialVersionUID = -3970206781360313502L;
+        {
+            put(111,new Employee(111,"Employee1"));
+            put(222,new Employee(222,"Employee2"));
+        }
+    };
+  
+    @RequestMapping(value = "/findEmployeeDetails/{employeeId}", method = RequestMethod.GET)
+    public Employee getEmployeeDetails(@PathVariable int employeeId) {
+        System.out.println("Getting Employee details for " + employeeId);
+  
+        Employee employee = employeeData.get(employeeId);
+        if (employee == null) {
+             
+            employee = new Employee(0, "N/A");
+        }
+        return employee;
+    }
+}
+
+
+package com.howtodoinjava.example.employee.beans;
+ 
+public class Employee {
+ 
+    private String name;
+    private int id;
+ 
+    @Override
+    public String toString() {
+        return "Employee [name=" + name + ", id=" + id + "]";
+    }
+}
+
+
+
+application.yml
+server:
+  port: 8011   
+  
+eureka:         
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 2
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true
+    lease:
+      duration: 5
+  
+spring:    
+  application:
+    name: employee-service   
+      
+management:
+  security:
+    enabled: false 
+  
+logging:
+  level:
+    com.self.sprintboot.learning.employee: DEBUG
+
+
+API-Gateway with Hystrix : 
+
+
+
+package com.howtodoinjava.example.apigateway;
+ 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
+ 
+@SpringBootApplication
+@EnableEurekaClient
+@EnableHystrixDashboard
+@EnableCircuitBreaker
+public class ApiGatewayApplication {
+ 
+    public static void main(String[] args) {
+        SpringApplication.run(ApiGatewayApplication.class, args);
+    }
+}
+
+
+
+@EnableHystrixDashBoard – To give dashboard view of Hystrix stream.
+@EnableCircuitBreaker – To enable Circuit breaker implementation.
+
+
+
+package com.howtodoinjava.example.apigateway.controller;
+ 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+ 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+ 
+@RestController
+public class EmployeeController {
+     
+    @Autowired
+    RestTemplate restTemplate;
+  
+    @RequestMapping(value = "/employeeDetails/{employeeid}", method = RequestMethod.GET)
+    @HystrixCommand(fallbackMethod = "fallbackMethod")
+    public String getStudents(@PathVariable int employeeid)
+    {
+        System.out.println("Getting Employee details for " + employeeid);
+  
+        String response = restTemplate.exchange("http://employee-service/findEmployeeDetails/{employeeid}",
+                                HttpMethod.GET, null, new ParameterizedTypeReference<String>() {}, employeeid).getBody();
+  
+        System.out.println("Response Body " + response);
+  
+        return "Employee Id -  " + employeeid + " [ Employee Details " + response+" ]";
+    }
+     
+    public String  fallbackMethod(int employeeid){
+         
+        return "Fallback response:: No employee details available temporarily";
+    }
+  
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+
+
+application.yml
+server:
+  port: 8010    #port number
+  
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 2
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    healthcheck:
+      enabled: true
+    lease:
+      duration: 5
+  
+spring:    
+  application:
+    name: api-gateway   
+      
+management:
+  security:
+    enabled: false 
+  
+logging:
+  level:
+    com.self.sprintboot.learning.apigateway: DEBUG
+
+
+
+To monitor via Hystrix dashboard, open Hystrix dashboard at http://localhost:8010/hystrix
+
+
+
+Eureka admin dashboard view:
+
+
+package com.howtodoinjava.example.eureka;
+ 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+ 
+import de.codecentric.boot.admin.config.EnableAdminServer;
+ 
+@SpringBootApplication
+@EnableEurekaServer
+@EnableAdminServer
+ 
+public class EurekaServerApplication {
+ 
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}
+
+
+@EnableEurekaServer– This annotation will make this application to act as Microservice registry and discovery server.
+@EnableAdminServer – This annotation provides Spring Boot Admin configuration.
+
+
+application.yml
+server:
+  port: ${PORT:8761}
+  
+eureka:
+  client:
+    registryFetchIntervalSeconds: 5
+    registerWithEureka: false
+    serviceUrl:
+      defaultZone: ${DISCOVERY_URL:http://localhost:8761}/eureka/
+  instance:
+    leaseRenewalIntervalInSeconds: 10
+  
+management:
+  security:
+    enabled: false
+spring:
+  boot:
+    admin:
+      context-path: /admin  #A different context path for Spring boot admin server has been provided avoiding conflict with eureka
+
+
+spring:
+  application:
+    name: Eureka-Server
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_URL:http://localhost:8888}
+
+
+To monitor via Spring Boot Admin server, invoke this URL running at different context path- http://localhost:8761/admin.
+
+
+
+
+------------------------------------------------------------------
+
+Spring Cloud Config Server with Git Integration
+
+
+The idea of config server has come from the 12-factor app manifesto related to the best practices guidelines of developing modern cloud-native applications. It suggests to externalize properties or resource files out of server where the values of those resources vary during runtime – usually different configurations that will differ in each environment.
+
+As an example, let’s say one service is dependent on another service (invoked for specific business scenarios) and if that dependent service URL got changed to something else. Then usually we need to build and deploy our service with the updated URL. Now, if we go by the 12-factor app approach and if we read those config properties from external service, then we just need to update URL in the config server and refresh that client service configuration to use the updated URL.
+
+
+
+package com.howtodoinjava.example.springconfigserver;
+ 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.config.server.EnableConfigServer;
+ 
+@EnableConfigServer   			// @EnableConfigServergetting used
+@SpringBootApplication
+public class SpringConfigServerApplication 
+{
+    public static void main(String[] args) 
+    {
+        SpringApplication.run(SpringConfigServerApplication.class, args);
+    }
+}
+
+
+
+
+The next essential step is to create a local git repository. It can easily be converted to a remote repository later by configuring its URL in the properties file. We will place the external property file [configuration], which will be used by the Config server microservice to provide the external configuration of properties
+
+
+Create a directory config-server-repo in your Desktop.
+
+Then create a file config-server-client.properties file in the config-server-repo directory and add the message there msg = Hello world - this is from config server.
+
+Then create another file config-server-client-development.properties file in the config-server-repo directory and add the message there msg = Hello world - this is from config server – Development environment.
+
+Then create another file config-server-client-production.properties file in the config-server-repo directory and add the message there msg = Hello world - this is from config server – Production environment.
+
+Now open command prompt from config-server-repo directory and run command git init to make that directory as git repository.
+
+Now run git add . to add everything to this repo.
+
+Then finally we need to commit the properties file by running command git commit –m "initial checkin".
+
+
+
+client-config.properties
+msg = Hello world - this is from config server - default profile
+
+client-config-development.properties
+msg = Hello world - this is from config server - Development Environment
+
+client-config-production.properties
+msg = Hello world - this is from config server - Prodcution Environment
+
+Git commands to execute in properties folder
+$ git init
+ 
+$ git add .
+ 
+$ git commit -m "initial commit"
+
+
+
+
+Config Client Configuration:
+
+
+package com.howtodoinjava.example.springconfigclient;
+ 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+ 
+@SpringBootApplication
+public class SpringConfigClientApplication {
+ 
+    public static void main(String[] args) {
+        SpringApplication.run(SpringConfigClientApplication.class, args);
+    }
+     
+    @Autowired
+    public void setEnv(Environment e)
+    {
+        System.out.println(e.getProperty("msg"));
+    }
+}
+ 
+@RefreshScope
+@RestController
+class MessageRestController {
+ 
+    @Value("${msg:Config Server is not working. Please check...}")
+    private String msg;
+ 
+    @GetMapping("/msg")
+    public String getMsg() {
+        return this.msg;
+    }
+}
+
+
+
+
+bootstrap.properties
+spring.application.name=client-config
+ 
+#Active Profile - will relate to development properties file in the server. 
+#If this property is absent then,default profile will be activated which is 
+#the property file without any environment name at the end. 
+spring.profiles.active=development
+ 
+# N.B. this is the default:
+spring.cloud.config.uri=http://localhost:8888
+ 
+management.security.enabled=false
+
+
+
+Now in the browser open the /msg rest endpoint by browsing the url http://localhost:8080/msg. It should return Hello world - this is from config server which is mentioned in the config-server-client-development.properties file.
+
+
+------------------------------------------------------------------
+
+Hystrix Circuit Breaker Pattern – Spring Cloud
+
+
+If we design our systems on microservice based architecture, we will generally develop many Microservices and those will interact with each other heavily in achieving certain business goals. Now, all of us can assume that this will give expected result if all the services are up and running and response time of each service is satisfactory.
+
+Now what will happen if any service, of the current Eco system, has some issue and stopped servicing the requests. It will result in timeouts/exception and the whole Eco system will get unstable due to this single point of failure.
+
+Here circuit breaker pattern comes handy and it redirects traffic to a fall back path once it sees any such scenario. Also it monitors the defective service closely and restore the traffic once the service came back to normalcy.
+
+So circuit breaker is a kind of a wrapper of the method which is doing the service call and it monitors the service health and once it gets some issue, the circuit breaker trips and all further calls goto the circuit breaker fall back and finally restores automatically once the service came back !!
+
+
+
+
+ we will create following two microservices where first is dependent on another.
+
+Student Microservice – Which will give some basic functionality on Student entity. It will be a REST based service. We will call this service from School Service to understand Circuit Breaker. It will run on port 8098 in localhost.
+
+School Microservice – Again a simple REST based microservice where we will implement circuit breaker using Hystrix. Student Service will be invoked from here and we will test the fall back path once student service will be unavailable. It will run on port 9098 in localhost.
+
+
+
+Student Service:
+
+Open application.properties and add port information.
+server.port = 8098
+
+
+package com.example.howtodoinjava.springhystrixstudentservice.controller;
+ 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import com.example.howtodoinjava.springhystrixstudentservice.domain.Student;
+ 
+@RestController
+public class StudentServiceController {
+ 
+    private static Map<String, List<Student>> schooDB = new HashMap<String, List<Student>>();
+ 
+    static {
+        schooDB = new HashMap<String, List<Student>>();
+ 
+        List<Student> lst = new ArrayList<Student>();
+        Student std = new Student("Sajal", "Class IV");
+        lst.add(std);
+        std = new Student("Lokesh", "Class V");
+        lst.add(std);
+ 
+        schooDB.put("abcschool", lst);
+ 
+        lst = new ArrayList<Student>();
+        std = new Student("Kajal", "Class III");
+        lst.add(std);
+        std = new Student("Sukesh", "Class VI");
+        lst.add(std);
+ 
+        schooDB.put("xyzschool", lst);
+ 
+    }
+ 
+    @RequestMapping(value = "/getStudentDetailsForSchool/{schoolname}", method = RequestMethod.GET)
+    public List<Student> getStudents(@PathVariable String schoolname) {
+        System.out.println("Getting Student details for " + schoolname);
+ 
+        List<Student> studentList = schooDB.get(schoolname);
+        if (studentList == null) {
+            studentList = new ArrayList<Student>();
+            Student std = new Student("Not Found", "N/A");
+            studentList.add(std);
+        }
+        return studentList;
+    }
+}
+
+
+package com.example.howtodoinjava.springhystrixstudentservice.domain;
+ 
+public class Student {
+ 
+    private String name;
+    private String className;
+ 
+    public Student(String name, String className) {
+        super();
+        this.name = name;
+        this.className = className;
+    }
+ 
+    public String getName() {
+        return name;
+    }
+ 
+    public void setName(String name) {
+        this.name = name;
+    }
+ 
+    public String getClassName() {
+        return className;
+    }
+ 
+    public void setClassName(String className) {
+        this.className = className;
+    }
+}
+
+
+School Service – Hystrix Enabled:
+
+
+
+Open application.properties and add port information.
+server.port = 9098
+
+
+package com.example.howtodoinjava.springhystrixschoolservice;
+ 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.netflix.hystrix.dashboard.EnableHystrixDashboard;
+ 
+@SpringBootApplication
+@EnableHystrixDashboard
+@EnableCircuitBreaker
+public class SpringHystrixSchoolServiceApplication {
+ 
+    public static void main(String[] args) {
+        SpringApplication.run(SpringHystrixSchoolServiceApplication.class, args);
+    }
+}
+
+
+
+package com.example.howtodoinjava.springhystrixschoolservice.controller;
+ 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import com.example.howtodoinjava.springhystrixschoolservice.delegate.StudentServiceDelegate;
+ 
+@RestController
+public class SchoolServiceController {
+     
+    @Autowired
+    StudentServiceDelegate studentServiceDelegate;
+ 
+    @RequestMapping(value = "/getSchoolDetails/{schoolname}", method = RequestMethod.GET)
+    public String getStudents(@PathVariable String schoolname) {
+        System.out.println("Going to call student service to get data!");
+        return studentServiceDelegate.callStudentServiceAndGetData(schoolname);
+    }
+}
+
+
+
+package com.example.howtodoinjava.springhystrixschoolservice.delegate;
+ 
+import java.util.Date;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+ 
+@Service
+public class StudentServiceDelegate {
+ 
+    @Autowired
+    RestTemplate restTemplate;
+     
+    @HystrixCommand(fallbackMethod = "callStudentServiceAndGetData_Fallback")
+    public String callStudentServiceAndGetData(String schoolname) {
+ 
+        System.out.println("Getting School details for " + schoolname);
+ 
+        String response = restTemplate
+                .exchange("http://localhost:8098/getStudentDetailsForSchool/{schoolname}"
+                , HttpMethod.GET
+                , null
+                , new ParameterizedTypeReference<String>() {
+            }, schoolname).getBody();
+ 
+        System.out.println("Response Received as " + response + " -  " + new Date());
+ 
+        return "NORMAL FLOW !!! - School Name -  " + schoolname + " :::  " +
+                    " Student Details " + response + " -  " + new Date();
+    }
+     
+    @SuppressWarnings("unused")
+    private String callStudentServiceAndGetData_Fallback(String schoolname) {
+ 
+        System.out.println("Student Service is down!!! fallback route enabled...");
+ 
+        return "CIRCUIT BREAKER ENABLED!!! No Response From Student Service at this moment. " +
+                    " Service will be back shortly - " + new Date();
+    }
+ 
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+
+Note:
+
+Add Hystrix Command to enable fallback method – @HystrixCommand(fallbackMethod = "callStudentServiceAndGetData_Fallback") – this means that we will have to add another method callStudentServiceAndGetData_Fallback with same signature, which will be invoked when actual Student service will be down.
+Add fallback method – callStudentServiceAndGetData_Fallback which will simply return some default value.
+
+
+test urls:
+
+http://localhost:9098/getSchoolDetails/abcschool
+
+http://localhost:9098/hystrix.stream – It’s a continuous stream that Hystrix generates. It is just a health check result along with all the service calls that are being monitored by Hystrix.
+
+
+------------------------------------------------------------------
+
+Netflix zuul example – zuul api gateway pattern
+
+
+A common problem, when building microservices, is to provide a unique gateway to the client applications of your system. The fact that your services are split into small microservices apps that shouldn’t be visible to users otherwise it may result in substantial development/maintenance efforts. Also there are scenarios when whole ecosystem network traffic may be passing through a single point which could impact the performance of the cluster.
+
+To solve this problem, Netflix (a major adopter of microservices) created and open-sourced its Zuul proxy server and later Spring under Pivotal has adapted this in its spring cloud stack and enabled us to use zuul easily and effectively with just few simple steps.
+
+Zuul is an edge service that proxies requests to multiple backing services. It provides a unified “front door” to your ecosystem, which allows any browser, mobile app or other user interface to consume services from multiple hosts. You can integrate Zuul with other Netflix stack components like Hystrix for fault tolerance and Eureka for service discovery or use it to manage routing rules, filters and load balancing across your system. Most importantly all of those components are well adapted by spring framework through spring boot/cloud approach.
+
+
+
+
+Zuul has mainly four types of filters that enable us to intercept the traffic in different timeline of the request processing for any particular transaction. We can add any number of filters for a particular url pattern.
+
+pre filters – are invoked before the request is routed.
+post filters – are invoked after the request has been routed.
+route filters – are used to route the request.
+error filters – are invoked when an error occurs while handling the request.
+
+
+
+package com.example.springboostudentservice;
+ 
+import java.util.Date;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+ 
+@RestController
+@SpringBootApplication
+public class SpringBootStudentServiceApplication 
+{
+    @RequestMapping(value = "/echoStudentName/{name}")
+    public String echoStudentName(@PathVariable(name = "name") String name) 
+    {
+        return "hello  <strong style=\"color: red;\">" + name + " </strong> Responsed on : " + new Date();
+    }
+ 
+    @RequestMapping(value = "/getStudentDetails/{name}")
+    public Student getStudentDetails(@PathVariable(name = "name") String name) 
+    {
+        return new Student(name, "Pune", "MCA");
+    }
+ 
+    public static void main(String[] args) 
+    {
+        SpringApplication.run(SpringBootStudentServiceApplication.class, args);
+    }
+}
+ 
+class Student 
+{
+    String name;
+    String address;
+    String cls;
+ 
+    public Student(String name, String address, String cls) {
+        super();
+        this.name = name;
+        this.address = address;
+        this.cls = cls;
+    }
+ 
+    public String getName() {
+        return name;
+    }
+ 
+    public String getAddress() {
+        return address;
+    }
+ 
+    public String getCls() {
+        return cls;
+    }
+}
+
+
+application.properties
+
+spring.application.name=student
+server.port=8090
+
+
+Zuul Gateway Service Proxy
+
+
+package com.example.springbootzuulgatwayproxy;
+ 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+import org.springframework.context.annotation.Bean;
+import com.example.springbootzuulgatwayproxy.filters.ErrorFilter;
+import com.example.springbootzuulgatwayproxy.filters.PostFilter;
+import com.example.springbootzuulgatwayproxy.filters.PreFilter;
+import com.example.springbootzuulgatwayproxy.filters.RouteFilter;
+ 
+@SpringBootApplication
+@EnableZuulProxy
+public class SpringBootZuulgatwayproxyApplication {
+ 
+    public static void main(String[] args) {
+        SpringApplication.run(SpringBootZuulgatwayproxyApplication.class, args);
+    }
+ 
+    @Bean
+    public PreFilter preFilter() {
+        return new PreFilter();
+    }
+    @Bean
+    public PostFilter postFilter() {
+        return new PostFilter();
+    }
+    @Bean
+    public ErrorFilter errorFilter() {
+        return new ErrorFilter();
+    }
+    @Bean
+    public RouteFilter routeFilter() {
+        return new RouteFilter();
+    }
+}
+
+
+#Zuul routes. Here for /student path, we are routing to localhost:8090 with extra path after that.
+zuul.routes.student.url=http://localhost:8090
+ 
+#Ribbon is auto integrated with Zuul and for this exercise we are not using that.
+ribbon.eureka.enabled=false
+ 
+#Will start the gateway server @8080
+server.port=8080
+
+
+package com.example.springbootzuulgatwayproxy.filters;
+ 
+import javax.servlet.http.HttpServletRequest;
+import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
+ 
+pre filter code – We will add the below pre filter. Currently filters are doing nothing apart from a println for testing purpose. But actually those are powerful enough to do many important aspects as mentioned before.
+
+package com.example.springbootzuulgatwayproxy.filters;
+ 
+import javax.servlet.http.HttpServletRequest;
+import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
+ 
+public class PreFilter extends ZuulFilter {
+ 
+  @Override
+  public String filterType() {
+    return "pre";
+  }
+ 
+  @Override
+  public int filterOrder() {
+    return 1;
+  }
+ 
+  @Override
+  public boolean shouldFilter() {
+    return true;
+  }
+ 
+  @Override
+  public Object run() {
+    RequestContext ctx = RequestContext.getCurrentContext();
+    HttpServletRequest request = ctx.getRequest();
+ 
+    System.out.println("Request Method : " + request.getMethod() + " Request URL : " + request.getRequestURL().toString());
+    return null;
+  }
+}
+post filter
+
+package com.example.springbootzuulgatwayproxy.filters;
+ 
+import com.netflix.zuul.ZuulFilter;
+ 
+public class PostFilter extends ZuulFilter {
+ 
+  @Override
+  public String filterType() {
+    return "post";
+  }
+ 
+  @Override
+  public int filterOrder() {
+    return 1;
+  }
+ 
+  @Override
+  public boolean shouldFilter() {
+    return true;
+  }
+ 
+  @Override
+  public Object run() {
+   System.out.println("Inside Response Filter");
+ 
+    return null;
+  }
+}
+route filter
+
+package com.example.springbootzuulgatwayproxy.filters;
+ 
+import com.netflix.zuul.ZuulFilter;
+ 
+public class RouteFilter extends ZuulFilter {
+ 
+  @Override
+  public String filterType() {
+    return "route";
+  }
+ 
+  @Override
+  public int filterOrder() {
+    return 1;
+  }
+ 
+  @Override
+  public boolean shouldFilter() {
+    return true;
+  }
+ 
+  @Override
+  public Object run() {
+   System.out.println("Inside Route Filter");
+    return null;
+  }
+}
+Error filter
+
+package com.example.springbootzuulgatwayproxy.filters;
+ 
+import com.netflix.zuul.ZuulFilter;
+ 
+public class ErrorFilter extends ZuulFilter {
+ 
+  @Override
+  public String filterType() {
+    return "error";
+  }
+ 
+  @Override
+  public int filterOrder() {
+    return 1;
+  }
+ 
+  @Override
+  public boolean shouldFilter() {
+    return true;
+  }
+ 
+  @Override
+  public Object run() {
+   System.out.println("Inside Route Filter");
+ 
+    return null;
+  }
+}
+
+
+test urls:
+
+http://localhost:8080/student/getStudentDetails/Sajal
+http://localhost:8080/student/echoStudentName/Sajal
+
+------------------------------------------------------------------
+
+
+Spring Cloud Sleuth
+Spring cloud Sleuth logs are printed in the following format −
+
+[application-name,traceid,spanid,zipkin-export]
+Where,
+
+Application-name = Name of the application
+
+Traceid = each request and response traceid is same when calling same service or one service to another service.
+
+Spanid = Span Id is printed along with Trace Id. Span Id is different every request and response calling one service to another service.
+
+Zipkin-export = By default it is false. If it is true, logs will be exported to the Zipkin server.
+
+Now, add the Spring Cloud Starter Sleuth dependency in your build configuration file as follows −
+
+Maven users can add the following dependency in your pom.xml file −
+
+<dependency>
+   <groupId>org.springframework.cloud</groupId>
+   <artifactId>spring-cloud-starter-sleuth</artifactId>
+</dependency>
+<dependency>
+   <groupId>org.springframework.cloud</groupId>
+   <artifactId>spring-cloud-sleuth-zipkin</artifactId>
+</dependency>
+
+Gradle users can add the following dependency in your build.gradle file −
+
+compile('org.springframework.cloud:spring-cloud-starter-sleuth')
+Now, add the Logs into your Spring Boot application Rest Controller class file as shown here −
+
+package com.tutorialspoint.sleuthapp;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication
+@RestController
+public class SleuthappApplication {
+   private static final Logger LOG = Logger.getLogger(SleuthappApplication.class.getName());
+   public static void main(String[] args) {
+      SpringApplication.run(SleuthappApplication.class, args);
+   }
+   @RequestMapping("/")
+   public String index() {
+      LOG.log(Level.INFO, "Index API is calling");
+      return "Welcome Sleuth!";
+   }
+   @Bean				//add the Always Sampler Bean in your Spring Boot application to export the logs into Zipkin server.
+   public AlwaysSampler defaultSampler() {
+      return new AlwaysSampler();
+   }
+}
+Now, add the application name in application.properties file as shown −
+
+spring.application.name = tracinglogs
+spring.zipkin.baseUrl = http://localhost:9411/zipkin/ 
+
+
+
+Zipkin Server
+Zipkin is an application that monitors and manages the Spring Cloud Sleuth logs of your Spring Boot application. To build a Zipkin server, we need to add the Zipkin UI and Zipkin Server dependencies in our build configuration file.
+
+Maven users can add the following dependency in your pom.xml file −
+
+<dependency>
+   <groupId>io.zipkin.java</groupId>
+   <artifactId>zipkin-server</artifactId>
+</dependency>
+<dependency>
+   <groupId>io.zipkin.java</groupId>
+   <artifactId>zipkin-autoconfigure-ui</artifactId>
+</dependency>
+
+
+For properties file users, add the below property in application.properties file.
+
+server.port = 9411
+For YAML users, add the below property in application.yml file.
+
+server:
+   port: 9411
+Add the @EnableZipkinServer annotation in your main Spring Boot application class fie. The @EnableZipkinServer annotation is used to enable your application act as a Zipkin server.
+
+package com.tutorialspoint.zipkinapp;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import zipkin.server.EnableZipkinServer;
+
+@SpringBootApplication
+@EnableZipkinServer
+public class ZipkinappApplication {
+   public static void main(String[] args) {
+      SpringApplication.run(ZipkinappApplication.class, args);
+   }
+}
+
+
+
+Now, hit the below URL and see the Zipkin server UI.
+
+http://localhost:9411/zipkin/
+
+test url:
+
+http://localhost:9411/zipkin/traces/{traceid}/
+
+
+
+------------------------------------------------------------------
+SPRING CLOUD ENDS
+------------------------------------------------------------------
+
+Actuator:
+
+
+Spring Boot Actuator provides secured endpoints for monitoring and managing your Spring Boot application.
+
+
+To enable Spring Boot actuator endpoints to your Spring Boot application, we need to add the Spring Boot Starter actuator dependency in our build configuration file.
+
+Maven users can add the below dependency in your pom.xml file.
+
+<dependency>
+   <groupId>org.springframework.boot</groupId>
+   <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+
+Application.properties:
+
+server.port = 8085
+management.security.enabled=false  
+management.security.roles=ADMIN  
+management.endpoints.web.exposure.include=*
+security.basic.enabled=false  
+security.user.name=admin  
+security.user.passowrd=admin  
+# management.port = 9000     // for changing the actuator service port
+
+ENDPOINTS	USAGE
+/metrics	To view the application metrics such as memory used, memory free, threads, classes, system uptime etc.
+/env		To view the list of Environment variables used in the application.
+/beans		To view the Spring beans and its types, scopes and dependency.
+/health		To view the application health
+/info		To view the information about the Spring Boot application.
+/trace		To view the list of Traces of your Rest endpoints.
+
+------------------------------------------------------------------
+
+Swagger
+
+
+Swagger2 is an open source project used to generate the REST API documents for RESTful web services. It provides a user interface to access our RESTful web services via the web browser.
+
+To enable the Swagger2 in Spring Boot application, you need to add the following dependencies in our build configurations file.
+
+<dependency>
+   <groupId>io.springfox</groupId>
+   <artifactId>springfox-swagger2</artifactId>
+   <version>2.7.0</version>
+</dependency>
+<dependency>
+   <groupId>io.springfox</groupId>
+   <artifactId>springfox-swagger-ui</artifactId>
+   <version>2.7.0</version>
+</dependency>
+
+
+
+package com.tutorialspoint.demo;
+
+import org.apache.log4j.Logger;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@SpringBootApplication
+@RestController
+@EnableSwagger2
+public class DemoApplication {
+	
+	final Logger logger = Logger.getLogger(this.getClass());
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+	
+	@RequestMapping(value = "/")
+	   public String hello() {
+			logger.info("This is an info message");
+			logger.warn("This is a warn message");
+			return "How is life??";
+	}
+	
+	@Bean
+	   public RestTemplate getRestTemplate() {
+	      return new RestTemplate();
+	 }
+
+	// create Docket Bean to configure Swagger2 for your Spring Boot application. We need to define the base package to configure REST 		// API(s) for Swagger2.
+	
+	@Bean
+	   public Docket productApi() {
+	      return new Docket(DocumentationType.SWAGGER_2).select()
+	         .apis(RequestHandlerSelectors.basePackage("com.tutorialspoint.demo")).build();
+	  }
+
+}
+
+test-url: http://localhost:8085/swagger-ui.html
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
