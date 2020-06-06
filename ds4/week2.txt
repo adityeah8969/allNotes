@@ -1,0 +1,142 @@
+# video:1
+
+Polynomial time solvability(tractability):
+
+If there exist an algorithm which correctly solves the problem in O(n^k) , for some constant k.
+
+# video:2
+
+Reduction leading to enlarge the frontier of tractability:
+
+If P1 reduces to P2 and there is a known polynomial time algorithm available for solving P2.
+
+e.g  Computing median reduces to sorting.
+         Detecting a cycle reduces to DFS
+        All pair shortest path reduces to single source shortest path algorithm.
+
+Completeness:
+
+If P1 is not in class P and it reduces to P2 , then P2 also doesnt belong to class P. P2 is atleast as hard as P1.
+
+A problem is C-complete if
+
+i>   P belongs to C.
+ii>  Everything in C reduces to P.
+
+C for TSP would be brute force solvable problems.
+
+# video:3
+
+i>  A problem is in class NP if solutions have length polynomial in size i the input size.
+ii> Proported solutions can be verified in polynomial tme.
+
+e.g TSP tour , 3-SAT problem
+
+Every problem in NP can be solved in exponential time(by checking every candidate solution).
+
+Establishing a problem is NP complete:
+
+i>   Find some other problem that is NP complete say P2.
+ii>  Prove that P2 reduces to your problem P1.
+
+This implies,
+P1 is atleast as hard as P2.
+P1 is NP complete as well.
+
+# video:5
+
+NP stands for Non-deterministic polynomial.
+
+#video:6
+
+Strategies to cope up with NP completeness:
+
+i>  Focus on computationally tractable special cases.
+    e.g  WIS in path graphs , Knapsack DP for small capacity W , 2-SAT (class P) instead of 3-SAT (NP complete),Vertex Cover problem with small no. of vertices.
+
+ii> Heuristics (These are fast algorithms but may turn out to be incorrect in some instances)
+    e.g greedy heuristics for knapsack.
+
+iii> Solve in exponential time but better than brute force search.
+     e.g  Knapsack (can be solved in O(nW) instead of 2^n)
+          TSP (can be solved in 2^n instead of n!)
+          vertex cover (n*(2^k) instead of n^k)
+
+#video:8
+
+In vertex cover problem we check if a vertex cover set of cardinality k is present or not. We make sure k is less.
+
+Substructure lemma:
+
+Consider a graph G with an edge (u,v) and K>=1 but less.
+
+Let Gu denote the graph with all the edges incident on u deleted.
+&   Gv denote the graph with all the edges incident on v deleted.
+
+claim :   G has a vertex cover of size k <=> Gu or Gv (or both) has a vertex cover of size k-1.
+
+Let Eu denote all the edges with no end point as u.
+& Fu denote all the edges incident on u. 
+
+Deduction of LHS from RHS:
+
+Gu has vertex cover S of size k-1.
+
+Only edges that are missing have one end point incident on u.
+therefore S union {u} gives a vertex cover of size k.
+
+Deduction of RHS from LHS:
+
+Let S be the vertex cover of G having a size k, since edge uv would also be covered , say u is in S. Since no Eu edges are incident on u, S-{u} must be a vertex 
+cover of size k-1.
+
+Algorithm:
+
+i>   Pick an arbitrary edge uv.
+ii>  Recursively search for a vertex cover of size k-1 in Gu.If found return S union {u}.
+iii> Recursively search for a vertex cover of size k-1 in Gv.If found return S union {v}.
+
+Running time:
+
+Depth of the recursive tree k with branching factor 2.
+
+total no. of recursive call = 2^k
+work done per recursive call =O(m)
+
+Running time = O(m* 2^k) , way better than brute force search.
+
+#video:10
+
+Dynamic programming based algorithm for TSP problem takes O((n^2)*(2^n)).  (can solve upto n=30)
+Brute force method's running time is O(n!) which allows us to solve problems of size n<=12.
+
+Copying the format of Bellman ford algorithm wont work because solving the entire set of problem doesnt give you the final solution . The issue here is that in
+Bellman ford we disallowed repeated visits.
+
+In this dynamic programming algorithm we have to keep track of all the verices which have been visited in subproblem.
+
+#video:11
+
+Optimal substructure lemma:
+
+Let P be the shortest path from 1 to j that visits all the vertces in set S. If the last hop is Kj then P' is the shortest path from 1 to k that visits S-{j} 
+exactly once.
+
+Recurrence:
+
+Base case A[S,1]= 0        if S=1
+                = Infinite otherwise
+
+For m(2,3...,n)  (cardinality of set S)
+for each set S of size m having 1
+for each j!=1 and j belonging to S.
+
+A[S,j]= min(all k belonging to S & k!=j)  {A[S-{j},k] + Ckj}
+
+
+Running time =  O(n)       *         O(2^n)        *            O(n)
+             =  choices of j     choices of S           work done per subproblem
+             =  O((n^2)*(2^n))
+
+
+

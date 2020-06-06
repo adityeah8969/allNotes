@@ -1,0 +1,672 @@
+# video:1
+
+Application of sequence alignment:
+
+Mainly it gets used in computational genomics where genome strings are compared.
+
+i>   Extrapolate functions of genome substring i.e matching genome substrings of say man and rat.
+ii>  Similar genomes can reflect proximity in evolutionary tree.
+
+# video:3
+
+Cache:There is a small fast memory used for current requests.
+
+This cache memory has to evict a chunk of itself to make room for new requests if its not already present.For evicting a chunk ,Belady proposed 'Furthest in future'
+algorithm where the chunks which get requested least are evicted to make room for new requests. 
+
+#video:6
+
+Scheduling problem:
+
+minimize sigma(for all i's)(Wi*Ci)  , here C is the completion time
+
+We order jobs in the decreasing order of ratio Wi/Li (Li's are the length of individual jobs). We calculate sigma(for all i's)(Wi*Ci) and that is the minimum 
+weighted completion time.
+
+Proof:(By exchange argument)
+
+Assumption: Wi/li are all distinct.
+
+by renaming jobs we can write as follows W1/L1 > W2/L2 > W3/L3 > W4/L4 > W5/L5 >..... Wn/Ln  (in order 1,2,3,4....n) 
+
+let the proposed greedy solution be $. If its not correct then let $* be the optimal solution.
+
+$* will definitely have an ordering where i will come before j inspite of i being greater than j .
+
+$*= (ordering 1,2,3,4...i,j...n)
+
+lets exchange i & j ,
+
+$**= (ordering 1,2,3,4...j,i...n)
+
+If we look carefully weighted sum of the elements before the i,j pair and after it are unaffected.
+
+The completion time of 'j' goes down by Wj*Li.
+The completion time of 'i' goes up by Wi*Lj.
+
+we know Wj/Lj > Wi/Li
+
+       Wj*Li > Wi*Lj
+   so  Wj*Li - Wi*Lj > 0
+
+  That is the factor by which the completion time got reduced is more . $** turns out to be more optimal , so this contradicts our statement $* is the 
+  optimal solution. 
+
+case 2:
+if Wi/li are not all distinct.
+
+Then we will have a sequence like,
+
+  W1/L1 >= W2/L2 >= W3/L3 >= W4/L4 >= W5/L5 >= ..... Wn/Ln
+  
+  again let this be $ or the greedy solution.
+
+  Let $* be any other solution.
+  We need to prove that $ is as good as any other $*.
+
+  Now if $=$* , then we are done with the proof.
+  
+  else we will have a sequence like
+  $*= (ordering 1,2,3,4...i,j...n)  where  (i>j) 
+
+  if we exchange i & j ,  
+
+            then Wi*Lj <= Wj*Li
+            also Wj*Li - Wi*Lj >= 0
+
+   i.e the net benefit will either be zero or its gonna be better. Also since the no. of such ties are constant in no. with every flip their positions
+   we reduce the no. of ties and  we are gonna end up with $*=$.
+
+  note: Dont worry about '=' signs , if 4th and 5th jobs has the same ratio whether u put 4th one ahead or the 5th one it doesnt matter.
+
+# video:12
+
+Prims MST :
+
+Empty cut lemma : If a graph is not connected then it has to has a cut with no crossing edges.
+
+proof:
+
+If there are no crossing edges inside a cut then pick an element from either sides of the cut and since we have no crossing edges we cant reach the elements on the
+other side and thereby graph is not connected.
+
+Similarly if we assume graph is not connected then there will be no path between a certain pair 'U' and 'V' . So we can have two different sections , one having all 
+the vertices reachable from 'U' and other one having all the vertices reachable from V. These two sections comprise a cut because there is no U-V path in between and
+there are no points which have a crossing across the two sections cause that would mean reachability from one section to another.  
+   
+Double crossing lemma: If an crossing edge in a cut participates in a cycle then it has to cross the cut even no. of times.
+
+Lonely cut corollary: From double crossing lemma we can tell that if a single edge crosses the cut then it doesnt participate in cycle formation.
+
+Proof that prims algorithm outputs an spanning tree:
+
+i>   T or the tree spanned so far spans through all vertices (obvious).
+ii>  T doesnt get stuck at any vertex cause getting stuck would mean no crossing edges within the cut , but this contradicts the fact that the graph is connected.
+iii> If X and V-X be the cut after certain no. of iterations where X is the tree spanned so far , then a single crossing edge is chosen inside any iteration.
+     being single it exhibits lonely cut corollary and cant participate in any cycle formation.
+
+Cut property: (proof provided later) Consider an edge 'e' of a graph G. Suppose that there is a cut (A,B) such that 'e' is the cheapest of G that crosses it.
+Then 'e' belongs to the MST of G. Infact every such e's corresponding to different graph cuts form MST.
+
+Since prims algorithm outputs a spanning tree and explicitly picks up the least weight edge at every iteration there by justifying the Cut property . So the
+spanning tree turns out to be the subset of the MST(as everything it the spanning tree belongs to MST justified by the Cut property ) . But we cant add any 
+further edges to it as it may create cycles owing to it already being a spanning tree. So the spanning tree is indeed an MST. 
+
+for proof of the Cut property watch video 14. (Cant show here cause of diagram related issues)
+
+Running time analysis: O(n)        +                O(n)     +                   O(const* m * logn)                          = O(mlog(n))   (since m>=n-1)
+
+                      inserting inside heap     main loop       heap operations are proportional to the no. of edges crossing
+
+# video:18 
+
+Proof of kruskal algorithm:
+
+let the spanning tree produced be T*
+
+i>   T* has no cycles owing to the fact we never picked an edge that could partcipate in a cycle.
+ii>  Since the graph we started with is connected and spanning tree produced spans through cuts , lets fix a cut. Inside this cut kruskal algorithm surely considers
+     an edge , this edge is gonna be in the final output as it is the single edge crossing and cant participate in a cycle.
+iii> Every edge of the kruskal algorithm justifies the Cut property.After a certain no. of iterations we can picturise a cluster of mini-trees with no crossing edges.
+     Kruskal algorithm picks up the edges with the least weight justifying the Cut property. 
+
+
+#video:20
+Running time of kruskal algorithm is as follows,
+
+   O(mlog(n))(preprocessing sorting step, here mlog(m) time is taken but since m can be n^2 so we get rid of the constant)
+
+  +O(m)(Cycle checks takes O(1) time but over m edges total time would be O(m))
+
+  +O(n*log(n))(leader pointers update on average for any vertex is log(n), so summing up the time taken in this case for all the vertices) 
+
+ = O(m*log(n))   i.e sorting reduces to be the bottleneck step.
+
+# video:21
+
+There is a randomized algorithm which runs in time O(m) but outside the scope of this class.
+
+Fastest deterministic algorithm runs in O(m*alpha(n)).
+
+where alpha(n) stands for inverse ackerman function. 
+
+# video:22-23
+
+Application of MST:
+
+The clustering problem: It deals with formation of coherent groups among a set of n points.These n points can be anything like web pages etc.The coherent groups 
+are formed on the basis of a mathematical measure like eucledean distance whereby we can consider a set of points closer if the distance is less.
+
+The clustering problem asks us to form k clusters with maximum spacing . The procedure is simple , we will pick a pair of point with smallest distance and 
+cluster them together. Then we look out for pairs of two points having smallest distance in between and if they are in a different cluster we merge them.
+We repeat the same process till the no. of clusters are k.
+
+
+Correctness proof:
+
+Let C1,C2,C3,C4...Ck be the k clusters produced this way.If this is not the correct answer , then let C^1,C^2,C^3,C^4,..C^k be the clusters which has more spacing.
+Since both of them are fundamentally different, think of a pair of points p,q where both were same in the same cluster earlier in Ci's but in different clusters
+in C^i's say C^i and C^j. Let S be the maximum spacing in case of the original solution i.e Ci's. This S would be greater than distance between p & q cause S happens
+to be the maximum spacing in the original solution. Also distance between p & q upper bound the distance between the clusterings C^i's. So,
+
+S >= distance(p,q) >= spacings of clusters C^i's
+
+The earlier proof considered that p,q would have got merged in a single greedy iteration but there is a possibibility that p and q got into a cluster by a series
+of clustering of different clusters in which p and q were there . If aj and aj+1 are the points in the series which are responsible for the merging of the clusters
+having p and q inside them . Analogous to our last paragraph of proof we can write,
+
+S >= distance(aj,aj+1) >= spacings of clusters C^i's
+
+Thus our greedy solution had more spacing.
+
+#video:24
+
+UNION FIND DATA-STRUCTURE:
+
+Lazy unions:
+
+Here when two groups are about to get merged then instead of rewiring all the pointers of one group to point to the leader of the other group, we simply make
+the leader pointer of one group to point to the other group.
+
+Also union()= 2 * find() + O(1) time for updating leaders.
+
+Problem here is the traversal through parent pointers to lead to the leader of the group wont get completed in O(1) time .
+
+#video:25
+
+When two groups are to be merged then if we pick a group at random to be the one having the leader pointer , then the traversal inside the other group from leaves to
+leader can be as bad as O(n).
+
+Ranks:
+
+Rank = maximum no. of hops from leaves to root.
+
+in general it can be said that Rank[x]= 1 + max(rank[left child],rank[right child]).
+
+To avoid the traversal time from reaching O(n) by some margin we should keep the leader pointer suggested by the group having more no. of vertices as it will
+lead to less no. of pointer rewiring (other group is having less no. of vertices). Here the concept of rank plays a key role as the leader having more rank
+will definitely have more no. of vertices with itself. So while merging two groups , the group with its leader having lower rank is made the child of other 
+group having its leader with a better rank. Now if the ranks are the same then we pick up a group at random , make the other group its child and increase the
+rank of the group arbitrarily picked(the one having the new leader) by 1. 
+
+#video:26
+
+3 observations after using the rank scheme:
+
+i>   Ranks of all the vertices can only go up.
+ii>  Only the root can make its rank go up even more, and once a vertex  loses its root-tag its never gonna achieve it back.
+iii> As we traverse a leaf-root path we are gonna see a constant rise in ranks of the vertices.
+
+Rank lemma:
+
+Consider an arbitrary sequence of unions() and finds(), for every r E (0,1,2,3.....) there are at most n/(2^r) objects of rank r. For e.g with rank 0 we
+can have at max n objects, with rank 1 we can can at max n/2 objects.
+
+corollary:The maximum rank is always log(n).
+corollary:The worst case running time would also be O(log(n)).
+
+Proof of the rank lemma:
+
+We simply need to prove the following 2 claims for the rank lemma:
+ 
+Claim 1: if x,y have the same rank r, then their subtrees are in disjoint sets.
+Claim 2: The subtree of a rank r object has a size >= 2^r.
+
+
+Proof of claim 1: Suppose they have an object 'Z' in common. Z can reach from itself to both x and y. But if it can reach both x & y then one of it
+will get explored earlier and it should have a low rank. This contradicts our assumption.
+ 
+Proof of claim 2: Its obvious.
+
+When two groups with rank r are to be merged then sum of the no. of objects would be 2*2^r which is 2^(r+1) which is >=2^r.
+
+Now we have proved both the claims , so we have n objects to go around with 2^r objects inside each of them so there are at most n/(2^r) objects of rank r.
+
+#video:27
+
+Path compression:
+
+Every time we use Find() we rewire its pointer from its parent to the leader of its own group. This way we can avoid traversing the same path time and again.
+
+Now the ranks do not denote the maximum no. of hops from leaf to root but it actually upperbounds it. Rank lemma discussed earlier still holds true and 
+the rank[parent] is still more than that of its child.
+
+Hopcroft Ullman theorem:
+
+'m' union and find operations take O(mlog*n).log* function grows very slowly.(log* is the no. of times we apply log function to n till it drops below 1) 
+
+Important thing is not every union+find takes O(log*n), some may take O(log(n)) time also which is more. But on an average the time taken is O(log*n). 
+
+#video:28
+
+Every time we update the rank of the object the difference between its parent's rank and its rank i.e rank[parent]-rank[x] increases.
+This difference is taken into account while measuring the progress measure.
+
+Rank blocks: {0}, {1},{2,3,4},{5,6,7...2^4},{17,18,19...2^16},{65537,65538....2^65536}...........{......n}
+
+There are log*n different rank blocks.
+
+Lets have a notation of good objects:
+i>   its root
+ii>  its roots child
+iii> its parent is in a different rank block.
+
+All the objects not satisfying any of the above mentioned quality will be termed as bad objects.
+
+So for every good object , find() operations visits log*n blocks(1(root)+1(root's descendent)+ log*n no. of rank blocks)
+
+For every bad object i.e the objects having its parent inside the same block , maximum no. of visits to a bad object x till its parents rank is in the same block
+is 2^k if the block is of type (k+1,k+2,k+3....2^k).
+
+Total no. of finds that can be thrown on an object <= 2^k
+From rank lemma , total no. of objects = sigma(i=k+1 to i=2^k)n/(2^i)= this sums turns out to be n/(2^k)
+
+So the total no. of finds that can be thrown <= 2^k * n/(2^k) <= n
+So there are <= n visit to bad nodes.
+summing this over all the rank blocks , time taken = O(nlog*n)
+
+Total work=O((m+n)log*n)
+
+#video:30
+
+Tarjan's bound:
+
+'m' union and find operations take O(m*alpha(n)) where alpha is the inverse ackermann function.
+
+The Ackermann Function:
+
+Ak(r)  where k>=0 and r>=1
+
+Base case: A0(r)=r+1
+
+Ak(r)=(Ak-1 Ak-1 Ak-1......)(r)
+       ......r times.......
+
+So,
+
+A1(r)=2r
+A2(r)=r*2^r
+A3(r) >= ((((((((2^2)^2)^2)^2)^2)^2)^2)^2)^2)..... ^r)  i.e 2 raised to 2 raised to 2.....r times  i.e a tower of two's.
+
+
+Alpha(n) or The inverse Ackermann Function
+
+alpha(n)= minimum value of k such that Ak(2) >= n
+
+alpha(n)=1    for n=4
+alpha(n)=2    for n=5,6,7,8
+alpha(n)=3    for n=9,10,11....,2048
+alpha(n)=4    for n= upto roughly a tower of two's of height 2048
+
+The inverse Ackermann function grows even slowly tha log* function.
+
+#video:31
+
+Trajan's analysis:
+
+The rank of the new parent is considered to be much bigger than its old parent.
+
+Let there be a function delta(x) >= 0
+
+which is defined as max value of k such that rank[parent(x)]>=Ak(rank[x])
+
+delta(x)>=1  rank[parent(x)]>=2*rank[x]
+delta(x)>=2  rank[parent(x)]>=rank[x]*2^rank[x]
+.
+.
+.
+this way delta keeps on increasing, but it cant exceed alpha(n) i.e delta(x)<alpha(n) because of the following reason:
+
+Rank of any object <= n
+Rank [parent(x)]<=n
+let the rank of the object be 2, so
+
+delta(x) = max value of k such that Ak(2) <= n
+alpha(n) = smallest values of k such that Ak(2) >=n
+
+so from the above two declarations its obvious that delta(x) cant surpass alpha(n).
+
+Lets again have a notion of good and bad objects,  an object x can be called as a bad object if
+
+i>    x is not the root.
+ii>   parent(x) is not a root.
+iii>  rank(x)>=2
+iv>   x has an ancestor y with delta(x) = delta(y)
+
+So the maximum no. of good objects will be alpha(n) i.e the maximum no. blocks of delta's it can traverse through.
+
+The no. of visits to the good objects can be bounded by O(m*alpha(n)).
+
+The no. of visits to the bad nodes can be calculated as follows:
+
+Consider a bad object 'x' having a rank >=2 , delta(x)=k and parent ='A'. Suppose a find operation visits this bad object , then its gonna traverse up till the    
+new parent 'y' has delta(y) = k. Since y is also a bad object it cant be the root , so let its parent be 'p'.Later on going like this, x's new parent will be at
+an even higher rank. So we can say
+
+rank[x's new parent]>=rank[p]>=Ak(rank[y])>=Ak(rank[A])         (consult video 32 for clarity)
+
+focussing on the extremes of the inequality,
+
+
+rank[x's new parent]>=Ak(rank[A]) i.e rank of x's new parent is Ak function applied to rank of x's old parent.
+
+So after every r no. of visits to a bad object x,
+
+rank[x's parent] >= (Ak Ak Ak Ak....)r = Ak+1(r)   ,   so we can say every r visit increases delta(x) by 1.
+                     ...r times....
+
+Total no. of visits while x is bad = r*alpha(n)   (cause alpha(n) is the upper bound of delta(x))
+
+Total no. of visits to all the bad objects= sigma(r>=0)r*alpha(n)*(no. of objects having rank r)
+                                          = alpha(n)  *  sigma(r>=0)r*(no. of objects having rank r)
+                                          = alpha(n) *  sigma(r>=0) r* n/(2^r)         
+                                          = n * alpha(n) * constant                          (since sigma(r>=0) r* n/(2^r) evaluates to a constant)
+                                          
+
+So the running time corresponding to all bad nodes is O(n * alpha(n))
+
+So overall running time = O((m+n)alpha(n))=O(m*alpha(n))
+
+#video:33
+
+Binary codes map each character (say an alphabet) with a binary string. In general we use the ASCII code , if 32 characters are there , then we can get away with
+5-bit binary strings.
+
+Huffmann codes compress binary codes.
+
+Here we use variable length binary codes to encode a character.These variable codes are prefix free(discribed later) and are formed taking into account the frequency
+of the character.
+
+e.g
+
+                                 2-bit strings        Huffmann codes(% frequency)  
+
+A                                    00                   0          (60)
+B                                     01                   10         (25)
+C                                    10                   110        (20)
+D                                    11                   111        (5)
+
+Bits/character                        2                      1.55
+
+As we can see we can get away with less bits/character in case of Huffmann codes. Note that the huffmann codes are prefix-free i.e none of them start with already
+made codes e.g we cant take C to start with 0 or 10 .
+
+#video:34
+
+Set the left child=0 and the right to be 1.
+
+Here the leaf nodes corresponds to the character(owing to codes being prefix free,nodes cant have ancestors)and bits along the root-leaf path encodes the character. 
+
+To decode we just have to follow the root leaf path untill we hit a leaf.
+Also encoding length of a particular string representing a character = depth of the leaf in the tree.
+
+Average encoding length L(T) = sigma(all i's) (Pr[i]) * (depth of i )
+
+Greedy algorithm used in Huffmann codes minimizes the L(T) provided the probability or frequencies of occurence of a symbol.
+
+#video:35
+
+Greedy algorithm:
+
+suppose following are the nodes with their respective frequencies,
+
+A      (60)
+B      (15)                                   
+C      (20)                                   
+D      (5)                                      
+
+
+In each recursion we pick the characters with least frequencies here C & D . After this we merge them together as CD with frequency (20 + 5). So next we have
+   
+A      (60)
+B      (15)                                   
+CD     (25) 
+
+Now the two characters with least frequencies are  B & 'CD' . Combining them  , we get BCD 40.  So again we have
+
+A      (60)
+BCD    (40)                                
+
+Now we are left with two final nodes , so recursion unwinds from here in the following way ,
+
+left child = A 
+Right child = BCD
+
+breaking BCD into 
+
+left child = B
+Right child = CD 
+
+breaking CD into 
+
+left child = C
+Right child = D 
+
+# video:37
+
+Correctness proof:
+
+This is a proof by induction.The solution is optimal when n=2(below) and when n is larger the subproblems get solved optimally.
+
+Consider a situation when a combined node 'ab' is gonna get separated into a and b(a & b will be leaf nodes with max depth).  Let T' be the tree where ab is still 
+combined and T be the solution where both are leaves.
+
+L(T)-L(T')= Pa(depth of a in T) + Pb(depth of b in T) - Pab(depth of ab in T')
+          = Pa(d+1) + Pb(d+1) -(Pa+Pb)(d)
+          = Pa + Pb
+
+Pa + Pb << 1 , so L(T')~L(T)  (L(T) >> 1 for larger dats set), so we can say this merger preserves average encoding length to very good extent.
+
+#video:38
+
+We have proved that the tree is optimal if a,b i.e the least frequent elements have the maximum depth (they get merged first and form an optimal solution). The 
+proof of taking the least two element in the first step for merger makes the tree optimal as follows,
+
+Let T be the solution with a,b having max depth and x,y at some lesser depth . Let T* be any other solution with x,y in place of a,b 
+
+L(T*) - L(T) = (Px-Pa)(depth of x in T* - depth of a in T* ) + (Py-Pb)(depth of y in T* - depth of b in T* ) 
+             = All the quantities inside bracket are >= 0
+             
+L(T*) - L(T) >= 0
+
+i.e transferring the least frequent element from the nodes with max depth to some other place increases the average encoding length.
+
+#video:40
+
+Max weight independent set:
+
+Let S be the set of such vertices , Vn be the last vertex & G be the path.
+
+key point: either Vn is in S or it isn't.
+
+Case 1: Vn is not in S
+
+Let G' denote G with Vn excluded
+
+Then S is also a subset of G'
+infact S must be the MIS of G' , cause if it is not the MIS the some other set S* would be the MIS in G , but this contradicts the fact that S is the MIS in G.
+
+Case 2: Vn is in S
+
+Let G'' denote the set with Vn and Vn-1 deleted (2nd last vertex cant be selected because of the presence of last vertex in S)
+
+S-{Vn} is a subset of G''.
+infact S-{Vn} is the MIS of G'' , cause if it is not the MIS then some other set S* would be the having more weight . If we add the weight corresponding to the 
+final vertex to both S-{Vn} and S* then S* with final vertex would have larger weight contradicting the optimality of S being the MIS in G.
+
+
+A[i]= Value of max weight independent set of Gi.
+
+A[0]=0
+A[1]=W1 (Weight of the first vertex).
+
+A[i]=max{A[i-1],A[i-2]+Wi}
+
+Running time=O(n)
+
+Reconstruction:
+
+Trace the array from right to left ,
+
+i = final index 
+
+if A[i-1] >= A[i-2]+ Wi
+dont include the ith vertex and i--;
+
+else
+include the ith vertex and i=i-2;
+
+continue this till i>=1
+
+#video:44
+
+Knapsack problem:
+
+Let S be a max value solution to an instance.
+
+Lets think of the instance as a linear stuff and n to be its last member.
+
+Key point: Either n is is S or it isnt.
+
+Case 1: n doesnt belong to S.
+
+S must be optimal among first (n-1) objects cause if that is not the case then some S* would be optimal for first (n-1) object but this contradicts the optimality of
+S.
+
+Case 2: n belongs to S
+
+S-{n} must be optimal among first (n-1) objects with capacity W-Wn . If thats not the case and some S* is having even better capacity then adding the weight of the
+last member to the already S*'s capacity we get a capacity beter than that of S's capacity which is a contradiction.
+
+Let i(1 to n) denote the ith item and x(0 to W) denote the integral capacity of the first i items.Let Vi denote the value of ith item. W = Capacity. 
+
+
+A[0][x]=0 for all x's.
+
+
+A[i][x]= max{A[i-1][x] , A[i-1][x-Wi] + Vi}     (if Wi>x then take A[i-1][x-Wi] to be 0 )
+
+Running time: O(nW)
+
+#video:47
+
+Sequence alignment problem:
+
+Let X and Y be the two optimal strings and m and n determine the final indices of the respective strings.
+
+Relevant cases:
+
+i>    Xm and Yn get matched.
+ii>   Xm get matched with a gap.
+iii>  Yn get matched with a gap.
+
+Optimal substructure:
+
+Let X' and Y' be the substructures with final vertices i.e Xm and Yn removed. 
+
+i>   If case 1 holds , then induced alignment of X' and Y' are optimal. 
+ii>  If case 2 holds , then induced alignment of X' and Y  are optimal. 
+iii> If case 3 holds , then induced alignment of X  and Y' are optimal.
+
+Proof of all the cases are similar , so only first case has been discussed.
+
+Let the optimal penalty of X' and Y' be p . If some other solution has a penalty of p* < p then adding it to the cost of match of Xm & Yn we get a total penalty
+less than optimal solution.
+
+A[i][0]=i*penalty(gap)=A[0][i]
+
+i(1 to m) & j(1 to n)
+
+A[i][j] = min{A[i-1][j-1] + penalty(Xi,Yj) , A[i-1][j] + penalty(gap) , A[i][j-1] + penalty(gap)} 
+
+Running time = O(mn)
+
+Reconstruction:
+
+i>   If case 1 holds i.e  A[i][j] = A[i-1][j-1] then match Xi with Yj and move to A[i-1][j-1]
+ii>  If case 2 holds i.e  A[i][j] = A[i-1][j] then match Xi with a gap and move to A[i-1][j] 
+iii> If case 3 holds i.e  A[i][j] = A[i][j-1] then match Yj with a gap and move to A[i-1][j-1]
+
+If i or j happens to be 0 , match the remaining substrings with 0.
+
+#video:49
+
+Comparison b/w optimal BSTs and Huffman code:
+
+Similarities:
+i>  Binary tree
+ii> The goal is to minimize depth on average.
+
+Differences:
+i>  Optimal BSTs aren't prefix free so not only leaves but all other nodes can have a data associated with them.
+ii> BSTs are search trees.
+
+Optimal substructure:
+
+In an optimal BST for keys {1,2,3....r.....n} having a left tree T1 and right tree T2 , T1 is optimal for keys 1 to r-1 and T2 is optimal for keys r+1 to n.
+
+Proof of optimal BST:
+
+Let T be an optimal BST with root r , left tree T1 and right tree T2. Let C(T) denote the average search time in presecnce of frequencies (p1,p2...pn) for keys
+(1,2....n). Let T1* be a better left tree solution with C(T1*)<C(T1).Let T* be the tree having T1* as its left tree.
+
+For any BST we can say,
+
+C(T)= sigma(1 to n) Pi * (search time for i in T)
+    = Pr*1 + sigma(1 to r-1) Pi*(search time for i in T) + sigma(r+1 to n) Pi*(search time for i in T)
+    = Pr*1 + sigma(1 to r-1) Pi*(1+search time for i in T1) + sigma(r+1 to n) Pi*(1+search time for i in T2)
+    = sigma(1 to n)Pi + sigma(1 to r-1) Pi*(search time for i in T1) + sigma(r+1 to n) Pi*(search time for i in T2)
+    = constant + C(T1) + C(T2)
+
+therefore , C(T) = constant + C(T1) + C(T2)
+
+            C(T*)= constant + C(T1*)+ C(T2)
+
+since we assumed C(T1*)<C(T1) so C(T*) <  C(T) contradicting the proported optimality of T.
+
+Relevant subproblem:
+
+The subsets for which we will be computing BSTs are contiguous intervals {i,i+1,i+2.....j} for all i<=j . Reason: Say in our first recursive call we compute
+a root and then left tree and the right tree. In the next recursive call say left tree gets passed for root computation. Let this left tree had 1 to 22
+keys and 17 turned out to be the root. Next recursive call can be on the right subtree i.e 17 to 22 so we have a contiguous interval for root computation.
+
+
+Recursion :
+
+A[i][j]=0 if i>j
+
+for S=(0 to n-1) 
+  i=(1 to n)
+
+  A[i][i+s]= min r=(i to i+s){sigma(k=i to i+s)Pk +A[i][r-1] + A[r+1][i+s]}
+
+Running time:
+
+O(n^2)  (subproblems)
+O(j-i)  (search through contiguous interval)
+
+= O(n^3)
+
+Search through contiguous interval can be done in O(1) also as proposed by Knuth (search it on web) then running time reduces to O(n^2). 
+
+   

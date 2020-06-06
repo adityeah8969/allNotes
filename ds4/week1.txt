@@ -1,0 +1,210 @@
+# video:1
+
+Cons of Dijkstras algorithm for computing shortest path:
+
+i>  Not correct with negative edge lengths.
+ii> Not very distributed.
+
+Key point:
+
+If the input graph has no negative cycle then there is shortest s-v path with <= n-1 edges.
+
+#video:2
+
+We exploit the sequential nature of path from s-v and introduce a new budget in the no. of edges this path has.
+
+Let P be the shortest S-V path having atmost i edges.
+
+Case 1: If P doesnt use its final edge i.e P has <=i-1 edges then shortest S-V path has <=i-1 edges.(Obvious)
+Case 2: If P includes the last edge. The second last edge would lead us to W , so P = edge cost(S->W) +  edge cost(W->V).Let P' be the shortest path from S->W
+        Lets remove the the last edge from W to V. Let there be any other path Q' shorter than P' then adding edge cost(W->V) to Q' would lead to an even shorter
+        S-V path contradicting the optimality of P.
+
+Candidates for an optimal solution to a subproblem involving final vertex V:
+
+1 + indegree of V   (1 from case 1  and indegree of V refers to total no. of W->V paths)
+
+Recursion:
+
+Let i(0,1,2...n-1) be the edge budget. Let A[i][V] denote the shortest path.
+
+A[0][S]=0 & A[0][V]=infinity   ( with 0 edge budget source can't reach any other vertex than itself)
+
+If there are no negative cycle , A[n-1][V] is the answer.
+
+i(1,2, ...n-1)
+for all V's
+
+A[i][V]=min{A[i-1][V] , min(of all W->V)(A[i-1][W] + Edge cost(W->V))}
+
+Running time:
+
+Outer loop runs n times
+Inside inner loop time = some costant work picking  from already computed A[][] + sigma (for all V)indegree of(V)
+                       = O(m)  (sum of indegrees of all vertices = m )
+                       
+Tolal time = O(mn)
+
+#video:5
+
+If every V is reachable from S then running bellman ford algorithm one more time i.e filling up A[n][V's] shows whehter a negative cycle is there or not.
+If A[n][V's]=A[n-1][V] then there are no negative cycles.
+
+Proof:
+
+Bellman ford has no negative cycle and vertices are reachable from S <=>   A[n][V's]=A[n-1][V]
+
+LHS TO RHS is already proved when we said the edge budget can at max be n-1 as we will have a shortest path by then if LHS is true and there would be no change in 
+A[n][V's] or any further iterations.
+
+RHS to LHS can be proved as follows:
+
+A[n][V's]=min{A[n-1][V] , min(of all W->V)(A[n-1][W] + Edge cost(W->V))}
+
+if A[n-1][V] gets chosen we are done .
+if min(of all W->V)(A[n-1][W] + Edge cost(W->V)) gets chosen , then we can say
+
+d(V) <= d(W) + edge cost (W->V)    
+edge cost(W->V) >= d(V) - d(W)
+
+Consider an arbitrary cycle
+
+edge cost(W->V) >= 0  (inside a cycle there would be a repeated cancellation of all(d(V) - d(W)) )
+
+So there are no negative cycles.
+
+#video:6
+
+Space optimization:
+
+We only need A[i-1][V's] & A[i][V's] for computing the shortest path , so we can get away with O(n) space to remember current and last round operations.
+Make a similar table for predecessor vertices B[i-1][V's] & B[i][V's] having second to last vertex on the shortest S-V path with <= i-1 edges.
+
+case 1: B[i][V] = B[i-1][V]
+case 2: B[i][V] = the vertex W
+
+There is one more thing which can be done using predecessor vertices. If there happens to be any cycle inside the predecessor vertices at any iterations then that 
+cycle would be a negative cycle . Using DFS we can check for those cycles.
+
+# video:7
+
+Naive understanding of Bellman ford algorithm's application to internet routing
+
+i> Its destination driven i.e each vertex V stores the shortest path distance from v to its destination t.
+ii> Bellman ford algorithm is pull based i.e A[i][V's] asks for its values from A[i-1][V's]. Internet routing is push based i.e vertex notifies each of its neighbours.
+
+#video:8
+
+Handling failures :
+
+Since internet suffers from link failures and as discussed earlier each vertex stores information of only the next hop vertices,we cant converge to an optimal solution
+(check video for the reason). This is why routers have the entire path not just the information of the next hop.This costs space .
+
+Pros of having the entire path inside the routing table:
+
+i>  More robust to failures.
+ii> Permits sophisticated route selection.
+
+#video:9
+
+The no. of invocations of single source shortest path subroutine to compute all pair shortest path problem = n(i.e selecting every vertex at a time as a source vertex)
+
+In case of non-negative edge lengths:
+
+Running time = n* running time of dijkstras
+             = O(nmlog(n)) 
+             = O((n^2)*log(n))  (for sparse graph)  & O((n^3)*log(n)) (for dense graph)
+
+
+In case of general edges(inclusive of negative edge lengths)
+
+Running time = n* running time of Bellman ford
+             = O((n^2)m)
+             = O(n^3)  (for sparse graph)  & O(n^4) (for dense graph)
+
+The last O(n^4) can be improved upon to O(n^3) through Floyd Warshall algorithm.
+
+#video:10
+
+Floyd Warshall algorithm runs in O(n^3) time even for graphs with non negative edge lengths , also it is competent with dijkstras algorithm for dense graph.
+
+Application:
+
+Transitive closure of a binary relation. (Basically it deals with all pairs reachability)
+
+Lets order the n vertices 1 through n.
+Let Vk denote the ordering {1,2,3,4...,k} , it acts as an additional parameter whereby the path having k=i can only use 1st i vertices inside other than first and
+last vertex.
+
+Optimal substructure:
+
+Let G has no negative cycle.Let P be the shortest path from i to j with internal nodes belonging to the set Vk.
+
+Case 1: if k is not internal to P then P is optimal with internal vertices of  Vk-1 .
+
+Case 2: if k is internal to P then the situation would be like shortest path = {i,.....,k.....j} . Now i->k path & k->j path both would be the shortest path with
+        internal vertces of Vk-1.
+
+#video:11
+
+We will use a 3D array ,
+
+k=(1 to n)
+i=(1 to n)
+j=(1 to n)
+
+A[i][j][0]= 0          (if i=j)
+          = Cij        (if i!=j but there is an edge in between)
+          = infinite   (if i!=j and there is no edge in between)
+
+Recursion:
+
+A[i][j][k]= min(A[i][j][k-1] , A[i][k][k-1] + A[k][j][k-1])
+
+Running time= O(n^3)
+
+Key point 1: Scan through A[i][i][n] if there are any negative value then graph has a negative cycle.
+
+Reconstruction:
+
+Let B[i][j] be the 2-D array having the max label node i.e Kth vertex .
+
+suppose for i=12 to j=24 k turns out to be 17 then we recursively compute the path between 12 to 17 and 17 to 24.
+
+#video:12
+
+Johnsons algorithm:
+
+Graphs with general edges(inclusive of negative edges) can be solved in O(mnlog(n)) time.
+
+Johnsons algorithn:
+
+1 indication of Bellman ford + n invocations of Dijkstras
+
+Reweighting:
+
+Fix a no. Pv for every vertex(Vertex Weights).
+
+Let Cuv be the edge cost between u and v , then after reweighting C'uv= Cuv + Pu - Pv
+
+In a path from S to V , if P is the path length prior to reweighting then P' path length after reweighting = P + Ps - Pv. From this it follows that every path
+gets shifted by the same amount so the shortest path wil also get shifted by the same amount there by preserving it.
+
+For getting these no.'s Pv's simply take a dummy node and have an edge with edge length 0 to every vertex of the graph . Run bellman ford subroutine from S
+the shortest path length thus computed is the Pv.
+
+After reweighting all the edges become non-negative.
+
+After n invocations of dijkstras algorithm we can have shortest path between all the pairs.
+
+Since we reweighted edges , to get the original value we just have to subtract what we added i.e (rewighted edge length + Pv -Pu)
+
+Running time of O(mnlog(n)) is best suited for sparse graphs with general edges and is also competetive with floyd warshall algorithm.
+
+Proof that reweighting makes the edges positive:
+
+Let Pu denote length of shortest S-u path in G'(graph after inclusion of dummy node S to the original graph G)
+and Pv denote length of shortest S-v path in G'
+
+Pv <= Pu + Cuv  where Cuv is the edge cost.
+or,  Cuv + Pu -Pv >=0 which is the reweighted edge length.

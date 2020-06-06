@@ -1,0 +1,456 @@
+
+#merge sort(video 1.7):
+
+no. of subproblems in a step * time req to solve each sub problem * no. of steps
+
+ =      2^j                  *        n/(2^j)         *  logn
+ =  O(nlogn)
+
+#video:1.8
+
+reason for ignoring constant factors in running time analysis:
+i> doesnt affect the final result too much in case of larger data set.
+ii> constants vary with machine dependent reasons like processors,compiler etc.
+iii> easier representation.
+
+running time for simple sorting algorithms take approx (1/2)*n^2 which is 
+better than merge sort for small data set.
+
+#video:2.2
+
+t(n)=O(f(n))
+if    c.f(n)>=t(n) for n>n'
+
+where c & n' are positive constants.
+
+#video:2.4
+
+t(n)=omega(f(n))
+if   c.f(n)<=t(n)  for n>n'
+
+where c & n' are positive constants.
+
+t(n)=theta(f(n))
+
+if t(n)=O(f(n)) &  t(n)=omega(f(n))
+
+here we need constants c1,c2 & n'
+such that  c1.f(n)<=t(n)<=c2.f(n)
+for all n>n'
+
+#video:2.5 for examples.
+
+#video:3.2
+
+an inversion in an array means the no. of pairs such that array[i]>array[j](i<j)
+i.e the earlier array entry is bigger.
+
+inside merge-sort algorithm when we are about to merge left and right array left to right in the increasing order of array entries,then
+the no. of inversions are equal to sum of the no. of left array entries willing to get into the main array everytime a right array entry is picked.
+
+#video:4.2
+
+the master method(assumption:all the subproblems should be of equal size)
+
+if T(n)= aT(n/b) + O(n^d)  where a=no. of sub-problems , b=factor by which the sub-problem size decreases 
+                                 & d=exponent related to the work done outside the recursive.
+
+        O(n^d * log n)        if a=b^d
+
+T(n)=   O(n^d)                if a<b^d
+
+        O(n^(log(base b)a))   if a>b^d
+
+(a/b^d) is the qty which actually determines which case to use , 'a' can be thought of as a qty which describes the rate of proliferation of sub-problems
+while b^d is the factor by which the work done at each level shrinks. Combining these two , if both of them are equal then we do almost equal amt of work
+per level and as there are log(n) levels we get T(n)=O(n^d * log n) in the first case. In the second case , we can think of the qty b^d being decreasing
+as the level goes up,so basically what it means is that the maximum amt of work is done at level0 of the recursion tree which corresponds to O(n^d).
+In the last case the rate at which sub-problems proliferate is higher so we can expect the leaves or the base cases of the recursion tree to dominate,
+since we have a^(log(base b)n) no. of leaves ,the running time is O(n^(log(base b)a)). 
+
+#video:6.2 & 6.3
+
+proof regarding the running time of quicksort:
+
+Consider the ith smallest and jth smallest terms of an array(picturise the array to be sorted and think of the ith and jth terms).
+running time of the quicksort algorithm basically depends upon the no. of comparisons made by any two random terms inside the input
+array(say ith and jth smallest terms).Picturise the already sorted array think of it being fragmented in three different parts, one from
+0th index to i-1(1st fragment),other from ith to jth(2nd fragment) and last from j+1th to n(last fragment).If the pivot chosen at rondom 
+winds up inside the 1st or the last fragment then there is no comparison made between ith and jth terms as they both lie inside the same
+recursive subproblem. Now consider the situation where the pivot happens to be from the middle fragment ,here we have elements from Z[i] 
+to Z[j] (Z is just a notation symbolising already sorted array)  , here also the comparison between Z[i] and Z[j] is not possible if any
+term inside ith and jth terms gets selected as pivot because this will partition the array into two different subarrays , one having ith
+term and the other having jth term . So the only way in which the ith and jth terms get compared is if one of them is set to be pivot in
+a recursive call.So we have (j-i+1) no. of terms inside the middle fragment.Only 2 of these terms(i.e the ith and jth term) will lead to
+to a comparison between ith and jth terms(i.e Z[i] and Z[j]) , so the overall probability of having a comparison between these two terms
+is as follows,
+               P[that ith and jth terms will get compared]=2/(j-i+1).
+
+Expected no. of times that ith and jth terms will get compared can be calculated as follows,
+
+let the indicator random variable for successful comparison be 1 and 0 otherwise.
+
+E[ith and jth terms will get compared]=sigma(i=1 to n-1)sigma(j=i+1 to n)P[that ith and jth terms will get compared]*1+P[that ith and jth terms will get compared]*0
+
+which boils down to
+
+E[]= sigma(i=1 to n-1)sigma(j=i+1 to n) 2/(j-i+1)
+taking 2 outside,
+E[]=2 sigma(i=1 to n-1)sigma(j=i+1 to n) 1/(j-i+1)
+
+the term '1/(j-i+1)' for a particular value of i is series (1/2 + 1/3 + 1/4...)
+whick can also be written as sigma(2 to k) 1/k
+
+so the above series can be written as
+
+E[]=2.n.sigma(2 to k) 1/k      , here we have chosen n instead of the summation of i's as it ranges from 1 to n-1(it doesnt really matter which i we choose)
+
+sigma(k=1 to k=n) 1/k <= integral of (1/k)[limits=1 to n] i.e ln(n)
+
+substituting ln(n) in place we of the summation we get,
+E[]=2nln(n)
+
+As the running time is proportional to E[] , we can say
+
+running time=O(constan*E[])
+getting rid of the constants, we are left with
+
+T(n)=O(nln(n))
+
+#video:8.1-8.3
+
+Rselect(Randomized selection algorithm)
+
+pseudo-code for ith order statistic:
+
+Rselect(array,length n,order statistic)
+
+1.if n=1,return A0
+2.choose pivot and do partitioning at random and return p.
+3.if p=order satistic,return p.
+4.if p>orderstatistic return(1st part of array,p-1,order statistic).
+5.if p<orderstatistic return(2st part of array,n-p,order statistic-p).
+
+//inside the implementation same thing is done basically,except for a little modification in function calls.
+ 
+it runs in linear time,O(n)(most of the time but can be O(n^2) in worst case).
+proof is not necessary but its provided in video 8.2.
+
+#video:8.3-8.5
+
+Other than Rselect which uses randomization we have a deterministic algorithm as well,it runs in O(n) with no exception but its not practical
+as the constants are bigger than that of Rselect and also takes too much space to run this algo.
+
+#video:8.6
+
+proof that any sorting alogorithm having no information about the elements can't run faster than O(nlog(n)):
+
+http://stackoverflow.com/questions/7155285/what-are-the-rules-for-the-%CE%A9n-log-n-barrier-for-sorting-algorithms
+
+If an unsorted array is on its way to get sorted , then after each comparison it moves into a state closer to the sorted verison of the array.Let f(n) be the
+total no. of input array entries possible . Input entry can be represented by leaves of a binary tree , based on the comparisons made it moves to a state
+closer to the original sorted array i.e the root of the tree. To achieve sorting in least time the height of the binary tree should be minimum i.e log(f(n)).
+So the time taken to reach the root up from a leaf is O(log(f(n))). Total no. of distinct array entries posiible are n!.so putting n! in place of f(n) we get.
+O(log(n!)). Using stirlings approximation n!=(n/2)^(n/2), substituting this in place of n!, we get O((n/2)*log(n/2)), after getting rid of constants, time 
+complexity comes out to be O(nlog(n)) .
+
+In the video also same thing is discussed, the state mentioned here is described as execution path.
+
+Point to be noted here is that the upper bound is O(nlog(n)) for array with distinct entries and we dont have any clue whatsover as to what it(entry) is.
+ 
+#video:9.1
+
+Application of graph cuts:
+
+i>   Identify network bottlenecks and weaknesses.
+ii>  Community detection in social network.
+iii> Image segmentation , here edge weights are also used inorder to predict how likely are the points coming from same image.  
+
+#video:9.4
+
+Analysis of contraction algorithm:
+
+If the edge chosen at random happens to be from the set(say F) of edges corresponding to min cut , then algorithm is gonna return wrong output. So let the probability
+that it never contracts an edge from F . Si(S sub i) be the event if contracting an edge of set F in the ith iteration.We will compute pr(!S1 & !S2 & !S3.....& !Sn-2).
+A key observation:
+let the min-cut be k,since its the minimum degree of any other vertex >= k.
+now the summation of degree corresponding to all the verices would be >=kn.
+Since an edge adds two degrees to the earlier summation, so if m no. of edges are present then 2m>=kn.
+resulting in m>=kn/2.
+
+pr[S1]  =k/m   i.e probability of contracting any edge from set F(having k edges) out of all m edges.
+=> pr[S1]<=2/n  (after substituting m>=kn/2 as derived earlier)
+
+similarly,
+pr[!S1 & !S2] = pr[!S2 | !S1] * pr[!S1]
+pr[!S1 & !S2] = [1-k/(# remaining edges) ] * (1-(2/n))
+
+#remaining edges >= k(n-1)/2 , so pr[!S2 | !S1] >= (1-2/(n-1))
+ 
+pr[!S1 & !S2] = (1-2/(n-1)) * (1-(2/n))
+
+similarly,
+pr(!S1 & !S2 & !S3.....& !Sn-2) >= (1-(2/n)) * (1-2/(n-1)) * (1-2/(n-2)) * (1-2/(n-3))...... * (1-2/(n-(n-3))) * (1-2/(n-(n-4)))
+
+pr(!S1 & !S2 & !S3.....& !Sn-2) >= ((n-2)/n) * ((n-3)/n) * ((n-4)/n) * ((n-5)/n)...... * (2/4) * (1/3)
+
+
+pr(!S1 & !S2 & !S3.....& !Sn-2) > = 1/(n^2)
+
+so the probability that we dont contract any edge of set F is 1/(n^2) which is quite low. To achieve proper result we have to do repeated trials , no. of trials 
+needed can be calculated as follows:
+ 
+let pr[Ti] be the event where we successfully output the desired min cut.
+since we pick up edeges at random Ti's are independent results,
+pr[all tries fail]=pr[!T1 & !T2 & !T3...&TN]
+
+pr[all tries fail] <= (1-(1/(n^2)))^N                                       
+
+for all real numbers  1+x <= e^x
+
+so
+
+pr[all tries fail] <= 1/n if we take N =(n^2)ln(n)
+
+thus to reduce the failure probability to 1/n we have to go through (n^2)ln(n) numbers of terms.
+The running time is omega((n^2)ln(n)m) or omega((n^2)m)
+
+#video:9.5
+
+A graph can have many min-cuts.The largest no. of min cut which a graph can have is nC2.
+proof:
+
+The lower bound:
+
+consider the case of a cycle,
+cutting any two edge gives a min cut , so the no. of min cuts here is nC2.
+
+The upper bound:
+
+In the last section (having a star mark), pr[Ti] is event where we successfully output the desired min cut 
+
+its value is 1/n^2  can also be thought as 1/(nC2)    (we were sloppy last time and said its value to be 1/n^2 but it actually is 1/(nC2) )
+Also all these events are disjoint events owing to the randomness of contracting an edge,
+
+let 't' be the no. of such events so,
+
+summation of all these probabilities should be 1, so
+t/(nC2)=1, or t=nC2
+
+so the largest no. of min cuts any graph can have is nC2
+
+#video:10.1
+
+Graph search overview:
+
+applications:
+
+i>    check if a node is connected inside a network.
+ii>   Driving directions.
+iii>  Formulate a plan ,e.g filling a sudoku puzzle where nodes can be partially filled puzzle.
+iv>   Clustering , structure of web graph.
+
+Breadth First Search:
+i>   Explores nodes in layers.
+ii>  Compute shortest path, here the path itself is a little abstract thing where the path means the layer in which they get explored.
+iii> Compute connected components of an undirected graph , some pieces of graphs are provided and a BFS loop is run considering every vertex.(its a simple thing)
+
+Running time=O(Ns + Ms)   where Ns is the no. of vertices reachable from source 's' and Ms are the edges reachable from source 's'.
+
+Depth First Search:
+i>    Aggressive exploration.
+ii>   Compute topological ordering of a directed acyclic graph.
+iii>  Compute connected components of an undirected graph.
+
+#video:10.6
+
+Inside topological sorting a DFS loop is ran inside a cycle-free graph.A vertex is pushed to stack only when all of its adjacent vertices (and their adjacent vertices and so on)
+are already in stack. We make sure that every vertex gets visited using a loop. 
+
+#video:10.7 & 10.8
+
+For calculating the strongly connected components of a directed graph , kosaraju's two pass algorithm is used . Strongly connected means any vertex can be reached
+from any other vertex of the same component. In the video , the graph taken as example has 4 strongly connected component , though it seems every other vertex is 
+connected but strongly connected means connection which is eitherways. Inside the algorithm , two passes of DFS are made 1st on the graph with edges reversed and 
+then on the original graph in the order supplied by the first pass. In the first pass we keep a track of the order(time) in which a vertex gets explored i.e if 
+inside a DFS loop a vertex gets trapped amidst already seen nodes then it is termed as explored. The ones which get explored later are given a higher order or
+time in which they got explored.This way we get an increasing order in which the vertices get explored. This magical order is later used as the sequence in which 
+the DFS calls are to be made, which peels off strongly connected components one at a time. Vertices with higher order are used to make earlier DFS calls.
+    
+#video: 11.1
+
+Running time of dijkstras algorithm=O(mlog(n))
+
+#video:12.1-12.3
+
+all the operations in heap take (log(n)) time except for heapify which takes O(n).
+
+#video: 13.1-13.3
+
+All the operations in a BST take O(log(n)) time except for traversal , which takes O(n) time.
+
+#video: 14.1-14.3
+
+Applications of hashing data structure:
+
+i>   In early days of building a compiler , checking whether a name is new or used or a keyword etc required fast lookups and hash tables started getting used.
+ii>  Routers keep track of spam addresses using a hash table so that they can quickly check if an address belong to such list.
+iii> Inside a chess game , the stages of a game can be hashed so that no same configuration gets used back again. 
+
+# video: 14.1-14.3
+
+the size of the main array should be a prime no. not close to a power of 2 or a power of 10.
+
+#video:15.1
+
+load factor(denoted by alpha)=  (no. objects inside the hash table)/(array size or no. of buckets)
+
+with separate chaining method alpha=O(1) or in other words alpha should be a constant i.e we should increase or decrease the array size as per the input.
+with open addressing, alpha<<1
+
+Everyhash function has its own pathological data set under which it performs terribly(pigeon hole principle). 
+
+This pathological data set is used in DOS attack , where the hash function is reverse engineered to get the pathological data set.
+solutions:
+i> (use a good hash function difficult to reverse engineer) The SHA-2 hash function is very difficult to reverse engineer,but there would be a pathological data set.
+
+ii> At times we use a family of hash functions and pick functions at random.
+
+#video:15.2
+
+Universal hash function:
+
+Consider a set of data represented by U , a set of hash functions represented by H , main array 'n' 
+
+H is a universal set if and only if
+
+pr(h E H)[h(x)=h(y)]  <= 1/(n)  , where x and y are distinct keys and 'h' is chosen at random.
+
+Example: Hashing IP addresses
+
+let x1:x2:x3:x4 , y1:y2:y3:y4 be two different ip addresses, a hash function h(a1,a2,a3,a4) where ai's are 4 tuples and 1<ai<n where n is the array size and a prime
+no.
+
+let the hashing be as follows,
+h(x1,x2,x3,x4) = (a1*x1 + a2*x2 + a3*x3 + a4*x4)mod(n)
+
+similarly , h(y1,y2,y3,y4) = (a1*y1 + a2*y2 + a3*y3 + a4*y4)mod(n)
+
+consider x4!=y4,
+
+pr[h(y1,y2,y3,y4)=h(x1,x2,x3,x4)] is what we have to calculate.
+
+   h(x1,x2,x3,x4)=h(y1,y2,y3,y4)
+=> a4(x4-y4)mod(n)=sigma(i=1 to 3)ai(xi - yi)mod(n)
+=> a4(x4-y4)mod(n)=  (a no. from 0 to n-1)
+=> (a4*const )mod(n)= other constant(ranging fron 0 to n-1)
+
+from no. theory , every value of a4 gives rise to a distint value of LHS uniformly at random , as there are n different choices of a4 , there is 1/n probability of 
+collision. 
+therefore there is = 1/n chances of colliding.
+
+#video:15.3
+
+with separate chaining , constant time guarantee can be studied using a Carter-Wegman theorem.
+Caveats here are as follows:
+i>   it deals with O(1) in average, like quicksort.
+ii>  assumes |S|=O(n)  [i.e load alpha = |S|/n =O(1)]
+iii> assumes O(1) time to evaluate hash.
+
+Running time of an unsucessful lookup will be = O(1) + O(list length)
+                                              = O(1) + L               where L can be thought of as list length in A[h(x)]
+
+using decomposition principle,
+
+let x & y belong to data set S, y!=x
+
+let Zy be an indicator random variable , so Zy=0  {if h(x)!=h(y)}
+                                            Zy=1  {if h(x)=h(y)}
+
+L=sigma(for all y that belongs to S) Zy
+
+so, E[L]= sigma(for all y that belongs to S) E[Zy]  (linearity of expectation)
+    
+    sigma(for all y that belongs to S) E[Zy]=sigma(for all y that belongs to S) pr[h(x)=h(y)]
+                                            
+                                            >=sigma(for all y that belongs to S) (1/n)         {universal family of hashing}
+
+                                            >= |S|/n
+                                            >= load alpha(constant O(1))
+
+#video:15.4
+
+Performance with open addressing is difficult to analyze , here is a heuristic
+
+Assumption : all n! probes are equally likely.
+
+under this assumption expected insertion time is 1/(1-alpha).
+
+proof: A random probe finds an empty slot with probability of 1-alpha.
+
+Insertion time= The no. of N coin flips to get "heads", where pr["heads"]= 1 - alpha.
+
+E[N]=1+alpha*E[N]
+
+E[N]=1/(1-alpha)
+
+note: heuristic assumption is completely false in case of linear probing , Knuth  made an assumption that if the initial probe is made at random then
+
+E[N]=1/(1-alpha)^2 
+
+#video:16.1
+
+Bloom filters are kind of like hash tables used for same similar reasons but it doesnt store the data , it only tells if the data has been seen or not.
+It facilitates fast lookups . Compared to hash tables its more space efficient but cant store associated objects , deletions arent easy and has a small false
+probability(i.e it may output true to an object which it has never seen). 
+
+Applications:
+
+i>   Early spellcheckers.
+ii>  list of forbidden passwords.
+iii> inside routers for many reasons like having a track of blocked IP.
+
+Bloom filters has the following things inside them:
+
+i>  An array of 'n' bits.    (this array has n/|S| bits per object)
+ii> k hash functions(h1,h2 to hk).   (here k is a small constant)
+
+Insertion:
+
+For insertion of an object say 'x' we flip selected indices of the main array to 1. These indices are the numbers given by processing 'x' through all the
+k hash functions one by one. e.g say  for i=1 to k (hi (x))={12,13,56,74...kth entry} then array[12],array[13],array[56],array[74]....will have 1 inside them.
+If at those indices the main array already have 1 , we dont do anything and if they have 0 , we flip them to 1.
+
+This way we can achieve very fast lookups but it comes with false probabilities . There may happen a situation where a few objects collectively set a few 
+different array entries to 1 and these few array entries may coincide with the indices which hash functions spill out while processing an entirely new object.
+
+#video:16.2
+
+The false probabilities of a bloom filter can be reduced with increase in no. of bits per objects i.e n/|S|.But the space should be optimal.
+
+Heuristic: 
+
+Assumption: all hi(x)'s are random and independent(across different i's and x's).Under this assumption the probability that a given bit is set to
+0 is (1-(1/n))^k|S| and for 1 is 1-{(1-(1/n))^k|S|} .
+
+1-{(1-(1/n))^k|S|} can also be written as 1 - e^(k|S|/n). let b=n/|S| i.e the no. of bits per object. [1-e^(-k/b)]^k will be the probability if
+all the bits are to be set to 1 i.e probability under false assumption.
+
+from this , using calculus we can get an optimal 'k' for a given 'b'.
+k=(ln2)b
+
+e.g for b=8 and k=5 or 6 false prbability is .02
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+ 

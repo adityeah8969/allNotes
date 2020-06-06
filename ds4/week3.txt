@@ -1,0 +1,123 @@
+# video:1
+
+Greedy heuristic for knapsack:
+
+i>   Sort the item in the decreasing order of Vi/Wi .
+ii>  Pick high ratio stuffs till knapsack capacity gets filled.
+iii> answer is either step 2 or the maximum value stuff which fits in and 
+     is an even better solution.
+
+e.g
+
+W=1000
+
+V1=2       W1=1
+V2=1000    W2=1000
+
+After sorting a/c to ratio , we are left with
+
+1>2
+
+but step 3 prompts us to pick 2nd stuff.
+
+#video:2
+
+Let there be a greedy fractional solution F illustrated as follows:
+
+V1=3  W1=2
+V2=2  W2=2
+W=3
+
+sorting: 1 , 2
+
+F will choose entire 1 and half of 2 so the value would be 4.
+
+F>=optimal knapsack solution S.
+
+#video:3
+
+Value of 3-step greedy solution >= total value of first k items ....(i)
+Value of 3-step greedy solution >=  value of (k+1)th item       ....(ii)
+
+adding (i) & (ii) we get
+
+2*(Value of 3-step greedy solution) >= total value of first k items
+                                    >= F
+                                    >= optimal knapsack solution S
+
+therefore, Value of 3-step greedy solution >= (1/2)*optimal knapsack solution S
+
+#video:4
+
+A Dynamic Programming based approach,
+
+User-specified parameter e>0 , that guarantees (1-e) approximation.
+
+Running time and acuuracy are going to increase as e decreases.
+
+Basically we are solving a slightly different and easier knapsack instance.
+
+If Wi's and W are integers then can be solved via DP in O(nW).
+
+If Vi's are integers then we can use another DP to solve in O((n^2)*Vmax).
+
+Dynamic Programming heuristic:
+
+i> Round each of the Vi down to the nearest multiple of m(larger the m,lesser the accuracy).Divide the Vi's by m and round them off to get the nearest integers Vi(h)'s.
+    Basically Vi(h) = floor function of(Vi/m).
+ii> Use DP to solve the knapsack problem concerning Vi(h)'s in O((n^2)*V(h)max).
+
+#video:5
+
+A[i][x]= minimum capacity with which we can have  total value >=x with first i items.
+
+A[0][0]= 0
+A[0][x]= infinite
+
+for(i=1 to n)
+for (x=0 to nVmax)
+
+A[i][x]= min{A[i-1][x] , Wi + A[i-1][x-Vi]}
+
+return largest x such that A[n][x]<=W
+
+Running time=O((n^2)*V(h)max)
+
+#video:6
+
+When we round Vi to V(h)i , then m*V(h)i is between Vi-m & Vi.
+
+We can write ,
+
+Vi >= m*V(h)i    ..........(i)
+m*V(h)i >= Vi-m  .........(ii)
+
+Our solution to V(h)i's (S) is better than the the optimal knapsack solution(S* with original Vi's) only for V(h)i's.
+
+sigma(for all i's in S) V(h)i  >=  sigma(for all i's in S*) V(h)i   ........(iii)
+
+multiplying by m,
+
+m*sigma(for all i's in S) V(h)i  >=  m*sigma(for all i's in S*) V(h)i  
+
+using (i) & (ii) , we can write
+
+sigma(for all i's in S)Vi >= m*sigma(for all i's in S) V(h)i  >=  m*sigma(for all i's in S*) V(h)i  >= sigma(for all i's in S*)(Vi-m)
+
+Thus ,  sigma(for all i's in S)Vi >=sigma(for all i's in S*)(Vi-m)    (leftmost and rightmost terms)
+            sigma(for all i's in S)Vi >={sigma(for all i's in S*)(Vi)}  -  mn    (there are n no. of i's)
+            sigma(for all i's in S)Vi >=(1-e)sigma(for all i's in S*)(Vi)
+
+
+So basically we have to choose m small enough such that mn <= e*sigma(for all i's in S*)(Vi)
+                                                        mn <= e*Vmax  (either its Vmax or its better a/c to our 3-step greedy solution)
+
+therefore m=(e*Vmax)/n
+
+therefore setting e to the above given value guarantees that our solution >= (1-e)*value of optimal solution.
+
+Running time = O((n^2)*V(h)max)
+
+for every item , V(h)i <= Vi/m <= Vmax/m = Vmax*(n/(e*Vmax))=n/e
+
+puuting that in our running time , it reduces to O((n^3)/e)  i.e inversely proportional to e.
