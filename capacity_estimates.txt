@@ -89,7 +89,6 @@ UserFollow:
 Total space required for all tables for 10 years: 32GB + 1.88TB + 1.82TB ~= 3.7TB
 
 
-
 UserFollow/UserPhoto table -> Cassandra -> columnar storage of UserFollowID / UserPhotoID
 
 Partition based on PhotoID (epoch time  + auto ++ keys)
