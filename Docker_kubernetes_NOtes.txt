@@ -1481,6 +1481,77 @@ Events:
 ###########################################################################################
 
 
+client-deployment.yaml: 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment
+spec:
+  replicas: 1						// can be used to scale in/out
+  selector:
+    matchLabels:
+      component: web
+  template:
+    metadata:
+      labels:
+        component: web
+    spec:
+      containers:
+        - name: client
+          image: stephengrider/multi-client
+          ports:
+            - containerPort: 3000
+
+
+Deployment object type are preferred over pods in both dev & prod environments. It adds another layer of abstraction for managing pods.
+With Deployment object kind, even the 'containerPort' can be modified (deployment of which fails in case of modifying client-pod.yaml).
+Deployment also takes care of scaling in/out at pod level.
+
+Updating the deployment by modifying Deployment config file results in sending instructions to kube-api server which constantly tries 
+to meet the updated constraints.
+
+
+(base) aditya@aditya-HP-Notebook:~/simplek8s$ kubectl get pods -o wide
+NAME                                 READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+client-deployment-5dfb6bf966-bwwkl   1/1     Running   0          11m   172.17.0.4   minikube   <none>           <none>
+
+
+Here IP mentioned is local to the minikube cluster and cant be accessed from localhost. These IPs may change with time, all of these are 
+handled by Service Object kind.
+
+
+###########################################################################################
+
+Triggering Deployment updates:
+
+In case a different image with same name has been updated on docker hub, then there is no declarative way to notify k8s/kubectl to
+use the latest image and disregard the prev config file.
+
+Way out:
+
+1>  Delete running pods. 
+2>  Assign a tag to image and update the config file everytime there is an update.
+3>  Imperative command to upgrade the image which is in use.      
+
+Note: 	All 3 solutions are not good enough. Deleting any pod is not advisable in prod, updating config file with every deployment is 
+	also tedious. So the imperative command looks to be the best in current scenario.
+
+
+Imperative command to use latest v5 image:
+
+kubectl set image deployment/clint-deployment client=stephengrider/multi-client:v5
+
+###########################################################################################
+eval $(minikube docker-env)
+###########################################################################################
+
+
+
+
+
+
+
 
 
 

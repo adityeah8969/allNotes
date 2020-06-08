@@ -1,0 +1,120 @@
+
+Thousand - KB - 10^3
+Million  - GB - 10^6
+Billion  - TB - 10^9
+Trillion - PB - 10^12
+
+------------------------------------------------------------------
+TinyURL:
+------------------------------------------------------------------
+
+500M new URL shortenings per month
+
+100:1 read/write ratio
+
+expect 50B redirections (100 * 500M => 50B)
+
+Queries Per Second (QPS) : 500 million / (30 days * 24 hours * 3600 seconds) = ~200 URLs/s (write)
+							    100 * 200 URLs/s = 20K/s	   (read)
+
+500 million * 5 years * 12 months = 30 billion
+
+for 5 years: 500 million * 5 years * 12 months = 30 billion objects
+
+30 billion * 500 bytes = 15 TB
+
+
+Bandwidth estimates: 200 * 500 bytes = 100 KB/s  ingress
+					10 MB/s  egress
+
+
+Memory estimates: 20K * 3600 seconds * 24 hours = ~1.7 billion
+	
+cache 20% of these requests: 0.2 * 1.7 billion * 500 bytes = ~170GB
+
+
+# Key Generation Service + caching
+
+-----------------------------------------------------------------
+Pastebin: 
+-----------------------------------------------------------------
+
+5:1
+
+10^6 W / day   -> 120 KB/s 
+5*10^6 R / day -> 0.6 MB/s 
+
+10^6 * 10 * 360 = 3.6 * 10^9 = 3.6B (pastes per 10 years)
+
+Avg paste size 10KB
+
+3.6B * 10*10^3 = 36 TB  (storage in 10 years)
+
+3.6B * 6 = 22GB (6 bytes per keys) (key storage)
+
+36 TB >> 22 GB  =  36 TB
+
+0.7 -> 36 TB = 1 -> 51.4TB
+
+KGS + key-Value(content-key,content) + s3 storage
+
+-----------------------------------------------------------------
+Instagram:
+-----------------------------------------------------------------
+
+500M total users
+1M daily active users
+2M new photos every day, 23 new photos every second.
+Average photo file size => 200KB
+
+Total space required for 1 day of photos: 2M * 200KB => 400 GB
+Total space required for 10 years: 	  400GB * 365 (days a year) * 10 (years) ~= 1425TB
+
+User:
+
+     UserID (4 bytes) + Name (20 bytes) + Email (32 bytes) + DateOfBirth (4 bytes) + CreationDate (4 bytes) + LastLogin (4 bytes) = 68 bytes 	  500 million * 68 ~= 32GB		
+
+Photo:
+     	PhotoID (4 bytes) + UserID (4 bytes) + PhotoPath (256 bytes) + PhotoLatitude (4 bytes) +
+	PhotLongitude(4 bytes) + UserLatitude (4 bytes) + UserLongitude (4 bytes) + CreationDate
+	(4 bytes) = 284 bytes
+
+	2M * 284 bytes ~= 0.5GB per day
+	For 10 years = 1.88TB
+
+
+UserFollow:
+	500 million users * 500 followers * 8 bytes ~= 1.82TB
+
+Total space required for all tables for 10 years: 32GB + 1.88TB + 1.82TB ~= 3.7TB
+
+
+
+UserFollow/UserPhoto table -> Cassandra -> columnar storage of UserFollowID / UserPhotoID
+
+Partition based on PhotoID (epoch time  + auto ++ keys)
+
+-----------------------------------------------------------------
+Dropbox:
+-----------------------------------------------------------------
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
