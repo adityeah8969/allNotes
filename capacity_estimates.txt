@@ -1,8 +1,8 @@
 
 Thousand - KB - 10^3
-Million  - GB - 10^6
-Billion  - TB - 10^9
-Trillion - PB - 10^12
+Million  - MB - 10^6
+Billion  - GB - 10^9
+Trillion - TB - 10^12
 
 ------------------------------------------------------------------
 TinyURL:
@@ -56,7 +56,7 @@ Avg paste size 10KB
 
 0.7 -> 36 TB = 1 -> 51.4TB
 
-KGS + key-Value(content-key,content) + s3 storage
+KGS + key-Value(content-key,content) + s3 storage + caching
 
 -----------------------------------------------------------------
 Instagram:
