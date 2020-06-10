@@ -1343,7 +1343,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - port: 3050		// If there is another [pod trying to access 'client-pod' , then this port can be used (Irrelevant here).
+    - port: 3050		// If there is another pod trying to access 'client-pod' , then this port can be used (Irrelevant here).
       targetPort: 3000		// The target port of node. (here client-pod containers)
       nodePort: 31515		// The service gets exposed to outside world using this port.
   selector:			// selector is used to route traffic to all the pods having the same label (here component: web)
@@ -1509,7 +1509,7 @@ With Deployment object kind, even the 'containerPort' can be modified (deploymen
 Deployment also takes care of scaling in/out at pod level.
 
 Updating the deployment by modifying Deployment config file results in sending instructions to kube-api server which constantly tries 
-to meet the updated constraints.
+to keep up with the updated constraints.
 
 
 (base) aditya@aditya-HP-Notebook:~/simplek8s$ kubectl get pods -o wide
@@ -1545,6 +1545,35 @@ kubectl set image deployment/clint-deployment client=stephengrider/multi-client:
 ###########################################################################################
 eval $(minikube docker-env)
 ###########################################################################################
+
+ClusterIP is a sub type of object type Service. A ClusterIP is a Service that works as an internal load balancer for related Pods. A ClusterIP is not able to be accessed directly from outside of the Kubernetes cluster without a NodePort or a LoadBalancer. NodePort and LoadBalancer are Services to accept requests from external applications.
+
+###########################################################################################
+
+Docker Volumes: As described in the Dockers ection, it gets used when host system files are to be shared with file system 
+of docker containers.
+
+Kubernetes Volumes: These are object types where all the containers running inside of pods share a common storage (volume) to avoid
+		    data loss in case of failure of containers. It provides some degree of persistence as the data storage becomes 
+		    independent of running containers.
+
+K8s Persistent Volumes: Since the above mentioned volume was to serve at the pod level, in case there is a failure of pod, the app
+		        comes to a halt. To avoid this 'Persistent Volumes' creates volumes at cluster level, so multiple different 
+			pods(or deployments etc) of similar type can use it as a persistent data storage.
+
+K8s Persistent Volume Claim (PVC): There has to be created a config file specifying the details of a 'Persistent Volume'. In k8s,
+				   PVC is used to let other objects know the what all 'Persistent Volume's are available for the 
+				   cluster. K8s also has the responsibility of creating a new storage(volume) in case of unavailability.
+
+###########################################################################################
+
+
+
+
+
+
+
+
 
 
 

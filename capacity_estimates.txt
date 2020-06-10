@@ -97,7 +97,59 @@ Partition based on PhotoID (epoch time  + auto ++ keys)
 Dropbox:
 -----------------------------------------------------------------
 
-    
+Let’s assume that we have 500M total users, and 100M daily active users (DAU).
+
+Let’s assume that on average each user connects from three different devices.
+
+On average if a user has 200 files/photos, we will have 100 billion total files.
+
+Let’s assume that average file size is 100KB, this would give us ten petabytes of total storage.
+100B * 100KB => 10PB
+
+
+
+client , Block server ( ---> cloud storage) , Metadata server (------> metadata DB), synchronization server(------> metadata DB)
+
+client:
+
+I. Internal Metadata Database
+II. Chunker 
+III. Watcher
+IV. Indexer
+
+
+Synchronization Service :
+
+Metadata DB(contains info about the modified chunks(their IDs & Hash values)), Message Queuing Service 
+
+
+
+
+Cloud/Block Storage
+
+
+Metadata Partitioning (hash based + consistent hashing)
+
+Inline data deduplication
+
+-----------------------------------------------------------------
+Facebook Messenger:
+-----------------------------------------------------------------
+
+500 million daily active users
+
+average each user sends 40 messages
+
+20 billion messages per day
+
+20 billion messages * 100 bytes => 2 TB/day
+
+2 TB * 365 days * 5 years ~= 3.6 PB
+
+2 TB / 86400 sec ~= 25 MB/s
+
+
+
 
 
 
