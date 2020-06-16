@@ -149,6 +149,87 @@ average each user sends 40 messages
 2 TB / 86400 sec ~= 25 MB/s
 
 
+-----------------------------------------------------------------
+Twitter:
+-----------------------------------------------------------------
+
+200 million daily active users (DAU)
+
+
+Ingress:
+
+100 million new tweets every day
+
+average size of text tweet = 300 Bytes (280 Bytes of character + 30 Bytes of metadata = 310 == 300)
+average size of a tweet with photo = 200 KB
+average size of a tweet with video = 2 MB
+
+Frequency of text tweet = 100 M/day
+Frequency of photo tweet = (100 M/day) / 5
+Frequency of video tweet = (100 M/day) / 10
+
+
+Total ingress = 100M * 300 bytes + (100M/5 photos * 200KB) + (100M/10 videos * 2MB) = 24TB/day == 290MB/sec
+
+Egress:
+
+Lets assume avrage user goes through 20 tweets every session with 7 sessions/ day,
+
+Total tweets genearted = 200M DAU * ((2 + 5) * 20 tweets) => 28B/day
+
+assume that the users watch every 3rd video they see in their timeline,
+
+  (28B * 280 bytes) / 86400s of text => 93MB/s
++ (28B/5 * 200KB ) / 86400s of photos => 13GB/S
++ (28B/10/3 * 2MB ) / 86400s of Videos => 22GB/s
+Total ~= 35GB/s
+
+-----------------------------------------------------------------
+YouTube:
+-----------------------------------------------------------------
+
+1.5 billion total users
+800M daily active users
+800M * 5 / 86400 sec => 46K videos/sec (user views 5 videos per day)
+
+upload:view = 1:200
+46K / 200 => 230 videos/sec
+
+Storage Estimates:
+
+500 hours getting uploaded every hours: 500 hours * 60 min * 50MB => 1500 GB/min (25 GB/sec)
+
+Bandwidth Estimates:
+
+assuming each video upload takes a bandwidth of 10MB/min
+500 hours * 60 mins * 10MB => 300GB/min (5GB/sec)
+
+read:write ratio to be 200:1
+
+-----------------------------------------------------------------
+Typeahead
+-----------------------------------------------------------------
+
+5 billion searches/ day
+
+assusming we have 100 million chars to build an index
+
+Lets assume 15 chars to be an average typehead suggestion, 
+
+storage estimation: 100M*2B*15 => 3GB
+
+assuming 2% new queries everyday,
+
+storage estimation: 0.02*365*3GB => 25 GB/ year
+
+
+
+
+
+ 
+
+
+
 
 
 

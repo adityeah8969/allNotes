@@ -1565,10 +1565,337 @@ K8s Persistent Volume Claim (PVC): There has to be created a config file specify
 				   PVC is used to let other objects know the what all 'Persistent Volume's are available for the 
 				   cluster. K8s also has the responsibility of creating a new storage(volume) in case of unavailability.
 
+				   K8s when asked by object PVC for storage space allocates a chunk of memory from local hard disk(drive).
+				   In minikube there is a storage provisioner, K8s tries to communicate the need of provisioning of storage
+				   space to this provisioner. 
+
+				   In cloud environments, there are multiple storage options available, e.g google persistent disk (GCP),
+				   EBS(AWS). K8s has to be told explicity about which option to choose.
+	
+
+###########################################################################################
+
+Kubernetes NodePort vs LoadBalancer vs Ingress?
+
+
+A ClusterIP service is the default Kubernetes service. It gives you a service inside your cluster that other apps inside your cluster can access. There is no external access.
+
+Start the Kubernetes Proxy:
+$ kubectl proxy --port=8080
+Now, you can navigate through the Kubernetes API to access this service using this scheme:
+http://localhost:8080/api/v1/proxy/namespaces/<NAMESPACE>/services/<SERVICE-NAME>:<PORT-NAME>/
+
+Because this method requires you to run kubectl as an authenticated user, you should NOT use this to expose your service to the internet or use it for production services.
+
+----------------------------------
+
+A NodePort service is the most primitive way to get external traffic directly to your service. NodePort, as the name implies, opens a specific port on all the Nodes (the VMs), and any traffic that is sent to this port is forwarded to the service.
+
+There are many downsides to this method:
+
+You can only have one service per port
+You can only use ports 30000–32767
+If your Node/VM IP address change, you need to deal with that
+
+----------------------------------
+
+A LoadBalancer service is the standard way to expose a service to the internet. On GKE, this will spin up a Network Load Balancer that will give you a single IP address that will forward all traffic to your service.
+
+If you want to directly expose a service, this is the default method. All traffic on the port you specify will be forwarded to the service. There is no filtering, no routing, etc. This means you can send almost any kind of traffic to it, like HTTP, TCP, UDP, Websockets, gRPC, or whatever.
+
+The big downside is that each service you expose with a LoadBalancer will get its own IP address, and you have to pay for a LoadBalancer per exposed service, which can get expensive!
+
+----------------------------------
+
+Ingress:
+
+Unlike all the above examples, Ingress is actually NOT a type of service. Instead, it sits in front of multiple services and act as a “smart router” or entrypoint into your cluster.
+You can do a lot of different things with an Ingress, and there are many types of Ingress controllers that have different capabilities.
+The default GKE ingress controller will spin up a HTTP(S) Load Balancer for you. This will let you do both path based and subdomain based routing to backend services. For example, you can send everything on foo.yourdomain.com to the foo service, and everything under the yourdomain.com/bar/ path to the bar service.
+
+
 ###########################################################################################
 
 
+client-deployment.yaml:
 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: web				// selector: matchLabels tells the resource, whatever it may be, service, deployment, etc, to 
+  template:					// match the pod, according to that label.
+    metadata:
+      labels:
+        component: web				// label of the deployment object
+    spec:					// kubectl delete -l component=web	will delete the deployment object using label
+      containers:				 
+        - name: client
+          image: stephengrider/multi-client
+          ports:
+            - containerPort: 3000
+
+
+
+client-cluster-ip-service.yaml:
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: web
+  ports:
+    - port: 3000
+      targetPort: 3000
+
+
+
+-------------------------------------------------------
+
+redis-deployment.yaml:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: redis
+  template:
+    metadata:
+      labels:
+        component: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis
+          ports:
+            - containerPort: 6379
+
+
+
+
+redis-cluster-ip-service.yaml:
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+
+
+-------------------------------------------------------
+
+postgres-deployment.yaml:
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
+
+
+
+postgres-cluster-ip-service.yaml:
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+
+
+-------------------------------------------------------
+
+worker-deployment.yaml:
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: worker
+  template:
+    metadata:
+      labels:
+        component: worker
+    spec:
+      containers:
+        - name: worker
+          image: stephengrider/multi-worker
+          env:
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: '6379'
+
+
+
+-------------------------------------------------------
+
+server-deployment.yaml:
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+        - name: server
+          image: cygnetops/multi-server-pgfix-5-11
+          ports:
+            - containerPort: 5000
+          env:
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PGUSER
+              value: postgres
+            - name: PGHOST
+              value: postgres-cluster-ip-service
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: postgres
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
+
+
+
+server-cluster-ip-service.yaml:
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: server
+  ports:
+    - port: 5000
+      targetPort: 5000
+
+
+-------------------------------------------------------
+
+
+databse-persistent-volume-claim.yaml:
+
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-persistent-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+-------------------------------------------------------
+
+
+ingress-service.yaml:
+
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # UPDATE THIS LINE ABOVE
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /?(.*)
+            # UPDATE THIS LINE ABOVE
+            backend:
+              serviceName: client-cluster-ip-service
+              servicePort: 3000
+          - path: /api/?(.*)
+            # UPDATE THIS LINE ABOVE
+            backend:
+              serviceName: server-cluster-ip-service
+              servicePort: 5000
 
 
 
