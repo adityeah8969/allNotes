@@ -222,6 +222,86 @@ assuming 2% new queries everyday,
 
 storage estimation: 0.02*365*3GB => 25 GB/ year
 
+-----------------------------------------------------------------
+API Rate Limiter  (N/A)
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+Twitter
+-----------------------------------------------------------------
+
+Total users : 1.5 B
+DAU : 800 M
+avg size of a tweet : 300 bytes
+number of searches/day : 500 M
+number of new tweets/day : 400 M
+
+Storage Capacity: 400M * 300 => 120GB/day ~= 1.38MB/second
+
+120GB * 365days * 5years ~= 200TB  (storage for 5 yrs)
+
+
+-----------------------------------------------------------------
+Web Crawler
+-----------------------------------------------------------------
+
+crawl 15 billion pages within four weeks
+
+15B / (4 weeks * 7 days * 86400 sec) ~= 6200 pages/sec
+
+15B * (100KB + 500) ~= 1.5 petabytes  (100 kb size of avg HTML text)
+
+1.5 petabytes / 0.7 ~= 2.14 petabytes  (actual storage assuming  a 70% capacity model)
+
+-----------------------------------------------------------------
+Facebook Newsfeed
+-----------------------------------------------------------------
+
+Traffic Estimates:
+
+DAU: 300 M
+
+avg timeline fetch/ day : 5
+
+Total fetched timelines/ day : 1.5 B ~= 17500/sec
+
+
+Storage estimates:
+
+500 posts / day seen by the user
+
+500 KB of data seen / day / user
+
+500 KB * 300 M = 150 TB
+
+1500 servers needed (modern day server can hold rougly 100 GB of data)
+
+-----------------------------------------------------------------
+Yelp
+-----------------------------------------------------------------
+
+places: 500M
+queries/sec: 100K
+
+-----------------------------------------------------------------
+Uber Backend
+-----------------------------------------------------------------
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
 
 
 
