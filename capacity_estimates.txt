@@ -286,6 +286,28 @@ queries/sec: 100K
 Uber Backend
 -----------------------------------------------------------------
 
+DAU Drivers : 500K
+DAU Customers : 1M
+
+DriverLocationHT memory:
+
+1 million * 35 bytes(DriverID, Old latitude, Old longitude, New latitude, New longitude) => 35 MB
+-----------------------------------------------------------------
+Ticketmaster
+-----------------------------------------------------------------
+
+page views : 3B
+tickets sold : 10 M
+
+50 bytes (IDs, NumberOfSeats, ShowID, MovieID, SeatNumbers, SeatStatus, Timestamp, etc.) to store in the database.
+We would also need to store information about movies and cinemas; let’s assume it’ll take 50 bytes.
+
+500 cities * 10 cinemas * 2000 seats * 2 shows * (50+50) bytes = 2GB / day
+
+To store five years of this data, we would need around 3.6TB.
+
+
+
 
 
 
