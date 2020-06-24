@@ -302,6 +302,7 @@ Basics of spring MVC, servlet:
 
 https://www.tutorialspoint.com/spring/spring_web_mvc_framework.htm
 https://dzone.com/articles/what-servlet-container
+https://www.studytonight.com/servlet/steps-to-create-servlet-using-tomcat-server.php
 
 ------------------------------------------------------------------
 
@@ -433,9 +434,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-@ControllerAdvice									// handling all exce[tions globally
+@ControllerAdvice									// handling all exceptions globally
 public class ProductExceptionController {
-   @ExceptionHandler(value = ProductNotfoundException.class)				// @ExceptionHandler handlinf specific exceptions
+   @ExceptionHandler(value = ProductNotfoundException.class)				// @ExceptionHandler handling specific exceptions
    public ResponseEntity<Object> exception(ProductNotfoundException exception) {
       return new ResponseEntity<>("Product not found here", HttpStatus.NOT_FOUND);
    }
@@ -804,7 +805,7 @@ Enable CORS in Controller Method
 We need to set the origins for RESTful web service by using @CrossOrigin annotation for the controller method. This @CrossOrigin annotation supports specific REST API, and not for the entire application.
 
 @RequestMapping(value = "/products")
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "http://localhost:8080")        			// "http://localhost:8080" is allowed to make request
 public ResponseEntity<Object> getProduct() {
    return null;
 }
@@ -1115,9 +1116,9 @@ server:
  
 eureka:         #tells about the Eureka server details and its refresh time
   instance:
-    leaseRenewalIntervalInSeconds: 1
-    leaseExpirationDurationInSeconds: 2
-  client:
+    leaseRenewalIntervalInSeconds: 1	     		// indicates the interval of heartbeats that the client sends to the server.
+    leaseExpirationDurationInSeconds: 2  		// the time in seconds that the Eureka server waits since it received the last 	
+  client:						// heartbeat from a client before it can remove that client from its registry. 
     serviceUrl:
       defaultZone: http://127.0.0.1:8761/eureka/
     healthcheck:

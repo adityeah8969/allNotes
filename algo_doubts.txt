@@ -1,0 +1,34 @@
+The Time complexity of both BFS and DFS will be O(V + E), where V is the number of vertices, and E is the number of Edges. 
+
+if E >> V , the O(V+E) ~= O(E)
+if V >> E , the O(V+E) ~= O(V)
+
+O(V+E) tries to cover either of the above possibilities.
+
+
+--------------------------------------------------------
+
+Applications of DFS:
+
+* MST detection
+* Detecting cycles
+* Path Finding
+* Topo Sort
+* if Bipartite
+* Strongly connected components
+* Solving puzzles with only one solution
+
+Applications of BFS:
+
+* Shortest Path and Minimum Spanning Tree
+* Peer to Peer Networks
+* Crawlers in Search Engines
+* Social Networking Websites
+* GPS Navigation systems
+* Broadcasting in Network
+* Garbage Collection
+* Ford-Fulkerson algorithm
+* if Bipartite
+
+--------------------------------------------------------
+
