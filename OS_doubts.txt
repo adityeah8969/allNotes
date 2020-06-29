@@ -233,4 +233,35 @@ Paging:
 
 In computer operating systems, paging is a memory management scheme by which a computer stores and retrieves data from secondary storage for use in main memory. In this scheme, the operating system retrieves data from secondary storage in same-size blocks called pages. Paging is a memory management scheme that eliminates the need for contiguous allocation of physical memory. This scheme permits the physical address space of a process to be non – contiguous.
 
+-------------------------------------------------------------------------------------------------------------------------------------------
+worm v/s virus v/s trojan horse
+
+https://www.websecurity.digicert.com/security-topics/difference-between-virus-worm-and-trojan-horse#:~:text=A%20Trojan%20horse%20is%20not%20a%20virus.&text=Unlike%20viruses%2C%20Trojan%20horses%20do,personal%20information%20to%20be%20theft.
+
+
+https://www.geeksforgeeks.org/difference-between-virus-worm-and-trojan-horse/
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+What is a Kernel? 
+
+A Kernel is a computer program that is the heart and core of an Operating System. Since the Operating System has control over the system so, the Kernel also has control over everything in the system. It is the most important part of an Operating System. Whenever a system starts, the Kernel is the first program that is loaded after the bootloader because the Kernel has to handle the rest of the thing of the system for the Operating System. The Kernel remains in the memory until the Operating System is shut-down.
+
+The Kernel is responsible for low-level tasks such as disk management, memory management, task management, etc. It provides an interface between the user and the hardware components of the system. When a process makes a request to the Kernel, then it is called System Call.
+
+A Kernel is provided with a protected Kernel Space which is a separate area of memory and this area is not accessible by other application programs. So, the code of the Kernel is loaded into this protected Kernel Space. Apart from this, the memory used by other applications is called the User Space. As these are two different spaces in the memory, so communication between them is a bit slower.
+
+
+System Library − System libraries are special functions or programs using which application programs or system utilities accesses Kernel's features. These libraries implement most of the functionalities of the operating system and do not requires kernel module's code access rights.
+
+
+Kernel Mode vs User Mode: 
+
+Kernel component code executes in a special privileged mode called kernel mode with full access to all resources of the computer. This code represents a single process, executes in single address space and do not require any context switch and hence is very efficient and fast. Kernel runs each processes and provides system services to processes, provides protected access to hardware to processes.
+
+Support code which is not required to run in kernel mode is in System Library. User programs and other system programs works in User Mode which has no access to system hardware and kernel code. User programs/ utilities use System libraries to access Kernel functions to get system's low level tasks.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
 

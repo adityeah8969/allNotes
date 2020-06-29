@@ -1,3 +1,159 @@
 Broadcast domains v/s collision domains
 
 https://www.youtube.com/watch?v=ck3gx9HB9-k
+
+---------------------------------------------
+
+OSI Model:
+
+To ease network engineering, the whole networking concept is divided into multiple layers. Each layer is involved in some particular task and is independent of all other layers. But as a whole, almost all networking tasks depend on all of these layers. Layers share data between them and they depend on each other only to take input and send output.
+
+In layered communication system, one layer of a host deals with the task done by or to be done by its peer layer at the same level on the remote host. The task is either initiated by layer at the lowest level or at the top most level. If the task is initiated by the-top most layer, it is passed on to the layer below it for further processing. The lower layer does the same thing, it processes the task and passes on to lower layer. If the task is initiated by lower most layer, then the reverse path is taken.
+
+
+layer 1 Physical Layer
+layer 2 Data-Link Layer
+layer 3 Network Layer
+layer 4 Transport Layer
+layer 5 Session Layer
+layer 6 Presentation Layer
+layer 7 Application Layer
+
+
+Physical layer : 
+
+The main functionality of the physical layer is to transmit the individual bits from one node to another node.
+It specifies the mechanical, electrical and procedural network interface specifications.
+It establishes, maintains and deactivates the physical connection.
+It defines the transmission mode whether it is simplex, half-duplex or full-duplex mode between the two devices on the network.
+It defines the way how network devices are arranged. (Topology)
+It determines the type of the signal used for transmitting the information.
+
+Data-Link Layer : 
+
+Framing: The data link layer translates the physical's raw bit stream into packets known as Frames. The Data link layer adds the header and trailer to the frame. The header which is added to the frame contains the hardware destination and source address.
+
+Flow Control: Flow control is the main functionality of the Data-link layer. It is the technique through which the constant data rate is maintained on both the sides so that no data get corrupted. It ensures that the transmitting station such as a server with higher processing speed does not exceed the receiving station, with lower processing speed.
+
+Error Control: Error control is achieved by adding a calculated value CRC (Cyclic Redundancy Check) that is placed to the Data link layer's trailer which is added to the message frame before it is sent to the physical layer. If any error seems to occurr, then the receiver sends the acknowledgment for the retransmission of the corrupted frames.
+
+Access Control: When two or more devices are connected to the same communication channel, then the data link layer protocols are used to determine which device has control over the link at a given time.
+
+Data-link layer provides layer-2 hardware addressing(different from IP addressing) mechanism. Hardware address is assumed to be unique on the link. It is encoded into hardware at the time of manufacturing.
+
+
+Network Layer :
+
+Internetworking: An internetworking is the main responsibility of the network layer. It provides a logical connection between different devices.
+
+Addressing: A Network layer adds the source and destination address to the header of the frame. Addressing is used to identify the device on the internet.
+
+Routing: Routing is the major component of the network layer, and it determines the best optimal path out of the multiple paths from source to the destination.
+
+
+Transport Layer :
+
+Service-point addressing: Computers run several programs simultaneously due to this reason, the transmission of data from source to the destination not only from one computer to another computer but also from one process to another process. The transport layer adds the header that contains the address known as a service-point address or port address. The responsibility of the network layer is to transmit the data from one computer to another computer and the responsibility of the transport layer is to transmit the message to the correct process. 
+
+Segmentation and reassembly: When the transport layer receives the message from the upper layer, it divides the message into multiple segments, and each segment is assigned with a sequence number that uniquely identifies each segment. When the message has arrived at the destination, then the transport layer reassembles the message based on their sequence numbers.
+
+Connection control: Transport layer provides two services Connection-oriented service and connectionless service. A connectionless service treats each segment as an individual packet, and they all travel in different routes to reach the destination. A connection-oriented service makes a connection with the transport layer at the destination machine before delivering the packets. In connection-oriented service, all the packets travel in the single route.
+
+
+Session Layer : 
+
+The Session layer is used to establish, maintain and synchronizes the interaction between communicating devices
+
+Dialog control: Session layer acts as a dialog controller that creates a dialog between two processes or we can say that it allows the communication between two processes which can be either half-duplex or full-duplex.
+
+Synchronization: Session layer adds some checkpoints when transmitting the data in a sequence. If some error occurs in the middle of the transmission of data, then the transmission will take place again from the checkpoint. This process is known as Synchronization and recovery.
+
+
+Presentation Layer :
+
+Translation: The processes in two systems exchange the information in the form of character strings, numbers and so on. Different computers use different encoding methods, the presentation layer handles the interoperability between the different encoding methods. It converts the data from sender-dependent format into a common format and changes the common format into receiver-dependent format at the receiving end.
+
+Encryption: Encryption is needed to maintain privacy. Encryption is a process of converting the sender-transmitted information into another form and sends the resulting message over the network.
+
+Compression: Data compression is a process of compressing the data, i.e., it reduces the number of bits to be transmitted. Data compression is very important in multimedia such as text, audio, video.
+
+
+Application Layer : 
+
+This layer provides the network services to the end-users.
+
+An application layer serves as a window for users and application processes to access network service.
+
+File transfer, access, and management (FTAM): An application layer allows a user to access the files in a remote computer, to retrieve the files from a computer and to manage the files in a remote computer.
+
+---------------------------------------------
+
+
+PKI :
+
+
+PKI (or Public Key Infrastructure) is the framework of encryption and cybersecurity that protects communications between the server (your website) and the client (the users). It works by using two different cryptographic keys: a public key and a private key. The public key is available to any user that connects with the website. The private key is a unique key generated when a connection is made, and it is kept secret. When communicating, the client uses the public key to encrypt and decrypt, and the server uses the private key. This protects the user’s information from theft or tampering.
+
+The important thing here is the information encrypted by private key can only be decrypted using corresponding public key and vice-versa.
+This is an assymetric key crptography. 
+
+
+Digital Signatures:
+
+A digital signature is a mathematical technique used to validate the authenticity and integrity of a message, software or digital document.
+
+Digital signatures are based on public key cryptography, also known as asymmetric cryptography. Using a public key algorithm, such as RSA, one can generate two keys that are mathematically linked: one private and one public. 
+
+Lets say A wants to send digital data to B. 'A' first creates a MD5/SHA256 hash of the digital data. This hash is also called as digest.
+This digest is then encrypted using the private key which 'A' has. The public key, digest attached to digital data are then sent to 'B'.
+'B' takes out the digest and decrypts it using the public key (decrypted hash). Then digital data is then hashed using MD5/SHA256 to 
+get another hash (calculated hash). The calculated hash must match with decrypted hash. This confirms 'B' of the authenticity of data sent. 
+
+
+Only the authenticity of the data can be checked using digital signatures. It merely guarantees that the data received has not been tampered.
+There is no way for 'B' to know that the data has been sent from 'A'. This is where 'Digital Certificates' come in picture.
+
+
+Digital Certificates:
+
+A digital certificate, an electronic document that contains the digital signature of the issuing certificate authority, binds together a public key with an identity and can be used to verify that a public key belongs to a particular person or entity.
+
+Now when 'A' has to send digital data to 'B', rather than sending the public key, A's digital certificate gets sent. This certificate 
+has details of CA(Certificate Authority) signing the certificate, public key getting used and the information regarding the identity of the person (here 'A'). Public key is extracted and rest of the process remains the same.
+
+  
+---------------------------------------------
+
+Circuit switch vs Message switch vs Packet switch
+
+
+Circuit switching and packet switching are the two switching methods that are used to connect the multiple communicating devices with one another. Circuit Switching was particularly designed for voice communication and it was less suitable for data transmission. 
+
+The main difference between circuit switching and packet switching is that Circuit Switching is connection oriented whereas, Packet Switching is connectionless.
+
+Message switching is a network switching technique in which data is routed in its entirety from the source node to the destination node, one hope at a time. During message routing, every intermediate switch in the network stores the whole message. If the entire network's resources are engaged or the network becomes blocked, the message-switched network stores and delays the message until ample resources become available for effective transmission of the message.
+
+
+Packet switching is basically a special case of message switching type. After advancement of computer communication and networking, packet switching came into existence.
+
+In packet switching, the message is broken into smaller pieces. This will allow each router to start transmission as soon as first packet of message has been arrived. This will save enormous amount of time, especially when no. of hops between source and destination are more. 
+
+---------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

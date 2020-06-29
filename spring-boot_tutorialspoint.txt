@@ -857,42 +857,31 @@ Typically, @Bean methods are declared within @Configuration classes. In this exa
 
 package com.therealdanvega;
 
-public class User {
-
-    private String first;
-    private String last;
-
-    public User(String first, String last) {
-        this.first = first;
-        this.last = last;
-    }
-}
-
-
-
-package com.therealdanvega;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ApplicationConfig {
-
-    @Bean
-    public User superUser() {
-        return new User("Dan","Vega");
+public class ApplicationConfiguration {
+ 
+    @Bean(name="demoService")
+    public DemoManager helloWorld() 
+    {
+        return new DemoManagerImpl();
     }
-
 }
 
 
-//Getting Bean by Class
-
-AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-context.scan("com.therealdanvega");
-context.refresh();
-	
-User user = context.getBean(User.class);
+public class VerifySpringCoreFeature
+{
+    public static void main(String[] args)
+    {
+        ApplicationContext context = new AnnotationConfigApplicationContext(ApplicationConfiguration.class);
+ 
+        DemoManager  obj = (DemoManager) context.getBean("demoService");
+ 
+        System.out.println( obj.getServiceName() );
+    }
+}
 
 
 @Component
