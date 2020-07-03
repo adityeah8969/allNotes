@@ -1,0 +1,92 @@
+Hashing v/s Indexing : 
+
+
+When executing SQL queries, it takes some amount of time to access data from the disk. Herein, an index is a data structure that helps to find and access data in a table of a database quickly. Indexing technique reduces the number of disks accessed to process queries.
+
+An index consists of two sections:  a search key and a data reference. The search key contains the primary key or the candidate key of the table. Data reference holds the address of the disk block that has the value corresponding to that key.
+
+# The main difference between indexing and hashing is that the indexing optimizes the performance of a database by reducing the number of disk accesses to process queries while hashing calculates the direct location of a data record on the disk without using index structure.
+
+# Another difference between indexing and hashing is that the hashing works well for large databases than indexing.
+
+
+
+--------------------------------------------------------------------------------------
+
+Static Hashing v/s Dynamic hashing : 
+
+In static hashing, when a search-key value is provided, the hash function always computes the same address.
+
+Operation
+Insertion − When a record is required to be entered using static hash, the hash function h computes the bucket address for search key K, where the record will be stored.
+
+Bucket address = h(K)
+
+Search − When a record needs to be retrieved, the same hash function can be used to retrieve the address of the bucket where the data is stored.
+
+Delete − This is simply a search followed by a deletion operation.
+
+
+Bucket Overflow: 
+
+The condition of bucket-overflow is known as collision. This is a fatal state for any static hash function. In this case, overflow chaining can be used.
+
+# Overflow Chaining − When buckets are full, a new bucket is allocated for the same hash result and is linked after the previous one. This mechanism is called Closed Hashing.
+
+# Linear Probing − When a hash function generates an address at which data is already stored, the next free bucket is allocated to it. This mechanism is called Open Hashing.
+
+
+The problem with static hashing is that it does not expand or shrink dynamically as the size of the database grows or shrinks. Dynamic hashing provides a mechanism in which data buckets are added and removed dynamically and on-demand. Dynamic hashing is also known as extended hashing.
+
+Hash function, in dynamic hashing, is made to produce a large number of values and only a few are used initially.
+
+Operation
+Querying − Look at the depth value of the hash index and use those bits to compute the bucket address.
+
+Update − Perform a query as above and update the data.
+
+Deletion − Perform a query to locate the desired data and delete the same.
+
+Insertion − Compute the address of the bucket
+
+If the bucket is already full.
+	Add more buckets.
+	Add additional bits to the hash value.
+	Re-compute the hash function.
+Else
+	Add data to the bucket,
+If all the buckets are full, perform the remedies of static hashing.
+
+
+
+e.g: initially suppose we have a bucket size of 2 and 2 least significant bits are getting used for hash calculation, in case there is a new
+entry which attempts to get into a bucket filled upto its capacity(2), then we have to modify our hash function to consider 3 least significant bits (previously 2, now we will have 2^3 = 8 bucket partitions, prevously 2^2 = 4). We have to modify the location of already 
+existing data entries as well.
+
+
+Advantages of dynamic hashing
+# In this method, the performance does not decrease as the data grows in the system. It simply increases the size of memory to accommodate the data.
+# In this method, memory is well utilized as it grows and shrinks with the data. There will not be any unused memory lying.
+# This method is good for the dynamic database where data grows and shrinks frequently.
+
+Disadvantages of dynamic hashing
+# In this method, if the data size increases then the bucket size is also increased. These addresses of data will be maintained in the bucket address table. This is because the data address will keep changing as buckets grow and shrink. If there is a huge increase in data, maintaining the bucket address table becomes tedious.
+# In this case, the bucket overflow situation will also occur. But it might take little time to reach this situation than static hashing.
+
+
+---------------------------------------------------------------------------------------
+
+conflict serializability v/s view serializability
+
+https://beginnersbook.com/2018/12/dbms-conflict-serializability/
+https://beginnersbook.com/2018/12/dbms-view-serializability/#:~:text=View%20Serializability%20is%20a%20process,what%20I%20mean%20by%20that.
+
+
+
+
+
+
+
+
+
+

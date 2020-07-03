@@ -32,3 +32,112 @@ Applications of BFS:
 
 --------------------------------------------------------
 
+Time complexity of dijkstras : 
+
+space complexity of the priority queue : O(V*e) where e is the avg number of edges attached to a vertex and 'V' is the number of vertices.
+				       : O(E)
+				       : O(V^2)
+				       : 2*O(V)
+				       : O(V)
+
+time complexity for maintaining the priority queue (min heap) : O(log(V))
+time complexity for picking the min dist[v] : O(1)
+time complexity associated with one node  :  O(e) * O(1) * O(log(V)) where e is the avg number of edges attached to that node
+time complexity associated with all the nodes : O(V) * O(e)* O(1) * O(log(V)) --> O(E*log(V))
+
+--------------------------------------------------------
+
+Eulerian Path v/s Eulerian Circuit : 
+
+Eulerian Path is a path in graph that visits every edge exactly once. Eulerian Circuit is a special kind of eulerian path where start and end
+vertex are the same thing.
+
+To detect the path and circuit, we have to follow these conditions 
+
+* The graph must be connected.
+* When exactly two vertices have odd degree, it is a Euler Path.
+* Now when no vertices of an undirected graph have odd degree, then it is a Euler Circuit.
+
+--------------------------------------------------------
+
+Ford Fulkerson : 
+
+c(u,v) denotes the residual capacity of an edge. If a flow of value f(u,v) flows the residual capacity decreases to,
+
+c(u,v) = c(u,v) - f(u,v)
+
+f(u,v) = -f(v,u) (same as negative flow in opposite direction)
+
+c(v,u) = c(v,u) - f(v,u)
+       = c(v,u) + f(u,v)
+
+
+if DFS is used time complexity of Ford Fulkerson would be O((E+V)*max_flow), works horrible in case the max_flow value is high.
+
+while using BFS an edge can get critical O(V/2) times,
+
+			------->(x =1)
+	s ---->		1	2     ----->	t
+			<-------(y =0)
+
+
+x with the capacity of 1 is the edge (connecting 1 & 2) in the direction 1 to 2, y with capacity of 0 is the edge (connecting 1 & 2) in the direction 2 to 1
+
+let s be the source , t be the destination and 'x'(edge) connectiong 1 & 2 be the critical edge. In case x gets selected as a critical edge 
+teh residual capacity decreases by 1 and that of y increases by 1.
+
+			------->(x =0)
+	s ---->		1	2     ----->	t
+			<-------(y =1)
+
+
+Currently only the 'y' edge can be made critical as x has no residual capacity left. 
+For 'y' to be critical there has to be atlest one node between 's' and '2'.Let that be called n'. This time the residual capacity of 'y' decreases.
+and that of 'x' increases.
+
+
+			------->(x =1)
+	s -> n' >	2	1     ----->	t
+			<-------(y =0)
+
+Similarly, the next time edge 'x' gets selected as a critical edge, there has to be one more than previous number of nodes between 's' 
+and '1'. Since there is an upper limit on total number of nodes available O(V) and both x & y operate in alternate turns, so the
+maximum number of nodes that can come in between 's' & '1' OR 's' & '2' is O(V/2). Also O(V/2) will b ethe maximum number of times as
+edge can become critical.
+
+Considering all the edges inside the graph, Total number of times all the edges became critical = O(E) * O(V/2)
+
+Time compexity of Ford Fulkerson = BFS * Total number of occeurence of critical edges 
+ 				 = O(V+E) * O(EV/2)
+				 = O(E) * O(EV)
+			         = O(E^2 * V)
+
+----------------------------------------------------------------------------------------------------------------
+
+A Clique is a subgraph of graph such that all vertcies in subgraph are completely connected with each other. 
+
+2 clique problem states if we can divide the graph into 2 cliques,
+
+Steps :
+
+i>  Find complement of Graph.
+ii> Return true if complement is Bipartite, else false.
+
+It works because of the following:
+
+If complement is Bipartite, then graph can be divided into two sets U and V such that there is no edge connecting to vertices of same set. This means in original graph, these sets U and V are completely connected. Hence original graph could be divided in two Cliques.
+
+----------------------------------------------------------------------------------------------------------------
+
+ 
+
+
+
+
+
+
+
+
+
+
+
