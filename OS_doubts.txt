@@ -49,19 +49,26 @@ Some of the ways to avoid deadlock are as follows:
 
 Mutex v/ Semaphore
 
-There are many issues unique to multithreaded programming, the most prominent being atomicity and ordering. Whats important to realize is that these are completely unrelated to each other.
+Consider the standard producer-consumer problem. Assume, we have a buffer of 4096 byte length. A producer thread collects the data and writes it to the buffer. A consumer thread processes the collected data from the buffer. Objective is, both the threads should not run at the same time.
 
-# Atomicity:
-An illusion that a section of code either executes completely, or doesn't execute at all. This illusion can be provided by allowing only one thread to execute that code at a time. Atomicity is a key requirement for generating consistent results with respect to a memory location. It is particularly useful for the parts of your program that modify shared state, say globals.
+Using Mutex:
 
-# Ordering:
-Different threads might be running on different cores. However, since there is no such thing as a global clock, at times its imperative to achieve ordering of instructions across various cores, for correctness. For example, it might be a correctness requirement to execute instruction X of thread T1 running on core C1 before instruction Y of thread T2 running on core C2.
+A mutex provides mutual exclusion, either producer or consumer can have the key (mutex) and proceed with their work. As long as the buffer is filled by producer, the consumer needs to wait, and vice versa.
 
-A mutex is used to meet the atomicity requirement. However, it does not impose any ordering. In other words, given two threads, use of a mutex can't specify, which thread will acquire the mutex first, and hence execute the critical section before the other. The only assurance is that if one thread is executing the critical section, the other will be kept out of it.
+At any point of time, only one thread can work with the entire buffer. The concept can be generalized using semaphore.
 
-On the other hand, a semaphore can be used to impose ordering constraints in your execution. Considering the aforementioned example, you can block thread T2 just before it executes instruction Y, conditioned on whether T1 is done executing instruction X. This can be done by making T2 wait on the same condition variable that T1 signals, precisely the programming abstraction that the semaphore provides through its wait() and signal() operations.
+Using Semaphore:
 
-Thus, a mutex can only be used to maintain atomicity whereas a semaphore can be used for both ordering and atomicity.
+A semaphore is a generalized mutex. In lieu of single buffer, we can split the 4 KB buffer into four 1 KB buffers (identical resources). A semaphore can be associated with these four buffers. The consumer and producer can work on different buffers at the same time.
+
+Misconception:
+
+There is an ambiguity between binary semaphore and mutex. We might have come across that a mutex is binary semaphore. But they are not! The purpose of mutex and semaphore are different. May be, due to similarity in their implementation a mutex would be referred as binary semaphore.
+
+
+Strictly speaking, a mutex is locking mechanism used to synchronize access to a resource. Only one task (can be a thread or process based on OS abstraction) can acquire the mutex. It means there is ownership associated with mutex, and only the owner can release the lock (mutex).
+
+Semaphore is signaling mechanism (“I am done, you can carry on” kind of signal). For example, if you are listening songs (assume it as one task) on your mobile and at the same time your friend calls you, an interrupt is triggered upon which an interrupt service routine (ISR) signals the call processing task to wakeup.
 
 -------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -100,7 +107,7 @@ while(TRUE)
     wait(m);
     read_count++;
     if(read_count == 1)
-        wait(w);                               // puts a halt on all other writers 
+        wait(w);                               // puts a halt on the writer
     
     //release lock  
     signal(m);  
@@ -111,12 +118,14 @@ while(TRUE)
     wait(m);   
     read_count--;
     if(read_count == 0)
-        signal(w);			      // all writers can be made available again
+        signal(w);			      // the writer can be made available again
         
     // release lock
     signal(m);  
 } 
 
+
+Note: The lock is getting acquired (on m) only when we need to update the read_count variable, not while reading.
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------
@@ -262,6 +271,144 @@ Kernel component code executes in a special privileged mode called kernel mode w
 
 Support code which is not required to run in kernel mode is in System Library. User programs and other system programs works in User Mode which has no access to system hardware and kernel code. User programs/ utilities use System libraries to access Kernel functions to get system's low level tasks.
 
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Difference between Microkernel v/s Monolithic Kernel: 
+
+The main differences were listed as the following:
+
+# The basic point on which microkernel and monolithic kernel is distinguished is that microkernel implement user services and kernel services in different address spaces and monolithic kernel implement both user services and kernel services under same address space.
+
+# The size of microkernel is small as only kernel services reside in the kernel address space. However, the size of monolithic kernel is comparatively larger than microkernel because both kernel services and user services reside in the same address space.
+
+# The execution of monolithic kernel is faster as the communication between application and hardware is established using the system call. On the other hands, the execution of microkernel is slow as the communication between application and hardware of the system is established through message passing.
+
+# It is easy to extend microkernel because new service is to be added in user address space that is isolated from kernel space, so the kernel does not require to be modified. Opposite is the case with monolithic kernel if a new service is to be added in monolithic kernel then entire kernel needs to be modified.
+
+# Microkernel is more secure than monolithic kernel as if a service fails in microkernel the operating system remain unaffected. On the other hands, if a service fails in monolithic kernel entire system fails.
+
+# Monolithic kernel designing requires less code, which further leads to fewer bugs. On the other hands, microkernel designing needs more code which further leads to more bugs.
+
+This can result in a gross generalisation.
+
+# Microkernel slower and more secure.
+# Monolithic kernel faster and less secure.
 
 -------------------------------------------------------------------------------------------------------------------------------------------
+
+What is the concept of demand paging?
+Demand paging specifies that if an area of memory is not currently being used, it is swapped to disk to make room for an application's need.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+What is thrashing?
+Thrashing is a phenomenon in virtual memory scheme when the processor spends most of its time in swapping pages, rather than executing instructions.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+27) What is fragmentation?
+Fragmentation is a phenomenon of memory wastage. It reduces the capacity and performance because space is used inefficiently.
+
+There are several key types of fragmentation:
+
+Internal Fragmentation. Refers to a type of fragmentation where either RAM system memory or storage space is over provisioned and then not used by the operating system or application.
+
+External Fragmentation. Occurs when an application or process is removed from memory or from a storage system and the used space is not immediately reallocated, leaving a fragment.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Types of OS :
+
+
+Batch operating system : 
+
+Some computer processes are very lengthy and time-consuming. To speed the same process, a job with a similar type of needs are batched together and run as a group. The user of a batch operating system never directly interacts with the computer. In this type of OS, every user prepares his or her job on an offline device like a punch card and submit it to the computer operator.
+
+The problems with Batch Systems are as follows −
+
+Lack of interaction between the user and the job.
+CPU is often idle, because the speed of the mechanical I/O devices is slower than the CPU.
+Difficult to provide the desired priority.
+
+
+
+Time-sharing operating systems: 
+
+Time-sharing is a technique which enables many people, located at various terminals, to use a particular computer system at the same time. Time-sharing or multitasking is a logical extension of multiprogramming. Processor's time which is shared among multiple users simultaneously is termed as time-sharing.
+
+Multiple jobs are executed by the CPU by switching between them, but the switches occur so frequently. Thus, the user can receive an immediate response. For example, in a transaction processing, the processor executes each user program in a short burst or quantum of computation. That is, if n users are present, then each user can get a time quantum. When the user submits the command, the response time is in few seconds at most.
+
+Advantages of Timesharing operating systems are as follows −
+
+Provides the advantage of quick response.
+# Avoids duplication of software.
+# Reduces CPU idle time.
+# Disadvantages of Time-sharing operating systems are as follows −
+
+Problem of reliability.
+# Question of security and integrity of user programs and data.
+# Problem of data communication.
+
+
+
+Distributed operating System:
+
+Distributed systems use multiple central processors to serve multiple real-time applications and multiple users. Data processing jobs are distributed among the processors accordingly.
+
+The processors communicate with one another through various communication lines (such as high-speed buses or telephone lines). These are referred as loosely coupled systems or distributed systems. Processors in a distributed system may vary in size and function. These processors are referred as sites, nodes, computers, and so on.
+
+The advantages of distributed systems are as follows −
+
+# With resource sharing facility, a user at one site may be able to use the resources available at another.
+# Speedup the exchange of data with one another via electronic mail.
+# If one site fails in a distributed system, the remaining sites can potentially continue operating.
+# Better service to the customers.
+# Reduction of the load on the host computer.
+# Reduction of delays in data processing.
+
+
+
+Network operating System:
+
+A Network Operating System runs on a server and provides the server the capability to manage data, users, groups, security, applications, and other networking functions. The primary purpose of the network operating system is to allow shared file and printer access among multiple computers in a network, typically a local area network (LAN), a private network or to other networks.
+
+The advantages of network operating systems are as follows −
+
+# Centralized servers are highly stable.
+# Security is server managed.
+# Upgrades to new technologies and hardware can be easily integrated into the system.
+# Remote access to servers is possible from different locations and types of systems.
+# The disadvantages of network operating systems are as follows −
+
+High cost of buying and running a server.
+# Dependency on a central location for most operations.
+# Regular maintenance and updates are required.
+
+
+
+Real Time operating System:
+
+A real-time system is defined as a data processing system in which the time interval required to process and respond to inputs is so small that it controls the environment. The time taken by the system to respond to an input and display of required updated information is termed as the response time. So in this method, the response time is very less as compared to online processing.
+
+Real-time systems are used when there are rigid time requirements on the operation of a processor or the flow of data and real-time systems can be used as a control device in a dedicated application. A real-time operating system must have well-defined, fixed time constraints, otherwise the system will fail. For example, Scientific experiments, medical imaging systems, industrial control systems, weapon systems, robots, air traffic control systems, etc.
+
+There are two types of real-time operating systems.
+
+Hard real-time systems:
+
+Hard real-time systems guarantee that critical tasks complete on time. In hard real-time systems, secondary storage is limited or missing and the data is stored in ROM. In these systems, virtual memory is almost never found.
+
+Soft real-time systems:
+
+Soft real-time systems are less restrictive. A critical real-time task gets priority over other tasks and retains the priority until it completes. Soft real-time systems have limited utility than hard real-time systems. For example, multimedia, virtual reality, Advanced Scientific Projects like undersea exploration and planetary rovers, etc.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+What is spooling?
+
+Spooling is a process in which data is temporarily gathered to be used and executed by a device, program or the system. It is associated with printing. When different applications send output to the printer at the same time, spooling keeps these all jobs into a disk file and queues them accordingly to the printer.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
 
