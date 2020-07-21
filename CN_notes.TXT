@@ -11,13 +11,13 @@ To ease network engineering, the whole networking concept is divided into multip
 In layered communication system, one layer of a host deals with the task done by or to be done by its peer layer at the same level on the remote host. The task is either initiated by layer at the lowest level or at the top most level. If the task is initiated by the-top most layer, it is passed on to the layer below it for further processing. The lower layer does the same thing, it processes the task and passes on to lower layer. If the task is initiated by lower most layer, then the reverse path is taken.
 
 
-layer 1 Physical Layer
-layer 2 Data-Link Layer
-layer 3 Network Layer
-layer 4 Transport Layer
-layer 5 Session Layer
-layer 6 Presentation Layer
 layer 7 Application Layer
+layer 6 Presentation Layer
+layer 5 Session Layer
+layer 4 Transport Layer
+layer 3 Network Layer
+layer 2 Data-Link Layer
+layer 1 Physical Layer
 
 
 Physical layer : 
@@ -122,6 +122,32 @@ Now when 'A' has to send digital data to 'B', rather than sending the public key
 has details of CA(Certificate Authority) signing the certificate, public key getting used and the information regarding the identity of the person (here 'A'). Public key is extracted and rest of the process remains the same.
 
   
+---------------------------------------------
+
+SSL Certificates : 
+
+An SSL certificate displays important information for verifying the owner of a website and encrypting web traffic with SSL/TLS, including the public key, the issuer of the certificate, and the associated subdomains.
+
+SSL certificates are what enable websites to move from HTTP to HTTPS, which is more secure. An SSL certificate is a data file hosted in a website's origin server. SSL certificates make SSL/TLS encryption possible, and they contain the website's public key and the website's identity, along with related information. Devices attempting to communicate with the origin server will reference this file to obtain the public key and verify the server's identity. The private key is kept secret and secure.
+
+say we are trying to connect to https://www.yahoo.com
+
+step 1 : Browser requests secure (HTTPS) web pages from yahoo's web server.
+
+step 2 : Yahoo's server sends its public key along with an SSL certificate (digitally signed using CA's private key).
+
+step 3 : Browser checks the issuer's certicate to make sure that the certificate is valid. For this the browser itself has public keys of 		 major CAs. Once the digital signature is verified, the SSL certificate can be trusted. This is where a green padlock appears.
+	 This green padlock simply indicates that the public key sent belongs to the Yahoo server.
+
+step 4 : Browser creates a symmetric key (2 pvt keys) encrypts one of them using public key sent by the server, and sends the 
+	 encrypted key to the server(Yahoo's server). 
+
+step 5 : Web server uses private key to decrypt the encrypted key sent. This way the server now has the clients shared pvt key. From
+	 this point onwards all the data between client and server will be encrypted/decrypted using the same key.
+
+
+This is also an example of how symmetric and assymetric keys work together.
+
 ---------------------------------------------
 
 Circuit switch vs Message switch vs Packet switch

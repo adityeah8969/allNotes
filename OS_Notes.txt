@@ -1,3 +1,21 @@
+New (Create) – In this step, the process is about to be created but not yet created, it is the program which is present in secondary memory that will be picked up by OS to create the process.
+
+Ready – New -> Ready to run. After the creation of a process, the process enters the ready state i.e. the process is loaded into the main memory. The process here is ready to run and is waiting to get the CPU time for its execution. Processes that are ready for execution by the CPU are maintained in a queue for ready processes.
+
+Run – The process is chosen by CPU for execution and the instructions within the process are executed by any one of the available CPU cores.
+
+Blocked or wait – Whenever the process requests access to I/O or needs input from the user or needs access to a critical region(the lock for which is already acquired) it enters the blocked or wait state. The process continues to wait in the main memory and does not require CPU. Once the I/O operation is completed the process goes to the ready state.
+
+Terminated or completed – Process is killed as well as PCB is deleted.
+
+Suspend ready – Process that was initially in the ready state but were swapped out of main memory(refer Virtual Memory topic) and placed onto external storage by scheduler are said to be in suspend ready state. The process will transition back to ready state whenever the process is again brought onto the main memory.
+
+Suspend wait or suspend blocked – Similar to suspend ready but uses the process which was performing I/O operation and lack of main memory caused them to move to secondary memory.
+When work is finished it may go to suspend ready.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
 
 PROCESS/JOBS/TASK/THREAD/THREAD-POOL
 
@@ -15,3 +33,382 @@ In computer programming, a thread pool is a software design pattern for achievin
 UNIX has separate concepts "process", "process group", and "session".The shell creates a process group within the current session for each "job" it launches, and places each process it starts into the appropriate process group. For example, ls | head is a pipeline of two processes, which the shell considers a single job, and will belong to a single, new process group.
 
 A process is a (collection of) thread of execution and other context, such as address space and file descriptor table. A process may start other processes; these new processes will belong to the same process group as the parent unless other action is taken. Each process may also have a "controlling terminal", which starts off the same as its parent.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Dining Philosophers Problem:
+
+Some of the ways to avoid deadlock are as follows:
+
+* There should be at most four philosophers on the table.
+* An even philosopher should pick the right chopstick and then the left chopstick while an odd philosopher should pick the left chopstick and 	then the right chopstick.
+* A philosopher should only be allowed to pick their chopstick if both are available at the same time.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Mutex v/ Semaphore
+
+Consider the standard producer-consumer problem. Assume, we have a buffer of 4096 byte length. A producer thread collects the data and writes it to the buffer. A consumer thread processes the collected data from the buffer. Objective is, both the threads should not run at the same time.
+
+Using Mutex:
+
+A mutex provides mutual exclusion, either producer or consumer can have the key (mutex) and proceed with their work. As long as the buffer is filled by producer, the consumer needs to wait, and vice versa.
+
+At any point of time, only one thread can work with the entire buffer. The concept can be generalized using semaphore.
+
+Using Semaphore:
+
+A semaphore is a generalized mutex. In lieu of single buffer, we can split the 4 KB buffer into four 1 KB buffers (identical resources). A semaphore can be associated with these four buffers. The consumer and producer can work on different buffers at the same time.
+
+Misconception:
+
+There is an ambiguity between binary semaphore and mutex. We might have come across that a mutex is binary semaphore. But they are not! The purpose of mutex and semaphore are different. May be, due to similarity in their implementation a mutex would be referred as binary semaphore.
+
+
+Strictly speaking, a mutex is locking mechanism used to synchronize access to a resource. Only one task (can be a thread or process based on OS abstraction) can acquire the mutex. It means there is ownership associated with mutex, and only the owner can release the lock (mutex).
+
+Semaphore is signaling mechanism (“I am done, you can carry on” kind of signal). For example, if you are listening songs (assume it as one task) on your mobile and at the same time your friend calls you, an interrupt is triggered upon which an interrupt service routine (ISR) signals the call processing task to wakeup.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Readers - Writers problem:
+
+
+# The Problem Statement
+
+There is a shared resource which should be accessed by multiple processes. There are two types of processes in this context. They are reader and writer. Any number of readers can read from the shared resource simultaneously, but only one writer can write to the shared resource. When a writer is writing data to the resource, no other process can access the resource. A writer cannot write to the resource if there are non zero number of readers accessing the resource at that time.
+
+The Solution
+From the above problem statement, it is evident that readers have higher priority than writer. If a writer wants to write to the resource, it must wait until there are no readers currently accessing that resource.
+
+Here, we use one mutex m and a semaphore w. An integer variable read_count is used to maintain the number of readers currently accessing the resource. The variable read_count is initialized to 0. A value of 1 is given initially to m and w.
+
+Instead of having the process to acquire lock on the shared resource, we use the mutex m to make the process to acquire and release lock whenever it is updating the read_count variable.
+
+
+The code for the writer process looks like this:
+
+while(TRUE) 
+{
+    wait(w);
+    
+   /* perform the write operation */
+   
+   signal(w);
+}
+
+
+And, the code for the reader process looks like this:
+
+while(TRUE) 
+{
+    //acquire lock
+    wait(m);
+    read_count++;
+    if(read_count == 1)
+        wait(w);                               // puts a halt on the writer
+    
+    //release lock  
+    signal(m);  
+    
+    /* perform the reading operation */
+    
+    // acquire lock
+    wait(m);   
+    read_count--;
+    if(read_count == 0)
+        signal(w);			      // the writer can be made available again
+        
+    // release lock
+    signal(m);  
+} 
+
+
+Note: The lock is getting acquired (on m) only when we need to update the read_count variable, not while reading.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Bounded Buffer Problem
+
+
+Bounded buffer problem, which is also called producer consumer problem, is one of the classic problems of synchronization. 
+
+There is a buffer of n slots and each slot is capable of storing one unit of data. There are two processes running, namely, producer and consumer, which are operating on the buffer.
+
+A producer tries to insert data into an empty slot of the buffer. A consumer tries to remove data from a filled slot in the buffer. As you might have guessed by now, those two processes won't produce the expected output if they are being executed concurrently.
+
+One solution of this problem is to use semaphores. 
+
+The semaphores which will be used here are:
+
+i>   m, a binary semaphore which is used to acquire and release the lock.
+ii>  empty, a counting semaphore whose initial value is the number of slots in the buffer, since, initially all slots are empty.
+iii> full, a counting semaphore whose initial value is 0.
+
+
+The pseudocode of the producer function looks like this:
+
+do 
+{
+    // wait until empty > 0 and then decrement 'empty'
+    wait(empty);   
+    // acquire lock
+    wait(mutex);  
+    
+    /* perform the insert operation in a slot */
+    
+    // release lock
+    signal(mutex);  
+    // increment 'full'
+    signal(full);   
+} 
+while(TRUE)
+
+
+The pseudocode for the consumer function looks like this:
+
+do 
+{
+    // wait until full > 0 and then decrement 'full'
+    wait(full);
+    // acquire the lock
+    wait(mutex);  
+    
+    /* perform the remove operation in a slot */ 
+    
+    // release the lock
+    signal(mutex); 
+    // increment 'empty'
+    signal(empty); 
+} 
+while(TRUE);
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Deadlock avoidance v/s Deadlock prevention:
+
+Deadlock prevention means to block at least one of the following four conditions required for deadlock to occur.
+
+Mutual Exclusion
+Hold and Wait
+No Preemption
+Circular Wait
+
+In Deadlock avoidance we have to anticipate deadlock before it really occurs and ensure that the system does not go in unsafe state.It is possible to avoid deadlock if resources are allocated carefully. For deadlock avoidance we use Banker’s and Safety algorithm for resource allocation purpose. In deadlock avoidance the maximum number of resources of each type that will be needed are stated at the beginning of the process.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Address Binding:
+
+Computer memory uses both logical addresses and physical addresses. Address binding allocates a physical memory location to a logical pointer by associating a physical address to a logical address, which is also known as a virtual address. Address binding is part of computer memory management and it is performed by the operating system on behalf of the applications that need access to memory.
+
+There are 3 types of Address Binding:
+
+i>   Compile Time Address Binding
+ii>  Load Time Address Binding
+iii> Execution Time Address Binding
+
+
+Compile Time Address Binding:
+
+If the compiler is responsible of performing address binding then it is called as compile time address binding. This type of address binding will be done before loading the program into memory. The compiler required to interact with the operating system memory manager to perform compile time address binding.
+
+
+Load Time Address Binding:
+
+This type of address binding will be done after loading the program into memory. Load time address binding will be done by operating memory manager.
+
+Execution Time:
+
+Execution time address binding usually applies only to variables in programs and is the most common form of binding for scripts, which don't get compiled. In this scenario, the program requests memory space for a variable in a program the first time that variable is encountered during the processing of instructions in the script. The memory will allocate space to that variable until the program sequence ends, or unless a specific instruction within the script releases the memory address bound to a variable.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Dynamic Loading v/s Dynamic Linking:
+
+Dynamic loading refers to mapping (or less often copying) an executable or library into a process's memory after is has started. Dynamic linking refers to resolving symbols - associating their names with addresses or offsets - after compile time. 
+
+
+Overlays:
+
+Overlay is a technique to run a program that is bigger than the size of the physical memory by keeping only those instructions and data that are needed at any given time.Divide the program into modules in such a way that not all modules need to be in the memory at the same time.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Paging:
+
+In computer operating systems, paging is a memory management scheme by which a computer stores and retrieves data from secondary storage for use in main memory. In this scheme, the operating system retrieves data from secondary storage in same-size blocks called pages. Paging is a memory management scheme that eliminates the need for contiguous allocation of physical memory. This scheme permits the physical address space of a process to be non – contiguous.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+worm v/s virus v/s trojan horse
+
+https://www.websecurity.digicert.com/security-topics/difference-between-virus-worm-and-trojan-horse#:~:text=A%20Trojan%20horse%20is%20not%20a%20virus.&text=Unlike%20viruses%2C%20Trojan%20horses%20do,personal%20information%20to%20be%20theft.
+
+
+https://www.geeksforgeeks.org/difference-between-virus-worm-and-trojan-horse/
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+What is a Kernel? 
+
+A Kernel is a computer program that is the heart and core of an Operating System. Since the Operating System has control over the system so, the Kernel also has control over everything in the system. It is the most important part of an Operating System. Whenever a system starts, the Kernel is the first program that is loaded after the bootloader because the Kernel has to handle the rest of the thing of the system for the Operating System. The Kernel remains in the memory until the Operating System is shut-down.
+
+The Kernel is responsible for low-level tasks such as disk management, memory management, task management, etc. It provides an interface between the user and the hardware components of the system. When a process makes a request to the Kernel, then it is called System Call.
+
+A Kernel is provided with a protected Kernel Space which is a separate area of memory and this area is not accessible by other application programs. So, the code of the Kernel is loaded into this protected Kernel Space. Apart from this, the memory used by other applications is called the User Space. As these are two different spaces in the memory, so communication between them is a bit slower.
+
+
+System Library − System libraries are special functions or programs using which application programs or system utilities accesses Kernel's features. These libraries implement most of the functionalities of the operating system and do not requires kernel module's code access rights.
+
+
+Kernel Mode vs User Mode: 
+
+Kernel component code executes in a special privileged mode called kernel mode with full access to all resources of the computer. This code represents a single process, executes in single address space and do not require any context switch and hence is very efficient and fast. Kernel runs each processes and provides system services to processes, provides protected access to hardware to processes.
+
+Support code which is not required to run in kernel mode is in System Library. User programs and other system programs works in User Mode which has no access to system hardware and kernel code. User programs/ utilities use System libraries to access Kernel functions to get system's low level tasks.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Difference between Microkernel v/s Monolithic Kernel: 
+
+The main differences were listed as the following:
+
+# The basic point on which microkernel and monolithic kernel is distinguished is that microkernel implement user services and kernel services in different address spaces and monolithic kernel implement both user services and kernel services under same address space.
+
+# The size of microkernel is small as only kernel services reside in the kernel address space. However, the size of monolithic kernel is comparatively larger than microkernel because both kernel services and user services reside in the same address space.
+
+# The execution of monolithic kernel is faster as the communication between application and hardware is established using the system call. On the other hands, the execution of microkernel is slow as the communication between application and hardware of the system is established through message passing.
+
+# It is easy to extend microkernel because new service is to be added in user address space that is isolated from kernel space, so the kernel does not require to be modified. Opposite is the case with monolithic kernel if a new service is to be added in monolithic kernel then entire kernel needs to be modified.
+
+# Microkernel is more secure than monolithic kernel as if a service fails in microkernel the operating system remain unaffected. On the other hands, if a service fails in monolithic kernel entire system fails.
+
+# Monolithic kernel designing requires less code, which further leads to fewer bugs. On the other hands, microkernel designing needs more code which further leads to more bugs.
+
+This can result in a gross generalisation.
+
+# Microkernel slower and more secure.
+# Monolithic kernel faster and less secure.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+What is the concept of demand paging?
+Demand paging specifies that if an area of memory is not currently being used, it is swapped to disk to make room for an application's need.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+What is thrashing?
+Thrashing is a phenomenon in virtual memory scheme when the processor spends most of its time in swapping pages, rather than executing instructions.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+27) What is fragmentation?
+Fragmentation is a phenomenon of memory wastage. It reduces the capacity and performance because space is used inefficiently.
+
+There are several key types of fragmentation:
+
+Internal Fragmentation. Refers to a type of fragmentation where either RAM system memory or storage space is over provisioned and then not used by the operating system or application.
+
+External Fragmentation. Occurs when an application or process is removed from memory or from a storage system and the used space is not immediately reallocated, leaving a fragment.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Types of OS :
+
+
+Batch operating system : 
+
+Some computer processes are very lengthy and time-consuming. To speed the same process, a job with a similar type of needs are batched together and run as a group. The user of a batch operating system never directly interacts with the computer. In this type of OS, every user prepares his or her job on an offline device like a punch card and submit it to the computer operator.
+
+The problems with Batch Systems are as follows −
+
+Lack of interaction between the user and the job.
+CPU is often idle, because the speed of the mechanical I/O devices is slower than the CPU.
+Difficult to provide the desired priority.
+
+
+
+Time-sharing operating systems: 
+
+Time-sharing is a technique which enables many people, located at various terminals, to use a particular computer system at the same time. Time-sharing or multitasking is a logical extension of multiprogramming. Processor's time which is shared among multiple users simultaneously is termed as time-sharing.
+
+Multiple jobs are executed by the CPU by switching between them, but the switches occur so frequently. Thus, the user can receive an immediate response. For example, in a transaction processing, the processor executes each user program in a short burst or quantum of computation. That is, if n users are present, then each user can get a time quantum. When the user submits the command, the response time is in few seconds at most.
+
+Advantages of Timesharing operating systems are as follows −
+
+Provides the advantage of quick response.
+# Avoids duplication of software.
+# Reduces CPU idle time.
+# Disadvantages of Time-sharing operating systems are as follows −
+
+Problem of reliability.
+# Question of security and integrity of user programs and data.
+# Problem of data communication.
+
+
+
+Distributed operating System:
+
+Distributed systems use multiple central processors to serve multiple real-time applications and multiple users. Data processing jobs are distributed among the processors accordingly.
+
+The processors communicate with one another through various communication lines (such as high-speed buses or telephone lines). These are referred as loosely coupled systems or distributed systems. Processors in a distributed system may vary in size and function. These processors are referred as sites, nodes, computers, and so on.
+
+The advantages of distributed systems are as follows −
+
+# With resource sharing facility, a user at one site may be able to use the resources available at another.
+# Speedup the exchange of data with one another via electronic mail.
+# If one site fails in a distributed system, the remaining sites can potentially continue operating.
+# Better service to the customers.
+# Reduction of the load on the host computer.
+# Reduction of delays in data processing.
+
+
+
+Network operating System:
+
+A Network Operating System runs on a server and provides the server the capability to manage data, users, groups, security, applications, and other networking functions. The primary purpose of the network operating system is to allow shared file and printer access among multiple computers in a network, typically a local area network (LAN), a private network or to other networks.
+
+The advantages of network operating systems are as follows −
+
+# Centralized servers are highly stable.
+# Security is server managed.
+# Upgrades to new technologies and hardware can be easily integrated into the system.
+# Remote access to servers is possible from different locations and types of systems.
+# The disadvantages of network operating systems are as follows −
+
+High cost of buying and running a server.
+# Dependency on a central location for most operations.
+# Regular maintenance and updates are required.
+
+
+
+Real Time operating System:
+
+A real-time system is defined as a data processing system in which the time interval required to process and respond to inputs is so small that it controls the environment. The time taken by the system to respond to an input and display of required updated information is termed as the response time. So in this method, the response time is very less as compared to online processing.
+
+Real-time systems are used when there are rigid time requirements on the operation of a processor or the flow of data and real-time systems can be used as a control device in a dedicated application. A real-time operating system must have well-defined, fixed time constraints, otherwise the system will fail. For example, Scientific experiments, medical imaging systems, industrial control systems, weapon systems, robots, air traffic control systems, etc.
+
+There are two types of real-time operating systems.
+
+Hard real-time systems:
+
+Hard real-time systems guarantee that critical tasks complete on time. In hard real-time systems, secondary storage is limited or missing and the data is stored in ROM. In these systems, virtual memory is almost never found.
+
+Soft real-time systems:
+
+Soft real-time systems are less restrictive. A critical real-time task gets priority over other tasks and retains the priority until it completes. Soft real-time systems have limited utility than hard real-time systems. For example, multimedia, virtual reality, Advanced Scientific Projects like undersea exploration and planetary rovers, etc.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+What is spooling?
+
+Spooling is a process in which data is temporarily gathered to be used and executed by a device, program or the system. It is associated with printing. When different applications send output to the printer at the same time, spooling keeps these all jobs into a disk file and queues them accordingly to the printer.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+
