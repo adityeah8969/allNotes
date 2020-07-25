@@ -4,6 +4,12 @@ Million  - MB - 10^6
 Billion  - GB - 10^9
 Trillion - TB - 10^12
 
+5 yrs -> 150 Million seconds
+
+Modern day server capacity -> 256 GB
+
+Consistency can take a hit (in the interest of availability)
+
 ------------------------------------------------------------------
 TinyURL:
 ------------------------------------------------------------------
@@ -21,7 +27,7 @@ Queries Per Second (QPS) : 500 million / (30 days * 24 hours * 3600 seconds) = ~
 
 for 5 years: 500 million * 5 years * 12 months = 30 billion objects
 
-30 billion * 500 bytes = 15 TB
+storage for 5 yrs = 30 billion * 500 bytes(object size) = 15 TB
 
 
 Bandwidth estimates: 200 * 500 bytes = 100 KB/s  ingress
@@ -29,6 +35,7 @@ Bandwidth estimates: 200 * 500 bytes = 100 KB/s  ingress
 
 
 Memory estimates: 20K * 3600 seconds * 24 hours = ~1.7 billion
+
 	
 cache 20% of these requests: 0.2 * 1.7 billion * 500 bytes = ~170GB
 
@@ -59,7 +66,7 @@ Avg paste size 10KB
 KGS + key-Value(content-key,content) + s3 storage + caching
 
 -----------------------------------------------------------------
-Instagram:
+Instagram: (Photo + likes + follow)
 -----------------------------------------------------------------
 
 500M total users

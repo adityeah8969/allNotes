@@ -166,9 +166,79 @@ In packet switching, the message is broken into smaller pieces. This will allow 
 
 ---------------------------------------------
 
+13) What is DNS forwarder?
+
+A forwarder is used with DNS server when it receives DNS queries that cannot be resolved quickly. So it forwards those requests to external DNS servers for resolution.
+
+A DNS server which is configured as a forwarder will behave differently than the DNS server which is not configured as a forwarder.
+
+Following are the ways that the DNS server behaves when it is configured as a forwarder:
+
+i>   When the DNS server receives the query, then it resolves the query by using a cache.
+ii>  If the DNS server is not able to resolve the query, then it forwards the query to another DNS server.
+iii> If the forwarder is not available, then it will try to resolve the query by using root hint.
+
+---------------------------------------------
+
+What do you understand by MAC address?
+
+MAC stands for Media Access Control. It is the address of the device at the Media Access Control Layer of Network Architecture. It is a unique address means no two devices can have same MAC addresses.
+
+---------------------------------------------
+
+What is RIP?
+
+RIP stands for Routing Information Protocol. It is accessed by the routers to send data from one network to another.
+
+RIP is a dynamic protocol which is used to find the best route from source to the destination over a network by using the hop count algorithm.
+Routers use this protocol to exchange the network topology information.
+
+This protocol can be used by small or medium-sized networks.
+
+---------------------------------------------
+
+What is Piggybacking?
+
+Piggybacking is used in bi-directional data transmission in the network layer (OSI model). The idea is to improve the efficiency. Piggyback acknowledgment (of the received data) is hooked on the data frame (to be sent) instead of sending a separate frame.
+
+---------------------------------------------
+
+Differences between Hub, Switch and Router?
+
+Hub :		                              
+# Physical Layer 	                      
+# Simply repeats signal to all ports	    
+# Connects devices within a single LAN	  
+# Collision domain of all hosts            
+  connected through Hub remains one.      
+  i.e., if signal sent by any two 
+  devices can collide.	                 	
 
 
+Switch :	                                                      
+# Data Link Layer 	                                              
+# Doesn’t simply repeat, but filters content by MAC or LAN address
+# Can connect multiple sub-LANs within a single LAN	              
+# Switch divides collision domain, but broadcast domain            
+  of connected devices remains same.
 
+
+Router :
+# Network Layer 
+# Routes data based on IP address
+# Connect multiple  LANS and WANS together.
+# It divides both collision and broadcast domains,
+
+
+---------------------------------------------
+
+What is DHCP, how does it work?
+
+# The idea of DHCP (Dynamic Host Configuration Protocol) is to enable devices to get IP address without any manual configuration.
+# The device sends a broadcast message saying “I am new here”
+# The DHCP server sees the message and responds back to the device and typically allocates an IP address. All other devices on network ignore  	 the message of the new device as they are not DHCP server.
+
+---------------------------------------------
 
 
 

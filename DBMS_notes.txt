@@ -73,13 +73,130 @@ Disadvantages of dynamic hashing
 # In this method, if the data size increases then the bucket size is also increased. These addresses of data will be maintained in the bucket address table. This is because the data address will keep changing as buckets grow and shrink. If there is a huge increase in data, maintaining the bucket address table becomes tedious.
 # In this case, the bucket overflow situation will also occur. But it might take little time to reach this situation than static hashing.
 
-
 ---------------------------------------------------------------------------------------
 
-conflict serializability v/s view serializability
+DBMS Serializability : 
 
-https://beginnersbook.com/2018/12/dbms-conflict-serializability/
-https://beginnersbook.com/2018/12/dbms-view-serializability/#:~:text=View%20Serializability%20is%20a%20process,what%20I%20mean%20by%20that.
+When multiple transactions are running concurrently then there is a possibility that the database may be left in an inconsistent state. Serializability is a concept that helps us to check which schedules are serializable. A serializable schedule is the one that always leaves the database in consistent state.
+
+A serial schedule is always a serializable schedule because in serial schedule, a transaction only starts when the other transaction finished execution. However a non-serial schedule needs to be checked for Serializability. A Serial schedule doesn’t support concurrent execution of transactions while a non-serial schedule supports concurrency. 
+
+A non-serial schedule of n number of transactions is said to be serializable schedule, if it is equivalent to the serial schedule of those n transactions. A serial schedule doesn’t allow concurrency, only one transaction executes at a time and the other starts when the already running transaction finished.
+
+You may be wondering instead of checking that a non-serial schedule is serializable or not, can’t we have serial schedule all the time? The answer is no, because concurrent execution of transactions fully utilize the system resources and are considerably faster compared to serial schedules.
+
+Types of Serializability:
+
+1. Conflict Serializabilty
+2. View Serializability
+
+
+Conflict Serializability:
+
+A schedule is called conflict serializable if we can convert it into a serial schedule after swapping its non-conflicting operations.
+
+Two operations are said to be in conflict, if they satisfy ALL the following three conditions:
+
+1. Both the operations should belong to different transactions.
+2. Both the operations are working on same data item.
+3. At least one of the operation is a write operation.
+
+e.g
+
+W(X) of T1 and R(X) of T2   -> conflicting
+W(X) of T1 and W(X) of T2   -> conflicting
+
+W(X) of T1 and W(Y) of T2   -> non-conflicting
+R(X) of T1 and R(X) of T2   -> non-conflicting
+W(X) of T1 and R(X) of T1   -> non-conflicting  (operating inside same transaction)
+
+Two schedules are said to be conflict Equivalent if one schedule can be converted into other schedule after swapping non-conflicting operations.
+
+If a schedule is conflict Equivalent to its serial schedule then it is called Conflict Serializable schedule.
+
+
+e.g:
+
+
+T1         T2
+-----     ------
+R(A)
+R(B)
+          R(A)
+          R(B)
+          W(B)
+W(A)
+
+
+The above schedule is not conflict serializable. For making it serializable we need to swap R(A) & W(A) which are both conflicting.
+
+T1         T2
+-----     ------
+          R(A)
+R(A)
+          R(B)
+          W(B)
+R(B)
+W(A)
+
+swapping R(A) of T1 with R(B) & W(B) of T2 , we get
+
+T1         T2
+-----     ------
+          R(A)
+          R(B)
+          W(B)
+R(A)         
+R(B)
+W(A)
+
+so its a Conflict Serializable schedule
+
+
+View Serializability:
+
+View Serializability is a process to find out that a given schedule is view serializable or not.
+
+To check whether a given schedule is view serializable, we need to check whether the given schedule is View Equivalent to its serial schedule.
+
+Two schedules T1 and T2 are said to be view equivalent, if they satisfy all the following conditions:
+
+1. Initial Read: Initial read of each data item in transactions must match in both schedules. For example, if transaction T1 reads a data item X before transaction T2 in schedule S1 then in schedule S2, T1 should read X before T2.
+
+Read vs Initial Read: You may be confused by the term initial read. Here initial read means the first read operation on a data item, for example, a data item X can be read multiple times in a schedule but the first read operation on X is called the initial read. This will be more clear once we will get to the example in the next section of this same article.
+
+2. Final Write: Final write operations on each data item must match in both the schedules. For example, a data item X is last written by Transaction T1 in schedule S1 then in S2, the last write operation on X should be performed by the transaction T1.
+
+3. Update Read: If in schedule S1, the transaction T1 is reading a data item updated by T2 then in schedule S2, T1 should read the value after the write operation of T2 on same data item. For example, In schedule S1, T1 performs a read operation on X after the write operation on X by T2 then in S2, T1 should read the X after T2 performs write on X. 
+
+
+S1(non serial)			S2(serial)
+--------------			--------------
+T1     T2			T1      T2
+
+R(X)				R(X)
+W(X)				W(X)
+      R(X)			R(Y)
+      W(X)			W(Y)
+R(Y)					R(X)
+W(Y)					W(X)
+      R(Y)				R(Y)
+      W(Y)				W(Y)
+
+
+S1 is a view equivalent of S2 which is a serial schedule and therefore S1 is view serializable.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
