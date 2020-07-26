@@ -39,6 +39,21 @@ A process is a (collection of) thread of execution and other context, such as ad
 
 Dining Philosophers Problem:
 
+do {
+   wait( chopstick[i] );
+   wait( chopstick[ (i+1) % 5] );
+   . .
+   . EATING THE RICE
+   .
+   signal( chopstick[i] );
+   signal( chopstick[ (i+1) % 5] );
+   .
+   . THINKING
+   .
+} while(1);
+
+But this solution can lead to a deadlock. This may happen if all the philosophers pick their left chopstick simultaneously. Then none of them can eat and deadlock occurs.
+
 Some of the ways to avoid deadlock are as follows:
 
 * There should be at most four philosophers on the table.
@@ -86,6 +101,7 @@ Here, we use one mutex m and a semaphore w. An integer variable read_count is us
 
 Instead of having the process to acquire lock on the shared resource, we use the mutex m to make the process to acquire and release lock whenever it is updating the read_count variable.
 
+Note: The lock is getting acquired (on m) only when we need to update the read_count variable, not while reading.
 
 The code for the writer process looks like this:
 
@@ -125,9 +141,6 @@ while(TRUE)
 } 
 
 
-Note: The lock is getting acquired (on m) only when we need to update the read_count variable, not while reading.
-
-
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 Bounded Buffer Problem
@@ -143,7 +156,7 @@ One solution of this problem is to use semaphores.
 
 The semaphores which will be used here are:
 
-i>   m, a binary semaphore which is used to acquire and release the lock.
+i>   m, a mutex which is used to acquire and release the lock.
 ii>  empty, a counting semaphore whose initial value is the number of slots in the buffer, since, initially all slots are empty.
 iii> full, a counting semaphore whose initial value is 0.
 
@@ -193,7 +206,7 @@ Deadlock prevention means to block at least one of the following four conditions
 
 Mutual Exclusion
 Hold and Wait
-No Preemption
+No Preemption (any new process has to wait until the running process finishes its CPU cycle)
 Circular Wait
 
 In Deadlock avoidance we have to anticipate deadlock before it really occurs and ensure that the system does not go in unsafe state.It is possible to avoid deadlock if resources are allocated carefully. For deadlock avoidance we use Banker’s and Safety algorithm for resource allocation purpose. In deadlock avoidance the maximum number of resources of each type that will be needed are stated at the beginning of the process.
@@ -262,7 +275,7 @@ The Kernel is responsible for low-level tasks such as disk management, memory ma
 A Kernel is provided with a protected Kernel Space which is a separate area of memory and this area is not accessible by other application programs. So, the code of the Kernel is loaded into this protected Kernel Space. Apart from this, the memory used by other applications is called the User Space. As these are two different spaces in the memory, so communication between them is a bit slower.
 
 
-System Library − System libraries are special functions or programs using which application programs or system utilities accesses Kernel's features. These libraries implement most of the functionalities of the operating system and do not requires kernel module's code access rights.
+System Library − System libraries are special functions or programs using which application programs or system utilities accesses Kernel's features. These libraries implement most of the functionalities of the operating system and do not require kernel module's code access rights.
 
 
 Kernel Mode vs User Mode: 
@@ -343,9 +356,10 @@ Advantages of Timesharing operating systems are as follows −
 Provides the advantage of quick response.
 # Avoids duplication of software.
 # Reduces CPU idle time.
-# Disadvantages of Time-sharing operating systems are as follows −
 
-Problem of reliability.
+Disadvantages of Time-sharing operating systems are as follows −
+
+# Problem of reliability.
 # Question of security and integrity of user programs and data.
 # Problem of data communication.
 
@@ -366,6 +380,12 @@ The advantages of distributed systems are as follows −
 # Reduction of the load on the host computer.
 # Reduction of delays in data processing.
 
+Disadvantages:
+
+# Security problem due to sharing
+# Bandwidth is another problem if there is large data then all network wires to be replaced which tends to become expensive.
+# If there is a database connected on local system and many users accessing that database through remote or distributed way then performance 	become slow
+
 
 
 Network operating System:
@@ -378,9 +398,10 @@ The advantages of network operating systems are as follows −
 # Security is server managed.
 # Upgrades to new technologies and hardware can be easily integrated into the system.
 # Remote access to servers is possible from different locations and types of systems.
-# The disadvantages of network operating systems are as follows −
 
-High cost of buying and running a server.
+The disadvantages of network operating systems are as follows −
+
+# High cost of buying and running a server.
 # Dependency on a central location for most operations.
 # Regular maintenance and updates are required.
 
@@ -411,4 +432,53 @@ Spooling is a process in which data is temporarily gathered to be used and execu
 
 -------------------------------------------------------------------------------------------------------------------------------------------
 
+Registers:
+
+Registers are a type of computer memory used to quickly accept, store, and transfer data and instructions that are being used immediately by the CPU. The registers used by the CPU are often termed as Processor registers. A processor register may hold an instruction, a storage address, or any data (such as bit sequence or individual characters). The computer needs processor registers for manipulating data and a register for holding a memory address. The register holding the memory location is used to calculate the address of the next instruction after the execution of the current instruction is completed.
+
+
+Program counter:
+
+The “program counter,” also called the “instruction pointer,” keeps track of where a computer is in its program sequence. 
+
+Stack v/s Heap : 
+
+Stack Allocation : The allocation happens on contiguous blocks of memory. We call it stack memory allocation because the allocation happens in function call stack. The size of memory to be allocated is known to compiler and whenever a function is called, its variables get memory allocated on the stack. And whenever the function call is over, the memory for the variables is deallocated. This all happens using some predefined routines in compiler. Programmer does not have to worry about memory allocation and deallocation of stack variables.
+
+Heap Allocation : The memory is allocated during execution of instructions written by programmers. Note that the name heap has nothing to do with heap data structure. It is called heap because it is a pile of memory space available to programmers to allocated and de-allocate. If a programmer does not handle this memory well, memory leak can happen in the program.
+
+Key Differences Between Stack and Heap Allocations
+
+In a stack, the allocation and deallocation is automatically done by whereas, in heap, it needs to be done by the programmer manually.
+
+# Handling of Heap frame is costlier than handling of stack frame.
+# Memory shortage problem is more likely to happen in stack whereas the main issue in heap memory is fragmentation.
+# Stack frame access is easier than the heap frame as the stack have small region of memory and is cache friendly, but in case of heap frames  	 which are dispersed throughout the memory so it cause more cache misses.
+# Stack is not flexible, the memory size allotted cannot be changed whereas a heap is flexible, and the allotted memory can be altered.
+# Accessing time of heap takes is more than a stack.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Threads are sometimes called lightweight processes because they have their own stack but can access shared data. Because threads share the same address space as the process and other threads within the process, the operational cost of communication between the threads is low, which is an advantage. The disadvantage is that a problem with one thread in a process will certainly affect other threads and the viability of the process itself.
+
+PROCESS             					THREAD
+
+Processes are heavyweight operations	                Threads are lighter weight operations
+
+Each process has its own memory space	                Threads use the memory of the process 
+                                                        they belong to
+
+Inter-process communication is slow as                  Inter-thread communication can be faster 
+processes have different memory addresses               than inter-process communication because  
+                                        	        threads of the same process share memory 
+                                                        with the process they belong to
+
+
+Context switching between processes is              	Context switching between threads of the 
+more expensive 			 	                same process is less expensive  
+
+Processes don’t share memory with other        		Threads share memory with other threads 
+processes                                               of the same process
+
+-------------------------------------------------------------------------------------------------------------------------------------------
 
