@@ -595,3 +595,99 @@ To overcome this problem a high-speed cache is set up for page table entries cal
 
 -------------------------------------------------------------------------------------------------------------------------------------------
 
+What are micro-processors?
+
+It is a programmable device that takes in input perform some arithmetic and logical operations over it and produce desired output. In simple words, a Microprocessor is a digital device on a chip which can fetch instruction from memory, decode and execute them and give results.
+
+Microprocessor performs three basic things while executing the instruction:
+
+# It performs some basic operations like addition, subtraction, multiplication, division and some logical operations using its Arithmetic and Logical Unit (ALU). New Microprocessors also perform operations on floating point numbers also.
+# Data in Microprocessor can move from one location to another.
+# It has a Program Counter (PC) register that stores the address of next instruction based on the value of PC, Microprocessor jumps from one   location to another and takes decision.
+
+Clock Speed of different Microprocessor:
+
+16-bit Microprocessor –
+8086: 4.7MHz, 8MHz, 10MHz
+8088: more than 5MHz
+80186/80188: 6MHz
+80286: 8MHz 
+
+32-bit Microprocessor –
+INTEL 80386: 16MHz to 33MHz
+INTEL 80486: 16MHz to 100MHz
+PENTIUM: 66MHz 
+
+64-bit Microprocessor –
+INTEL CORE-2: 1.2GHz to 3GHz
+INTEL i7: 66GHz to 3.33GHz
+INTEL i5: 2.4GHz to 3.6GHz
+INTEL i3: 2.93GHz to 3.33GHz 
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+RAM?
+
+RAM(Random Access Memory) is a part of computer’s Main Memory which is directly accessible by CPU. RAM is used to Read and Write data into it which is accessed by CPU randomly. RAM is volatile in nature, it means if the power goes off, the stored information is lost. RAM is used to store the data that is currently processed by the CPU. Most of the programs and data that are modifiable are stored in RAM.
+
+Integrated RAM chips are available in two form:
+
+SRAM(Static RAM) : Static memories(SRAM) are memories that consist of circuits capable of retaining their state as long as power is on.
+		   costlier & fast
+
+DRAM(Dynamic RAM): DRAM stores the binary information in the form of electric charges that applied to capacitors. 
+		   cheaper & slow
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+An object file is the real output from the compilation phase. It's mostly machine code, but has info that allows a linker to see what symbols are in it as well as symbols it requires in order to work. (For reference, "symbols" are basically names of global objects, functions, etc.)
+A linker takes all these object files and combines them to form one executable (assuming that it can, ie: that there aren't any duplicate or undefined symbols). A lot of compilers will do this for you (read: they run the linker on their own) if you don't tell them to "just compile" using command-line options. (-c is a common "just compile; don't link" option.)
+
+Loading v/s Linking:
+
+The key difference between linking and loading is that the linking generates the executable file of a program whereas, the loading loads the executable file obtained from the linking into main memory for execution. The linking combines all object files of a program to generate executable modules it also links the library function in the object module to built-in libraries of the high-level programming language. On the other hand, loading allocates space to an executable module in main memory.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+		   
+Static Linking:
+
+When we click the .exe (executable) file of the program and it starts running, all the necessary contents of the binary file have been loaded into the process’s virtual address space. However, most programs also need to run functions from the system libraries, and these library functions also need to be loaded. In the simplest case, the necessary library functions are embedded directly in the program’s executable binary file. Such a program is statically linked to its libraries, and statically linked executable codes can commence running as soon as they are loaded.
+
+Disadvantage:
+Every program generated must contain copies of exactly the same common system library functions. In terms of both physical memory and disk-space usage, it is much more efficient to load the system libraries into memory only once. Dynamic linking allows this single loading to happen.
+
+Dynamic Linking:
+Every dynamically linked program contains a small, statically linked function that is called when the program starts. This static function only maps the link library into memory and runs the code that the function contains. The link library determines what are all the dynamic libraries which the program requires along with the names of the variables and functions needed from those libraries by reading the information contained in sections of the library. After which it maps the libraries into the middle of virtual memory and resolves the references to the symbols contained in those libraries. We don’t know where in the memory these shared libraries are actually mapped: They are compiled into position-independent code (PIC), that can run at any address in memory.
+
+Advantage:
+Memory requirements of the program are reduced. A DLL is loaded into memory only once, whereas more than one application may use a single DLL at the moment, thus saving memory space. Application support and maintenance costs are also lowered.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+what are spin-locks?
+
+In a loop a thread waits simply ('spins') checks repeatedly until the lock becomes available. This type of lock is a spin lock. The lock is a kind of busy waiting, as the threads remains active by not performing a useful task. They are efficient as they are blocked only for a short periods. They can be wasteful if they are held for a longer duration.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+Cache Memory is a special very high-speed memory. It is used to speed up and synchronizing with high-speed CPU. Cache memory is costlier than main memory or disk memory but economical than CPU registers. Cache memory is an extremely fast memory type that acts as a buffer between RAM and the CPU. It holds frequently requested data and instructions so that they are immediately available to the CPU when needed.
+
+Cache memory is used to reduce the average time to access data from the Main memory. The cache is a smaller and faster memory which stores copies of the data from frequently used main memory locations. There are various different independent caches in a CPU, which store instructions and data.
+
+Levels of memory:
+
+Level 1 or Register –
+It is a type of memory in which data is stored and accepted that are immediately stored in CPU. Most commonly used register is accumulator, Program counter, address register etc.
+
+Level 2 or Cache memory –
+It is the fastest memory which has faster access time where data is temporarily stored for faster access.
+
+Level 3 or Main Memory –
+It is memory on which computer works currently. It is small in size and once power is off data no longer stays in this memory.
+
+Level 4 or Secondary Memory –
+It is external memory which is not as fast as main memory but data stays permanently in this memory.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
