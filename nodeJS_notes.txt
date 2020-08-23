@@ -1,0 +1,1238 @@
+A Node.js application consists of the following three important components −
+
+i>  Import required modules − We use the require directive to load Node.js modules.
+
+ii> Create server − A server which will listen to client's requests similar to Apache HTTP Server.
+
+iii>Read request and return response − The server created in an earlier step will read the HTTP request made by
+				       the client which can be a browser or a console and return the response.
+
+
+
+e.g:
+
+var http = require("http");
+
+http.createServer(function (request, response) {
+   // Send the HTTP header 
+   // HTTP Status: 200 : OK
+   // Content Type: text/plain
+   response.writeHead(200, {'Content-Type': 'text/plain'});
+   
+   // Send the response body as "Hello World"
+   response.end('Hello World\n');
+}).listen(8081);
+
+// Console will print the message
+console.log('Server running at http://127.0.0.1:8081/');
+
+
+------------------------------------------------------------------
+
+
+Node Package Manager (NPM) provides two main functionalities −
+
+i>  Online repositories for node.js packages/modules which are searchable on search.nodejs.org
+
+ii> Command line utility to install Node.js packages, do version management and dependency management of Node.js packages.
+
+
+basic commands:
+
+npm --version
+npm install <package name>  // installing a package   e.g npm install express
+npm ls 			    // listing all the installed dependencies
+npm update <package name>   // update the package
+npm search <package name>   // checking package inside dependencies
+
+
+------------------------------------------------------------------
+
+What is Callback?
+
+Callback is an asynchronous equivalent for a function. A callback function is called at the completion of a given task. 
+Node makes heavy use of callbacks. All the APIs of Node are written in such a way that they support callbacks.
+
+For example, a function to read a file may start reading file and return the control to the execution environment immediately
+so that the next instruction can be executed. Once file I/O is complete, it will call the callback function while passing the 
+callback function, the content of the file as a parameter. So there is no blocking or wait for File I/O. This makes Node.js 
+highly scalable, as it can process a high number of requests without waiting for any function to return results.
+
+
+lets say there is an input.txt file having the following content:
+
+Tutorials Point is giving self learning content
+to teach the world in simple and easy way!!!!!
+
+
+Blocking Code Example : 
+
+    var fs = require("fs");
+    var data = fs.readFileSync('input.txt');			//The first example shows that the program blocks until it reads the file 
+								//and then only it proceeds to end the program.
+    console.log(data.toString());
+    console.log("Program Ended");
+    
+O/P:
+    Tutorials Point is giving self learning content
+    to teach the world in simple and easy way!!!!!
+    Program Ended
+
+
+
+Non-Blocking Code Example:
+
+    var fs = require("fs");
+
+    fs.readFile('input.txt', function (err, data) {          // function(err, data) is the call back function getting used here
+       if (err) return console.error(err);
+       console.log(data.toString());
+    });
+    
+    console.log("Program Ended");			     // does not wait for the readFile func to get executed
+    
+O/P:
+    Program Ended
+    Tutorials Point is giving self learning content
+    to teach the world in simple and easy way!!!!!
+    
+    
+------------------------------------------------------------------
+
+Event loop in nodeJS:
+
+Node.js is a single-threaded event-driven platform that is capable of running non-blocking, asynchronously programming. These
+functionalities of Node.js make it memory efficient. The event loop allows Node.js to perform non-blocking I/O operations
+despite the fact that JavaScript is single-threaded. It is done by assigning operations to the operating system whenever and
+wherever possible.
+
+Most operating systems are multi-threaded and hence can handle multiple operations executing in the background. When one of these
+operations is completed, the kernel tells Node.js and the respective callback assigned to that operation is added to the event
+queue which will eventually be executed. 
+
+Features of Event Loop:
+
+# Event loop is an endless loop, which waits for tasks, executes them and then sleeps until it receives more tasks.
+# The event loop executes tasks from the event queue only when the call stack is empty i.e. there is no ongoing task.
+# The event loop allows us to use callbacks and promises.
+# The event loop executes the tasks starting from the oldest first.
+
+
+e.g:
+
+console.log("This is the first statement"); 
+   
+setTimeout(function(){ 
+    console.log("This is the second statement"); 
+}, 1000); 
+   
+console.log("This is the third statement"); 
+
+
+O/P:
+
+This is the first statement
+This is the third statement
+This is the second statement
+
+
+# Explanation: In the above example, the first console log statement is pushed to the call stack and “This is the first statement” is
+logged on the console and the task is popped from the stack. Next, the setTimeout is pushed to the queue and the task is sent to the
+Operating system and the timer is set for the task. This task is then popped from the stack. Next, the third console log statement 
+is pushed to the call stack and “This is the third statement” is logged on the console and the task is popped from the stack.
+
+When the timer set by setTimeout function (in this case 1000 ms) runs out, the callback is sent to the event queue. The event loop on
+finding the call stack empty takes the task at the top of the event queue and sends it to the call stack. The callback function for 
+setTimeout function runs the instruction and “This is the second statement” is logged on the console and the task is popped from the stack.
+
+Note: In the above case, if the timeout was set to 0ms then also the statements will be displayed in the same order. This is because although
+the callback with be immediately sent to the event queue, the event loop won’t send it to the call stack unless the call stack is empty 
+
+
+# Working of the Event loop: 
+
+When Node.js starts, it initializes the event loop, processes the provided input script which may make async API calls, schedule timers,
+then begins processing the event loop.
+
+When using Node.js, a special library module called libuv is used to perform async operations. This library is also used, together with 
+the back logic of Node, to manage a special thread pool called the libuv thread pool.This thread pool is composed of four threads used 
+to delegate operations that are too heavy for the event loop. I/O operations, Opening and closing connections, setTimeouts are the example
+of such operations.
+
+When the thread pool completes a task, a callback function is called which handles the error(if any) or does some other operation. This 
+callback function is sent to the event queue. When the call stack is empty, the event goes through the event queue and sends the callback
+to the call stack.
+
+# Phases of the Event loop: 
+
+Timers: Callbacks scheduled by setTimeout() or setInterval() are executed in this phase.
+Pending Callbacks: I/O callbacks deferred to the next loop iteration are executed here. Idle, Prepare: Used internally only.
+Poll: 	Retrieves new I/O events.
+Check: 	It invokes setIntermediate() callbacks.
+Close Callbacks: It handles some close callbacks. Eg: socket.on(‘close’, …)
+
+------------------------------------------------------------------
+
+Event Emitter : 
+
+Many objects in a Node emit events, for example, a net.Server emits an event each time a peer connects to it, an fs.readStream emits 
+an event when the file is opened. All objects which emit events are the instances of events.EventEmitter.
+
+EventEmitter Class:
+
+var events = require('events');			// Import events module
+var eventEmitter = new events.EventEmitter();	// Create an eventEmitter object
+
+EventEmitter provides multiple properties like 'on'and 'emit'. on property is used to bind a function with the event and emit is used
+to fire an event.
+
+# Methods inside EventEmitter Class:
+
+on(event, listener) / addListener(event, listener) : Adds a listener at the end of the listeners array for the specified event.(Returns emitter)
+removeListener(event, listener) : Removes a listener from the listener array for the specified event.(Returns emitter)
+emit(event, [arg1], [arg2], [...]) : Execute each of the listeners in order with the supplied arguments.(Returns true if the event had listeners)
+
+# Class Methods :
+
+listenerCount(emitter, event): Returns the number of listeners for a given event.
+
+# Events:
+
+newListener:
+
+	event − String: the event name
+	listener − Function: the event handler function
+
+	This event is emitted any time a listener is added.
+
+removeListener:
+	
+	event − String: the event name
+	listener − Function: the event handler function
+
+	This event is emitted any time someone removes a listener.
+
+
+sample events program:
+
+e.g:
+
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
+
+// listener #1
+var listner1 = function listner1() {
+   console.log('listner1 executed.');
+}
+
+// listener #2
+var listner2 = function listner2() {
+   console.log('listner2 executed.');
+}
+
+// Bind the connection event with the listner1 function
+eventEmitter.addListener('connection', listner1);
+
+// Bind the connection event with the listner2 function
+eventEmitter.on('connection', listner2);
+
+var eventListeners = require('events').EventEmitter.listenerCount
+   (eventEmitter,'connection');
+console.log(eventListeners + " Listner(s) listening to connection event");
+
+// Fire the connection event 
+eventEmitter.emit('connection');
+
+// Remove the binding of listner1 function
+eventEmitter.removeListener('connection', listner1);
+console.log("Listner1 will not listen now.");
+
+// Fire the connection event 
+eventEmitter.emit('connection');
+
+eventListeners = require('events').EventEmitter.listenerCount(eventEmitter,'connection');
+console.log(eventListeners + " Listner(s) listening to connection event");
+
+console.log("Program Ended.");
+
+O/P:
+
+2 Listner(s) listening to connection event
+listner1 executed.
+listner2 executed.
+Listner1 will not listen now.
+listner2 executed.
+1 Listner(s) listening to connection event
+Program Ended.
+	
+
+------------------------------------------------------------------
+
+what is Unicode?
+
+A worldwide standard where each character uses a unique number between U+0000 and U+10FFFF, Unicode may be 8-bit, 16-bit,
+or 32-bit. Numbers, mathematical notation, popular symbols and characters from all languages are assigned a code point, 
+for example, U+0041 is an English letter "A." Below is an example of how "Computer Hope" would be written in English Unicode.
+
+U+0043 U+006F U+006D U+0070 U+0075 U+0074 U+0065 U+0072 U+00A0 U+0048 U+006F U+0070 U+0065
+
+A common type of Unicode is UTF-8, which utilizes 8-bit character encoding. It is often used in Linux environments, to encode
+foreign characters so they display properly when output to a text file.
+
+Main difference between UTF-8, UTF-16 and UTF-32 character encoding is how many bytes it require to represent a character in 
+memory. UTF-8 uses minimum one byte, while UTF-16 uses minimum 2 bytes. BTW, if character's code point is greater than 127, 
+maximum value of byte then UTF-8 may take 2, 3 o 4 bytes but UTF-16 will only take either two or four bytes. On the other hand, 
+UTF-32 is fixed width encoding scheme and always uses 4 bytes to encode a Unicode code point.
+
+There are two things, which are important to convert bytes to characters, a character set and an encoding.Since there are so 
+many characters and symbols in the world, a character set is required to support all those characters. A character set is nothing
+but list of characters, where each symbol or character is mapped to a numeric value, also known as code points.
+
+On the other hand UTF-16, UTF-32 and UTF-8 are encoding schemes, which describe how these values (code points) are mapped to bytes.
+UTF stands for Unicode Transformation, which defines an algorithm to map every Unicode code point to a unique byte sequence.
+
+For example, for character A, which is Latin Capital A, Unicode code point is U+0041, UTF-8 encoded bytes are 41, UTF-16 encoding
+is 0041 and Java char literal is '\u0041'. In short, you must need a character encoding scheme to interpret stream of bytes.
+
+How do UTF-8/16 handle byte streams inspite of allowing variable sized bytes to encode them?
+
+U+0000 through U+007F   -> 1 byte
+U+0080 through U+07FF   -> 2 bytes
+U+0800 through U+FFFF   -> 3 bytes
+U+10000 through U+10FFFF-> 4 bytes
+
+Computers know where one character ends and the next one starts because UTF-8 was designed so that the single-byte values
+used for ASCII do not overlap with those used in multi-byte sequences. The bytes 0x00 through 0x7F are only used for ASCII
+and nothing else; the bytes above 0x7F are only used for multi-byte sequences and nothing else. Furthermore, the bytes that 
+are used at the beginning of the multi-byte sequences also cannot occur in any other position in those sequences.
+
+
+Because of that the codepoints need to be encoded. Consider the following binary patterns:
+
+2 bytes: 110xxxxx 10xxxxxx
+3 bytes: 1110xxxx 10xxxxxx 10xxxxxx
+4 bytes: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
+The amount of ones in the first byte tells you how many of the following bytes still belong to the same character. All bytes
+that belong to the sequence start with 10 in binary. To encode the character you convert its codepoint to binary and fill in
+the x's.
+
+e.g
+
+U+0754 is between U+0080 and U+07FF, so it needs two bytes
+0x0754 -> 11101010100
+
+so you replace the x's with 11101010100 as following
+
+110(11101) 10(010100)    // binaries inside bracket is the 11101010100 split to replace x's.
+
+
+------------------------------------------------------------------
+
+Buffers:
+
+While dealing with TCP streams or the file system, it's necessary to handle octet streams. Node provides Buffer class which provides
+instances to store raw data similar to an array of integers but corresponds to a raw memory allocation outside the V8 heap. Buffer 
+class is a global class that can be accessed in an application without importing the buffer module.
+
+Note: Default encoding is always utf-8
+
+
+var buf = new Buffer(10);
+var buf = new Buffer([10, 20, 30, 40, 50]);
+var buf = new Buffer("Simply Easy Learning", "utf-8");
+
+len = buf.write(string[, offset][, length][, encoding])    	//general syntax for writing into a buffer (returns number of octets written)
+console.log(buf.write("Simply Easy Learning"));			// 20
+
+buf.toString([encoding][, start][, end])	
+buf.toJSON()							// convert a Node Buffer into JSON object 
+Buffer.concat(list[, totalLength])				// list of array of buffers to be concatenated, length of the final buffer		
+
+
+e.g:
+
+buf = new Buffer(26);
+for (var i = 0 ; i < 26 ; i++) {
+  buf[i] = i + 97;
+}
+
+console.log( buf.toString('ascii'));       // outputs: abcdefghijklmnopqrstuvwxyz
+console.log( buf.toString('ascii',0,5));   // outputs: abcde
+console.log( buf.toString('utf8',0,5));    // outputs: abcde
+console.log( buf.toString(undefined,0,5)); // encoding defaults to 'utf8', outputs abcde
+
+
+
+e.g:
+
+var buf = new Buffer('Simply Easy Learning');
+var json = buf.toJSON(buf);
+console.log(json);
+
+O/P:
+
+{ type: 'Buffer',
+   data: 
+   [ 
+      83,
+      105,
+      109,
+      112,
+      108,
+      121,
+      32,
+      69,
+      97,
+      115,
+      121,
+      32,
+      76,
+      101,
+      97,
+      114,
+      110,
+      105,
+      110,
+      103 
+   ]
+}
+
+
+e.g:
+
+var buffer1 = new Buffer('TutorialsPoint ');
+var buffer2 = new Buffer('Simply Easy Learning');
+var buffer3 = Buffer.concat([buffer1,buffer2]);
+
+console.log("buffer3 content: " + buffer3.toString());
+
+O/P:
+
+buffer3 content: TutorialsPoint Simply Easy Learning
+
+
+e.g:
+
+var buffer1 = new Buffer('ABC');
+var buffer2 = new Buffer('ABCD');
+var result = buffer1.compare(buffer2);
+
+if(result < 0) {
+   console.log(buffer1 +" comes before " + buffer2);
+} else if(result === 0) {
+   console.log(buffer1 +" is same as " + buffer2);
+} else {
+   console.log(buffer1 +" comes after " + buffer2);
+}
+
+O/P:
+
+ABC comes before ABCD
+
+
+e.g:
+
+var buffer1 = new Buffer('ABC');
+var buffer2 = new Buffer(3);
+buffer1.copy(buffer2);
+console.log("buffer2 content: " + buffer2.toString());
+
+O/P:
+
+buffer2 content: ABC
+
+
+e.g:
+
+var buffer = new Buffer('TutorialsPoint');
+console.log("buffer length: " + buffer.length);
+
+
+O/P:
+
+buffer length: 14
+
+
+------------------------------------------------------------------
+
+
+What are Streams?
+Streams are objects that let you read data from a source or write data to a destination in continuous fashion. In Node.js, 
+there are four types of streams −
+
+Readable  − Stream which is used for read operation.
+Writable  − Stream which is used for write operation.
+Duplex	  − Stream which can be used for both read and write operation.
+Transform − A type of duplex stream where the output is computed based on input.
+
+Each type of Stream is an EventEmitter instance and throws several events at different instance of times. For example, some 
+of the commonly used events are −
+
+data   − This event is fired when there is data is available to read.
+end    − This event is fired when there is no more data to read.
+error  − This event is fired when there is any error receiving or writing data.  
+finish − This event is fired when all the data has been flushed to underlying system.
+
+
+
+e.g:
+
+Create a text file named input.txt having the following content −
+
+Tutorials Point is giving self learning content
+to teach the world in simple and easy way!!!!!
+
+
+# Read
+
+var fs = require("fs");
+var data = '';
+
+// Create a readable stream
+var readerStream = fs.createReadStream('input.txt');
+
+// Set the encoding to be utf8. 
+readerStream.setEncoding('UTF8');
+
+// Handle stream events --> data, end, and error
+readerStream.on('data', function(chunk) {
+   data += chunk;
+});
+
+readerStream.on('end',function() {
+   console.log(data);
+});
+
+readerStream.on('error', function(err) {
+   console.log(err.stack);
+});
+
+console.log("Program Ended");
+
+
+O/P:
+
+Program Ended
+Tutorials Point is giving self learning content
+to teach the world in simple and easy way!!!!!
+
+
+# Write
+
+var fs = require("fs");
+var data = 'Simply Easy Learning';
+
+// Create a writable stream
+var writerStream = fs.createWriteStream('output.txt');
+
+// Write the data to stream with encoding to be utf8
+writerStream.write(data,'UTF8');
+
+// Mark the end of file
+writerStream.end();
+
+// Handle stream events --> finish, and error
+writerStream.on('finish', function() {
+   console.log("Write completed.");
+});
+
+writerStream.on('error', function(err) {
+   console.log(err.stack);
+});
+
+console.log("Program Ended");
+
+
+O/P:
+
+Program Ended
+Write completed.
+
+
+
+Piping the Streams:
+
+Piping is a mechanism where we provide the output of one stream as the input to another stream. 
+
+
+
+var fs = require("fs");
+
+// Create a readable stream
+var readerStream = fs.createReadStream('input.txt');
+
+// Create a writable stream
+var writerStream = fs.createWriteStream('output.txt');
+
+// Pipe the read and write operations
+// read input.txt and write data to output.txt
+readerStream.pipe(writerStream);
+
+console.log("Program Ended");
+
+O/P:
+Program Ended
+
+
+Chaining of streams:
+
+Chaining is a mechanism to connect the output of one stream to another stream and create a chain of multiple stream operations.
+
+var gzip = zlib.createGzip();
+var fs = require('fs');
+var inp = fs.createReadStream('input.txt');
+var out = fs.createWriteStream('input.txt.gz');
+
+inp.pipe(gzip).pipe(out);
+
+
+------------------------------------------------------------------
+
+File System(I/O)
+
+Streams are better way of read/write operations if the file size is large(for fine-grained, coomplex). Generally we use File I/O for 
+such operations because of its simplicity. But File I/O does not behave optimally in case of larger sized files.
+
+
+Node implements File I/O using simple wrappers around standard POSIX functions.
+
+Every method in the fs module has synchronous as well as asynchronous forms. Asynchronous methods take the last parameter as the
+completion function callback and the first parameter of the callback function as error. It is better to use an asynchronous method
+instead of a synchronous method, as the former never blocks a program during its execution, whereas the second one does.
+
+File modes:
+
+r
+r+	// read + write
+rs	// synchronous read 
+rs+	// synchronous read + write
+
+w
+w+
+wx	// x makes the operation fail if file already exists
+wx+
+
+a	// append
+ax
+a+
+ax+
+
+
+# open
+
+fs.open(path, flags[, mode], callback)   // SYNTAX
+
+
+var fs = require("fs");
+
+// Asynchronous - Opening File
+console.log("Going to open file!");
+fs.open('input.txt', 'r+', function(err, fd) {
+   if (err) {
+      return console.error(err);
+   }
+   console.log("File opened successfully!");     
+});
+
+
+O/P:
+
+Going to open file!
+File opened successfully!
+
+# Get file info
+
+fs.stat(path, callback)		// SYNTAX
+
+callback − This is the callback function which gets two arguments (err, stats) where stats is an object of fs.Stats 
+type which is printed below in the example.
+
+methods inside stats: 
+
+stats.isFile()	
+stats.isDirectory()	
+stats.isBlockDevice()
+stats.isCharacterDevice()	
+stats.isSymbolicLink()	
+stats.isFIFO()
+stats.isSocket()
+
+
+var fs = require("fs");
+
+console.log("Going to get file info!");
+fs.stat('input.txt', function (err, stats) {
+   if (err) {
+      return console.error(err);
+   }
+   console.log(stats);
+   console.log("Got file info successfully!");
+   
+   // Check file type
+   console.log("isFile ? " + stats.isFile());
+   console.log("isDirectory ? " + stats.isDirectory());    
+});
+
+
+O/P:
+
+Going to get file info!
+{ 
+   dev: 1792,
+   mode: 33188,
+   nlink: 1,
+   uid: 48,
+   gid: 48,
+   rdev: 0,
+   blksize: 4096,
+   ino: 4318127,
+   size: 97,
+   blocks: 8,
+   atime: Sun Mar 22 2015 13:40:00 GMT-0500 (CDT),
+   mtime: Sun Mar 22 2015 13:40:57 GMT-0500 (CDT),
+   ctime: Sun Mar 22 2015 13:40:57 GMT-0500 (CDT) 
+}
+Got file info successfully!
+isFile ? true
+isDirectory ? false
+
+# Writing a File
+
+fs.writeFile(filename, data[, options], callback)	// SYNTAX
+
+
+
+var fs = require("fs");
+
+console.log("Going to write into existing file");
+fs.writeFile('input.txt', 'Simply Easy Learning!', function(err) {
+   if (err) {
+      return console.error(err);
+   }
+   
+   console.log("Data written successfully!");
+   console.log("Let's read newly written data");
+   
+   fs.readFile('input.txt', function (err, data) {
+      if (err) {
+         return console.error(err);
+      }
+      console.log("Asynchronous read: " + data.toString());
+   });
+});
+
+O/P:
+
+Going to write into existing file
+Data written successfully!
+Let's read newly written data
+Asynchronous read: Simply Easy Learning!
+
+
+
+# Read
+
+fs.read(fd, buffer, offset, length, position, callback)	// SYNTAX
+
+
+var fs = require("fs");
+var buf = new Buffer(1024);
+
+console.log("Going to open an existing file");
+fs.open('input.txt', 'r+', function(err, fd) {
+   if (err) {
+      return console.error(err);
+   }
+   console.log("File opened successfully!");
+   console.log("Going to read the file");
+   
+   fs.read(fd, buf, 0, buf.length, 0, function(err, bytes){
+      if (err){
+         console.log(err);
+      }
+      console.log(bytes + " bytes read");
+      
+      // Print only read bytes to avoid junk.
+      if(bytes > 0){
+         console.log(buf.slice(0, bytes).toString());
+      }
+   });
+});
+
+
+# Closing a file
+
+fs.close(fd, callback)	// SYNTAX
+
+
+var fs = require("fs");
+var buf = new Buffer(1024);
+
+console.log("Going to open an existing file");
+fs.open('input.txt', 'r+', function(err, fd) {
+   if (err) {
+      return console.error(err);
+   }
+   console.log("File opened successfully!");
+   console.log("Going to read the file");
+   
+   fs.read(fd, buf, 0, buf.length, 0, function(err, bytes) {
+      if (err) {
+         console.log(err);
+      }
+
+      // Print only read bytes to avoid junk.
+      if(bytes > 0) {
+         console.log(buf.slice(0, bytes).toString());
+      }
+
+      // Close the opened file.
+      fs.close(fd, function(err) {
+         if (err) {
+            console.log(err);
+         } 
+         console.log("File closed successfully.");
+      });
+   });
+});
+
+
+O/P:
+
+Going to open an existing file
+File opened successfully!
+Going to read the file
+Tutorials Point is giving self learning content
+to teach the world in simple and easy way!!!!!
+
+File closed successfully.
+
+
+
+# Delete
+
+fs.unlink(path, callback)	// SYNTAX
+
+
+
+var fs = require("fs");
+
+console.log("Going to delete an existing file");
+fs.unlink('input.txt', function(err) {
+   if (err) {
+      return console.error(err);
+   }
+   console.log("File deleted successfully!");
+});
+
+
+O/P:
+
+Going to delete an existing file
+File deleted successfully!
+
+# Create a Directory
+
+fs.mkdir(path[, mode], callback)	// SYNTAX
+
+var fs = require("fs");
+
+console.log("Going to create directory /tmp/test");
+fs.mkdir('/tmp/test',function(err) {
+   if (err) {
+      return console.error(err);
+   }
+   console.log("Directory created successfully!");
+});
+
+
+O/P:
+
+Going to create directory /tmp/test
+Directory created successfully!
+
+
+# Read a directory
+
+fs.readdir(path, callback)
+
+
+var fs = require("fs");
+
+console.log("Going to read directory /tmp");
+fs.readdir("/tmp/",function(err, files) {
+   if (err) {
+      return console.error(err);
+   }
+   files.forEach( function (file) {
+      console.log( file );
+   });
+});
+
+
+O/P:
+
+Going to read directory /tmp
+ccmzx99o.out
+ccyCSbkF.out
+employee.ser
+hsperfdata_apache
+test
+test.txt
+
+# Remove a Directory:
+
+fs.rmdir(path, callback)	// SYNTAX
+
+var fs = require("fs");
+
+console.log("Going to delete directory /tmp/test");
+fs.rmdir("/tmp/test",function(err) {
+   if (err) {
+      return console.error(err);
+   }
+   console.log("Going to read directory /tmp");
+   
+   fs.readdir("/tmp/",function(err, files) {
+      if (err) {
+         return console.error(err);
+      }
+      files.forEach( function (file) {
+         console.log( file );
+      });
+   });
+});
+
+
+O/P:
+
+Going to delete directory /tmp/test
+Going to read directory /tmp
+ccmzx99o.out
+ccyCSbkF.out
+employee.ser
+hsperfdata_apache
+test.txt
+
+
+
+
+------------------------------------------------------------------
+
+
+Global Objects:
+
+__filename	// resolved absolute path of the code file
+__dirname	
+
+setTimeout(cb, ms)	// global function is used to run callback cb after at least ms milliseconds.
+clearTimeout(t)		// global function is used to stop a timer that was previously created with setTimeout().
+
+e.g:
+
+function printHello() {
+   console.log( "Hello, World!");
+}
+
+var t = setTimeout(printHello, 2000);
+clearTimeout(t);
+
+setInterval(cb, ms)	//The setInterval(cb, ms) global function is used to run callback cb REPEATEDLY after at least ms milliseconds.
+clearInterval(t)	
+
+
+------------------------------------------------------------------
+
+nodeJS utilities : 
+
+# OS Module: Node.js os module provides a few basic operating-system related utility functions.
+
+var os = require("os");
+
+console.log('endianness : ' + os.endianness());			// Endianness
+console.log('type : ' + os.type());				// OS type
+console.log('platform : ' + os.platform());			// OS platform
+console.log('total memory : ' + os.totalmem() + " bytes.");	// Total system memory
+console.log('free memory : ' + os.freemem() + " bytes.");	// Total free memory
+
+O/P:
+
+endianness : LE
+type : Linux
+platform : linux
+total memory : 25103400960 bytes.
+free memory : 20676710400 bytes.
+
+# Path Module: Node.js path module is used for handling and transforming file paths.
+
+path.normalize(p) // Normalize a string path, taking care of '..' and '.' parts.
+	
+path.join([path1][, path2][, ...])	// Join all the arguments together and normalize the resulting path
+path.resolve([from ...], to)		// Resolves to an absolute path.
+path.isAbsolute(path)
+path.relative(from, to)			// Solve the relative path from from to to.
+path.dirname(p)				// Return the directory name of a path.
+
+e.g:
+
+var path = require("path");
+
+console.log('normalization : ' + path.normalize('/test/test1//2slashes/1slash/tab/..'));
+console.log('joint path : ' + path.join('/test', 'test1', '2slashes/1slash', 'tab', '..'));
+console.log('resolve : ' + path.resolve('main.js'));
+console.log('ext name : ' + path.extname('main.js'));
+
+O/P:
+
+normalization : /test/test1/2slashes/1slash
+joint path : /test/test1/2slashes/1slash
+resolve : /web/com/1427176256_27423/main.js
+ext name : .js
+
+
+# DNS Module: Node.js dns module is used to do actual DNS lookup as well as to use underlying operating system name resolution functionalities. 
+	      This module provides an asynchronous network wrapper and can be imported using the following syntax.
+
+var dns = require("dns");
+
+dns.lookup(hostname[, options], callback)	// Resolves a hostname (e.g. 'google.com') into the first found A (IPv4) or AAAA (IPv6) record.
+						// options can be an object or integer. If options is not provided, then IP v4 and v6 addresses
+						// are both valid. If options is an integer, then it must be 4 or 6.
+
+dns.lookupService(address, port, callback)	// Resolves the given address and port into a hostname and service using getnameinfo.
+
+dns.reverse(ip, callback)			// Reverse resolves an ip address to an array of hostnames.
+
+e.g:
+
+var dns = require('dns');
+
+dns.lookup('www.google.com', function onLookup(err, address, family) {
+   console.log('address:', address);
+   dns.reverse(address, function (err, hostnames) {
+      if (err) {
+         console.log(err.stack);
+      }
+
+      console.log('reverse for ' + address + ': ' + JSON.stringify(hostnames));
+   });  
+});
+
+
+O/P:
+
+address: 173.194.46.83
+reverse for 173.194.46.83: ["ord08s11-in-f19.1e100.net"]
+
+
+------------------------------------------------------------------
+
+Creating a simple web server using nodeJS:
+
+Following is the bare minimum structure of the HTTP server which listens at 8081 port.
+
+# server.js
+
+var http = require('http');
+var fs = require('fs');
+var url = require('url');
+
+http.createServer( function (request, response) {  
+   
+   var pathname = url.parse(request.url).pathname;		// Parse the request containing file name
+
+   console.log("Request for " + pathname + " received.");	// Print the name of the file for which request is made.
+   
+   fs.readFile(pathname.substr(1), function (err, data) {	// Read the requested file content from file system
+      if (err) {
+         console.log(err);
+         response.writeHead(404, {'Content-Type': 'text/html'});
+      } else {	
+         response.writeHead(200, {'Content-Type': 'text/html'});	
+         response.write(data.toString());			// Write the content of the file to response body		
+      }
+      response.end();						// Send the response body
+   });   
+}).listen(8081);
+
+
+console.log('Server running at http://127.0.0.1:8081/');	// Console will print the message
+
+# File: index.htm
+
+<html>
+   <head>
+      <title>Sample Page</title>
+   </head>
+   
+   <body>
+      Hello World!
+   </body>
+</html>
+
+# client.js:
+
+var http = require('http');
+
+
+var options = {						// Options to be used by request 
+   host: 'localhost',
+   port: '8081',
+   path: '/index.htm'  
+};
+
+
+var callback = function(response) {			// Callback function is used to deal with response
+   
+   var body = '';
+   response.on('data', function(data) {			// Continuously update stream with data
+      body += data;
+   });
+   
+   response.on('end', function() {			// Data received completely.
+      console.log(body);
+   });
+}
+
+var req = http.request(options, callback);		// Make a request to the server
+req.end();
+
+O/P:(in client's console)
+
+<html>
+   <head>
+      <title>Sample Page</title>
+   </head>
+   
+   <body>
+      Hello World!
+   </body>
+</html>
+
+
+O/P: (in server.js)
+
+Server running at http://127.0.0.1:8081/
+Request for /index.htm received.
+
+------------------------------------------------------------------
+
+Express :
+
+Express is a minimal and flexible Node.js web application framework that provides a robust set of features to develop web and mobile applications.
+It facilitates the rapid development of Node based Web applications.Following are some of the core features of Express framework −
+
+# Allows to set up middlewares to respond to HTTP Requests.
+# Defines a routing table which is used to perform different actions based on HTTP Method and URL.
+# Allows to dynamically render HTML Pages based on passing arguments to templates.
+
+e.g:
+
+var express = require('express');
+var app = express();
+
+app.get('/', function (req, res) {
+   res.send('Hello World');
+})
+
+var server = app.listen(8081, function () {
+   var host = server.address().address
+   var port = server.address().port
+   
+   console.log("Example app listening at http://%s:%s", host, port)
+})
+
+# Basic Routing:
+
+We have seen a basic application which serves HTTP request for the homepage. Routing refers to determining how an application responds to a client
+request to a particular endpoint, which is a URI (or path) and a specific HTTP request method (GET, POST, and so on).
+
+var express = require('express');
+var app = express();
+
+
+app.get('/', function (req, res) {				// This responds with "Hello World" on the homepage
+   console.log("Got a GET request for the homepage");
+   res.send('Hello GET');
+})
+
+app.post('/', function (req, res) {				// This responds a POST request for the homepage
+   console.log("Got a POST request for the homepage");
+   res.send('Hello POST');
+})
+				
+app.delete('/del_user', function (req, res) {			// This responds a DELETE request for the /del_user page.
+   console.log("Got a DELETE request for /del_user");
+   res.send('Hello DELETE');
+})
+
+app.get('/list_user', function (req, res) {			// This responds a GET request for the /list_user page.
+   console.log("Got a GET request for /list_user");
+   res.send('Page Listing');
+})
+
+app.get('/ab*cd', function(req, res) {   			// This responds a GET request for abcd, abxcd, ab123cd, and so on			
+   console.log("Got a GET request for /ab*cd");
+   res.send('Page Pattern Match');
+})
+
+var server = app.listen(8081, function () {
+   var host = server.address().address
+   var port = server.address().port
+   
+   console.log("Example app listening at http://%s:%s", host, port)
+})
+
+
+# Serving Static Files:
+
+Express provides a built-in middleware express.static to serve static files, such as images, CSS, JavaScript, etc. You simply need to 
+pass the name of the directory where you keep your static assets, to the express.static middleware to start serving the files directly.
+
+app.use(express.static('public'));
+
+We will keep a few images in public/images sub-directory as follows −
+
+node_modules
+server.js
+public/
+public/images
+public/images/logo.png
+
+
+e.g
+
+var express = require('express');
+var app = express();
+
+app.use(express.static('public'));			
+
+app.get('/', function (req, res) {
+   res.send('Hello World');
+})
+
+var server = app.listen(8081, function () {
+   var host = server.address().address
+   var port = server.address().port
+
+   console.log("Example app listening at http://%s:%s", host, port)
+})
+
+
+
+O/P:
+
+navgating to http://127.0.0.1:8081/images/logo.png shows the .png file in browser
+
+
+------------------------------------------------------------------
+
+
+
+
+
+
+
+
+

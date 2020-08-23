@@ -84,7 +84,7 @@ while using BFS an edge can get critical O(V/2) times,
 x with the capacity of 1 is the edge (connecting 1 & 2) in the direction 1 to 2, y with capacity of 0 is the edge (connecting 1 & 2) in the direction 2 to 1
 
 let s be the source , t be the destination and 'x'(edge) connectiong 1 & 2 be the critical edge. In case x gets selected as a critical edge 
-teh residual capacity decreases by 1 and that of y increases by 1.
+the residual capacity decreases by 1 and that of y increases by 1.
 
 			------->(x =0)
 	s ---->		1	2     ----->	t
@@ -102,7 +102,7 @@ and that of 'x' increases.
 
 Similarly, the next time edge 'x' gets selected as a critical edge, there has to be one more than previous number of nodes between 's' 
 and '1'. Since there is an upper limit on total number of nodes available O(V) and both x & y operate in alternate turns, so the
-maximum number of nodes that can come in between 's' & '1' OR 's' & '2' is O(V/2). Also O(V/2) will b ethe maximum number of times as
+maximum number of nodes that can come in between 's' & '1' OR 's' & '2' is O(V/2). Also O(V/2) will b ethe maximum number of times an
 edge can become critical.
 
 Considering all the edges inside the graph, Total number of times all the edges became critical = O(E) * O(V/2)

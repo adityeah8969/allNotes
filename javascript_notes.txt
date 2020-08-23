@@ -1,0 +1,1594 @@
+JavaScript can be implemented using JavaScript statements that are placed within the <script>... </script> HTML tags in a web page.
+
+You can place the <script> tags, containing your JavaScript, anywhere within your web page, but it is normally recommended that you
+should keep it within the <head> tags.
+
+sample :
+
+
+<html>
+   <body>   
+      <script language = "javascript" type = "text/javascript">
+         <!--
+	    var1 = 10; var2 = 20;
+            document.write("Hello World!")
+
+	    // This is a comment. It is similar to comments in C++
+   
+      	    /*
+             * This is a multi-line comment in JavaScript
+             * It is very similar to comments in C Programming
+             */
+
+         //-->
+      </script>      
+   </body>
+</html>
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+There is a flexibility given to include JavaScript code anywhere in an HTML document. However the most preferred ways to include
+JavaScript in an HTML file are as follows −
+
+i>  Script in <head>...</head> section.
+
+ii> Script in <body>...</body> section.
+
+iii>Script in <body>...</body> and <head>...</head> sections.
+
+iv> Script in an external file and then include in <head>...</head> section.
+
+
+
+
+<html>
+   <head>
+      <script type = "text/javascript" src = "filename.js" ></script>        // src referencing the js file
+   </head>
+   
+   <body>
+      .......
+   </body>
+</html>
+
+
+
+filename.js:
+
+function sayHello() {alert("Hello World")}
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+JavaScript allows you to work with three primitive data types −
+
+i>  Numbers, eg. 123, 120.50 etc.
+
+ii> Strings of text e.g. "This text string" etc.
+
+iii>Boolean e.g. true or false.
+
+Note: JavaScript also defines two trivial data types, null and undefined, each of which defines only a single value.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+JavaScript is untyped language. This means that a JavaScript variable can hold a value of any data type. Unlike many other languages,
+you don't have to tell JavaScript during variable declaration what type of value the variable will hold.
+The value type of a variable can change during the execution of a program and JavaScript takes care of it automatically.
+
+sample: 
+
+<script type = "text/javascript">
+   <!--
+      var name = "Ali";
+      var money;
+      money = 2000.50;
+      money = false
+   //-->
+</script>
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+JavaScript Variable Scope
+The scope of a variable is the region of your program in which it is defined. JavaScript variables have only two scopes.
+
+Global Variables − A global variable has global scope which means it can be defined anywhere in your JavaScript code.
+
+Local Variables − A local variable will be visible only within a function where it is defined. Function parameters are always local to that function.
+
+Within the body of a function, a local variable takes precedence over a global variable with the same name. If you declare a local variable or function parameter with the same name as a global variable, you effectively hide the global variable. Take a look into the following example.
+
+Live Demo
+<html>
+   <body onload = checkscope();>   
+      <script type = "text/javascript">
+         <!--
+            var myVar = "global";      // Declare a global variable
+            function checkscope( ) {
+               var myVar = "local";    // Declare a local variable
+               document.write(myVar);
+            }
+         //-->
+      </script>     
+   </body>
+</html>
+
+
+This produces the following result −
+
+local
+-----------------------------------------------------------------------------------------------------------------------------
+
+Addition operator (+) works for Numeric as well as Strings. e.g. "a" + 10 will give "a10".
+
+all operators are similar to c++
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Here is a list of the return values for the typeof Operator.
+
+Type	    String Returned by typeof
+
+Number	    "number"
+String	    "string"
+Boolean	    "boolean"
+Object	    "object"
+Function    "function"
+Undefined   "undefined"
+Null	    "object"
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+if - else 
+
+            var book = "maths";
+            if( book == "history" ) {
+               document.write("<b>History Book</b>");
+            } else if( book == "maths" ) {
+               document.write("<b>Maths Book</b>");
+            } else if( book == "economics" ) {
+               document.write("<b>Economics Book</b>");
+            } else {
+               document.write("<b>Unknown Book</b>");
+            }
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+switch :
+
+<html>
+   <body>   
+      <script type = "text/javascript">
+         <!--
+            var grade = 'A';
+            document.write("Entering switch block<br />");
+            switch (grade) {
+               case 'A': document.write("Good job<br />");
+               break;
+            
+               case 'B': document.write("Pretty good<br />");
+               break;
+            
+               case 'C': document.write("Passed<br />");
+               break;
+            
+               case 'D': document.write("Not so good<br />");
+               break;
+            
+               case 'F': document.write("Failed<br />");
+               break;
+            
+               default:  document.write("Unknown grade<br />")
+            }
+            document.write("Exiting switch block");
+         //-->
+      </script>      
+      <p>Set the variable to different value and then try...</p>
+   </body>
+</html>
+
+
+O/P:
+
+Entering switch block
+Good job
+Exiting switch block
+Set the variable to different value and then try...
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+while
+
+            var count = 0;
+            document.write("Starting Loop ");
+         
+            while (count < 10) {
+               document.write("Current Count : " + count + "<br />");
+               count++;
+            }
+         
+            document.write("Loop stopped!");
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+for loop
+
+            var count;
+            document.write("Starting Loop" + "<br />");
+         
+            for(count = 0; count < 10; count++) {
+               document.write("Current Count : " + count );
+               document.write("<br />");
+            }         
+            document.write("Loop stopped!");
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+functions:
+
+<html>
+   <head>  
+      <script type = "text/javascript">
+         function concatenate(first, last) {
+            var full;
+            full = first + last;
+            return full;
+         }
+         function secondFunction() {
+            var result;
+            result = concatenate('Zara', 'Ali');
+            document.write (result );
+         }
+      </script>      
+   </head>
+   
+   <body>
+      <p>Click the following button to call the function</p>      
+      <form>
+         <input type = "button" onclick = "secondFunction()" value = "Call Function">
+      </form>      
+      <p>Use different parameters inside the function and then try...</p>  
+  </body>
+</html>
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+JavaScript 1.2 introduces the concept of function literals which is another new way of defining functions.
+A function literal is an expression that defines an unnamed function.
+
+
+<html>
+   <head>
+      <script type = "text/javascript">
+         <!--
+            var func = function(x,y) { 
+               return x*y 
+            };
+            function secondFunction() {
+               var result;
+               result = func(10,20);
+               document.write ( result );
+            }
+         //-->
+      </script>
+   </head>
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+MAP / REDUCE / FILTER:
+
+var officers = [
+  { id: 20, name: 'Captain Piett' },
+  { id: 24, name: 'General Veers' },
+  { id: 56, name: 'Admiral Ozzel' },
+  { id: 88, name: 'Commander Jerjerrod' }
+];
+
+
+# map:
+
+var officersIds = officers.map(function (officer) {		// officersIds : [20, 24, 56, 88]
+  return officer.id
+});
+
+OR
+
+const officersIds = officers.map(officer => officer.id);	// officersIds : [20, 24, 56, 88]
+
+Note: map returns a list/array
+
+# reduce:
+
+var pilots = [
+  {
+    id: 10,
+    name: "Poe Dameron",
+    years: 14,
+  },
+  {
+    id: 2,
+    name: "Temmin 'Snap' Wexley",
+    years: 30,
+  },
+  {
+    id: 41,
+    name: "Tallissan Lintra",
+    years: 16,
+  },
+  {
+    id: 99,
+    name: "Ello Asty",
+    years: 22,
+  }
+];
+
+
+
+var totalYears = pilots.reduce(function (accumulator, pilot) {			// totalYears = 82
+  return accumulator + pilot.years;
+}, 0);
+
+OR
+
+const totalYears = pilots.reduce((acc, pilot) => acc + pilot.years, 0);		// totalYears = 82
+
+Note: using .reduce() is an easy way to generate a single value or object from an array.
+
+
+# filter:
+
+var pilots = [
+  {
+    id: 2,
+    name: "Wedge Antilles",
+    faction: "Rebels",
+  },
+  {
+    id: 8,
+    name: "Ciena Ree",
+    faction: "Empire",
+  },
+  {
+    id: 40,
+    name: "Iden Versio",
+    faction: "Empire",
+  },
+  {
+    id: 66,
+    name: "Thane Kyrell",
+    faction: "Rebels",
+  }
+];
+
+
+var rebels = pilots.filter(function (pilot) {				// rebels : ["Wedge Antilles", "Thane Kyrell"]
+  return pilot.faction === "Rebels";
+});
+
+O/R
+
+const rebels = pilots.filter(pilot => pilot.faction === "Rebels");	// rebels : ["Wedge Antilles", "Thane Kyrell"]
+
+Note: Just like map, it also returns an array/ist.
+
+
+# combining map, filter, reduce:
+
+
+say we want to get the total score of force users only in the following array:
+
+var personnel = [
+  {
+    id: 5,
+    name: "Luke Skywalker",
+    pilotingScore: 98,
+    shootingScore: 56,
+    isForceUser: true,
+  },
+  {
+    id: 82,
+    name: "Sabine Wren",
+    pilotingScore: 73,
+    shootingScore: 99,
+    isForceUser: false,
+  },
+  {
+    id: 22,
+    name: "Zeb Orellios",
+    pilotingScore: 20,
+    shootingScore: 59,
+    isForceUser: false,
+  },
+  {
+    id: 15,
+    name: "Ezra Bridger",
+    pilotingScore: 43,
+    shootingScore: 67,
+    isForceUser: true,
+  },
+  {
+    id: 11,
+    name: "Caleb Dume",
+    pilotingScore: 71,
+    shootingScore: 85,
+    isForceUser: true,
+  },
+];
+
+
+ans: 
+
+const totalJediScore = personnel				// totalJediScore  = 420
+  .filter(person => person.isForceUser)
+  .map(jedi => jedi.pilotingScore + jedi.shootingScore)
+  .reduce((acc, score) => acc + score, 0);
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+JavaScript's interaction with HTML is handled through events that occur when the user or the browser manipulates a page.
+
+When the page loads, it is called an event. When the user clicks a button, that click too is an event. Other examples include
+events like pressing any key, closing a window, resizing a window, etc.
+
+Developers can use these events to execute JavaScript coded responses, which cause buttons to close windows, messages to be 
+displayed to users, data to be validated, and virtually any other type of response imaginable.
+
+
+events:
+
+onclick :
+
+<input type = "button" onclick = "sayHello()" value = "Say Hello" />
+
+onsubmit :
+
+<form method = "POST" action = "t.cgi" onsubmit = "return validate()">
+
+onmouseover and onmouseout :
+
+<div onmouseover = "over()" onmouseout = "out()">
+    <h2> This is inside the division </h2>
+</div> 
+
+etc. (Many more events are available)
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+# Cookies:
+
+Cookies are small data packets which Web pages load on to browsers for a whole range of reasons. 
+Every time you return to the same URL, the computer sends back this little package of information to the server, 
+which detects that you have returned to the page. When you access your email account or Facebook profile, it is cookies that 
+allow your user name and password to be saved, so the next time you won’t have to enter them again.
+
+But apart from storing strings of digits and letters, webmasters can use these tools for monitoring the activity of Internet users.
+
+These virtual spies collect information about your Internet habits: the pages you visit frequently and the topics that interest you. 
+The problem is that they usually share this information with data analysis firms or those that design targeted marketing campaigns.
+
+If, say, an ad for a food product appears on your screen after you visit a restaurant page, don’t be too surprised. Thanks to cookies, 
+advertising can be tailored to consumers’ preferences.
+
+# How It Works ?
+Your server sends some data to the visitor's browser in the form of a cookie. The browser may accept the cookie. If it does, 
+it is stored as a plain text record on the visitor's hard drive. Now, when the visitor arrives at another page on your site, 
+the browser sends the same cookie to the server for retrieval. Once retrieved, your server knows/remembers what was stored earlier.
+
+# Cookies are a plain text data record of 5 variable-length fields −
+
+Expires −  The date the cookie will expire. If this is blank, the cookie will expire when the visitor quits the browser.
+Domain  −  The domain name of your site.
+Path    −  The path to the directory or web page that set the cookie. This may be blank if you want to retrieve the cookie from any directory or page.
+Secure  −  If this field contains the word "secure", then the cookie may only be retrieved with a secure server. If this field is blank,
+	   no such restriction exists.
+Name=Value − Cookies are set and retrieved in the form of key-value pairs
+
+
+# Storing Cookies
+The simplest way to create a cookie is to assign a string value to the document.cookie object, which looks like this.
+
+document.cookie = "key1 = value1;key2 = value2;expires = date";
+
+Note − Cookie values may not include semicolons, commas, or whitespace. For this reason, you may want to use the JavaScript escape() 
+       function to encode the value before storing it in the cookie. If you do this, you will also have to use the corresponding unescape() 
+       function when you read the cookie value.
+
+
+
+write:
+
+function WriteCookie() {
+               if( document.myform.customer.value == "" ) {
+                  alert("Enter some value!");
+                  return;
+               }
+               cookievalue = escape(document.myform.customer.value) + ";";
+               document.cookie = "name=" + cookievalue;
+               document.write ("Setting Cookies : " + "name=" + cookievalue );
+              }
+
+
+
+Read:
+
+function ReadCookie() {
+               var allcookies = document.cookie;
+               document.write ("All Cookies : " + allcookies );
+               
+               // Get all the cookies pairs in an array
+               cookiearray = allcookies.split(';');
+               
+               // Now take key value pair out of this array
+               for(var i=0; i<cookiearray.length; i++) {
+                  name = cookiearray[i].split('=')[0];
+                  value = cookiearray[i].split('=')[1];
+                  document.write ("Key is : " + name + " and Value is : " + value);
+               }
+            }
+
+
+setting cookie expiry date:
+
+function WriteCookie() {
+               var now = new Date();
+               now.setMonth( now.getMonth() + 1 );
+               cookievalue = escape(document.myform.customer.value) + ";"
+               
+               document.cookie = "name=" + cookievalue;
+               document.cookie = "expires=" + now.toUTCString() + ";"
+               document.write ("Setting Cookies : " + "name=" + cookievalue );
+            }
+
+
+
+Deleting a Cookie:
+
+function WriteCookie() {
+               var now = new Date();
+               now.setMonth( now.getMonth() - 1 );
+               cookievalue = escape(document.myform.customer.value) + ";"
+               
+               document.cookie = "name=" + cookievalue;
+               document.cookie = "expires=" + now.toUTCString() + ";"
+               document.write("Setting Cookies : " + "name=" + cookievalue );
+            } 
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Page Re-direction:
+
+<html>
+   <head>
+      <script type = "text/javascript">
+         <!--
+            function Redirect() {
+               window.location = "https://www.tutorialspoint.com";
+            }
+         //-->
+      </script>
+   </head>
+   
+   <body>
+      <p>Click the following button, you will be redirected to home page.</p>
+      
+      <form>
+         <input type = "button" value = "Redirect Me" onclick = "Redirect();" />
+      </form>
+      
+   </body>
+</html>
+
+
+You can show an appropriate message to your site visitors before redirecting them to a new page. This would need a bit time 
+delay to load a new page. The following example shows how to implement the same. Here setTimeout() is a built-in JavaScript
+function which can be used to execute another function after a given time interval.
+
+<html>
+   <head>
+      <script type = "text/javascript">
+         <!--
+            function Redirect() {
+               window.location = "https://www.tutorialspoint.com";
+            }            
+            document.write("You will be redirected to main page in 10 sec.");
+            setTimeout('Redirect()', 10000);
+         //-->
+      </script>
+   </head>
+   
+   <body>
+   </body>
+</html>
+
+
+The following example shows how to redirect your site visitors onto a different page based on their browsers.
+
+
+<html>
+   <head>     
+      <script type = "text/javascript">
+         <!--
+            var browsername = navigator.appName;
+            if( browsername == "Netscape" ) {
+               window.location = "http://www.location.com/ns.htm";
+            } else if ( browsername =="Microsoft Internet Explorer") {
+               window.location = "http://www.location.com/ie.htm";
+            } else {
+               window.location = "http://www.location.com/other.htm";
+            }
+         //-->
+      </script>      
+   </head>
+   
+   <body>
+   </body>
+</html>
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Dialog Boxes
+
+JavaScript supports three important types of dialog boxes. These dialog boxes can be used to raise and alert, or to get confirmation 
+on any input or to have a kind of input from the users.
+
+
+# Alert
+
+<html>
+   <head>   
+      <script type = "text/javascript">
+         <!--
+            function Warn() {
+               alert ("This is a warning message!");
+               document.write ("This is a warning message!");
+            }
+         //-->
+      </script>     
+   </head>
+   
+   <body>
+      <p>Click the following button to see the result: </p>      
+      <form>
+         <input type = "button" value = "Click Me" onclick = "Warn();" />
+      </form>     
+   </body>
+</html>
+
+
+# Confirmation 
+
+<html>
+   <head>   
+      <script type = "text/javascript">
+         <!--
+            function getConfirmation() {
+               var retVal = confirm("Do you want to continue ?");
+               if( retVal == true ) {
+                  document.write ("User wants to continue!");
+                  return true;
+               } else {
+                  document.write ("User does not want to continue!");
+                  return false;
+               }
+            }
+         //-->
+      </script>     
+   </head>
+   
+   <body>
+      <p>Click the following button to see the result: </p>      
+      <form>
+         <input type = "button" value = "Click Me" onclick = "getConfirmation();" />
+      </form>      
+   </body>
+</html>
+
+
+# Prompt 
+
+<html>
+   <head>     
+      <script type = "text/javascript">
+         <!--
+            function getValue() {
+               var retVal = prompt("Enter your name : ", "your name here");
+               document.write("You have entered : " + retVal);
+            }
+         //-->
+      </script>      
+   </head>
+   
+   <body>
+      <p>Click the following button to see the result: </p>      
+      <form>
+         <input type = "button" value = "Click Me" onclick = "getValue();" />
+      </form>      
+   </body>
+</html>
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+void keyword
+
+void is an important keyword in JavaScript which can be used as a unary operator that appears before its single operand, which 
+may be of any type. This operator specifies an expression to be evaluated without returning a value (undefined).
+
+
+
+e.g 1
+
+<html>
+   <head>      
+      <script type = "text/javascript">
+         <!--
+         //-->
+      </script>   
+   </head>
+   
+   <body>   
+      <p>Click the following, This won't react at all...</p>
+      <a href = "javascript:void(alert('Warning!!!'))">Click me!</a>     
+   </body>
+</html>
+
+
+
+in the following e.g expression 0 gets evaluated which results in nothing
+
+e.g 2
+
+<html>
+   <head>   
+      <script type = "text/javascript">
+         <!--
+         //-->
+      </script>      
+   </head>
+   
+   <body>   
+      <p>Click the following, This won't react at all...</p>
+      <a href = "javascript:void(0)">Click me!</a>      
+   </body>
+</html>
+
+
+e.g 3
+
+<html>
+   <head>      
+      <script type = "text/javascript">
+         <!--
+            function getValue() {
+               var a,b,c;
+               
+               a = void ( b = 5, c = 7 );
+               document.write('a = ' + a + ' b = ' + b +' c = ' + c );
+            }
+         //-->
+      </script>      
+   </head>
+   
+   <body>
+      <p>Click the following to see the result:</p>
+      <form>
+         <input type = "button" value = "Click Me" onclick = "getValue();" />
+      </form>     
+   </body>
+</html>
+
+
+
+O/P:
+
+a = undefined b = 5 c = 7
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+JavaScript is an Object Oriented Programming (OOP) language. A programming language can be called object-oriented if it provides 
+four basic capabilities to developers −
+
+Encapsulation − the capability to store related information, whether data or methods, together in an object.
+
+Aggregation − the capability to store one object inside another object.
+
+Inheritance − the capability of a class to rely upon another class (or number of classes) for some of its properties and methods.
+
+Polymorphism − the capability to write one function or method that works in a variety of different ways.
+
+Objects are composed of attributes. If an attribute contains a function, it is considered to be a method of the object, otherwise the
+attribute is considered a property.
+
+Object properties can be any of the three primitive data types, or any of the abstract data types, such as another object. 
+Object properties are usually variables that are used internally in the object's methods, but can also be globally visible 
+variables that are used throughout the page.
+
+The syntax for adding a property to an object is −
+
+objectName.objectProperty = propertyValue;
+
+
+
+Methods are the functions that let the object do something or let something be done to it. There is a small difference between a function and a method – at
+a function is a standalone unit of statements and a method is attached to an object and can be referenced by the this keyword.
+
+Note: All user-defined objects and built-in objects are descendants of an object called Object.
+
+The new operator is used to create an instance of an object. To create an object, the new operator is followed by the constructor method.
+
+In the following example, the constructor methods are Object(), Array(), and Date(). These constructors are built-in JavaScript functions.
+
+var employee = new Object();
+var books = new Array("C++", "Perl", "Java");
+var day = new Date("August 15, 1947");
+
+
+e.g 1
+
+<html>
+   <head>
+      <title>User-defined objects</title>     
+      <script type = "text/javascript">
+         var book = new Object();   // Create the object
+         book.subject = "Perl";     // Assign properties to the object
+         book.author  = "Mohtashim";
+      </script>      
+   </head>
+   
+   <body>  
+      <script type = "text/javascript">
+         document.write("Book name is : " + book.subject + "<br>");
+         document.write("Book author is : " + book.author + "<br>");
+      </script>   
+   </body>
+</html>
+
+
+O/P:
+
+Book name is : Perl 
+Book author is : Mohtashim
+
+
+e.g 2
+
+<html>
+   <head>   
+   <title>User-defined objects</title>
+      <script type = "text/javascript">
+         function book(title, author) {
+            this.title = title; 
+            this.author  = author;
+         }
+      </script>      
+   </head>
+   
+   <body>   
+      <script type = "text/javascript">
+         var myBook = new book("Perl", "Mohtashim");
+         document.write("Book title is : " + myBook.title + "<br>");
+         document.write("Book author is : " + myBook.author + "<br>");
+      </script>      
+   </body>
+</html>
+
+
+O/P: 
+
+Book title is : Perl 
+Book author is : Mohtashim
+
+
+e.g 3
+
+Live Demo
+<html>
+   
+   <head>
+   <title>User-defined objects</title>
+      <script type = "text/javascript">
+         // Define a function which will work as a method
+         function addPrice(amount) {
+            this.price = amount; 
+         }
+         
+         function book(title, author) {
+            this.title = title;
+            this.author  = author;
+	    this.price = price;
+            this.addPrice = addPrice;  // Assign that method as property.
+         }
+      </script>      
+   </head>
+   
+   <body>   
+      <script type = "text/javascript">
+         var myBook = new book("Perl", "Mohtashim", 50);
+         myBook.addPrice(100);
+         
+         document.write("Book title is : " + myBook.title + "<br>");
+         document.write("Book author is : " + myBook.author + "<br>");
+         document.write("Book price is : " + myBook.price + "<br>");
+      </script>      
+   </body>
+</html>
+
+O/P:
+Book title is : Perl 
+Book author is : Mohtashim 
+Book price is : 150
+
+
+# The 'with' Keyword
+The ‘with’ keyword is used as a kind of shorthand for referencing an object's properties or methods. The object specified as an argument
+to with becomes the default object for the duration of the block that follows. 
+
+
+<html>
+   <head>
+   <title>User-defined objects</title>   
+      <script type = "text/javascript">
+         // Define a function which will work as a method
+         function addPrice(amount) {
+            with(this) {
+               price = amount;
+            }
+         }
+         function book(title, author) {
+            this.title = title;
+            this.author = author;
+            this.price = 0;
+            this.addPrice = addPrice;  // Assign that method as property.
+         }
+      </script>      
+   </head>
+   
+   <body>   
+      <script type = "text/javascript">
+         var myBook = new book("Perl", "Mohtashim");
+         myBook.addPrice(100);
+         
+         document.write("Book title is : " + myBook.title + "<br>");
+         document.write("Book author is : " + myBook.author + "<br>");
+         document.write("Book price is : " + myBook.price + "<br>");
+      </script>      
+   </body>
+</html>
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Number:
+
+The Number object represents numerical date, either integers or floating-point numbers. In general, you do not need to worry about
+Number objects because the browser automatically converts number literals to instances of the number class.
+
+var val = new Number(number);
+var val = Number.MAX_VALUE;
+var val = Number.MIN_VALUE;
+
+var number = 1.23456
+document.write(number.toPrecision(4));   // 1.234
+document.write(number.toPrecision(1));   // 1
+
+num = new Number(15);
+document.write(num.toString()); 	 // 15     decimal string representation by default
+document.write(num.toString(2)); 	 // 1111   binary string representation
+document.write(num.toString(4)); 	 // 33	   base4 string representation
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+String: 
+
+var str = new String( "This is string" );
+document.write(str.length);  			// 14
+document.writeln(str.charAt(0));		// T
+
+str2 = " wxyz"
+var str3 = str1.concat( str2 );
+document.write(str3); 				//This is string wxyz
+
+var str = "Apples are round, and apples are juicy.";
+var splitted = str.split(" ", 3);   		// 3 limits the size of the array
+document.write( splitted );     		//Apples,are,round, 
+document.write(str.substr(0,2));		//Ap
+document.write(str.toUpperCase());		//APPLES ARE ROUND, AND APPLES ARE JUICY
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+var arr = new Array( 10, 20, 30 );
+var arr= [10, 20, 30];
+document.write(arr.length);		// 3
+
+var arr = new Array("orange", "mango", "banana", "sugar");         
+var sorted = arr.sort();
+document.write(sorted); 		// banana,mango,orange,sugar 
+
+var numbers = new Array(1, 4, 9);
+var length = numbers.push(10);   
+document.write(numbers);  		// 1, 4, 9, 10
+
+var element = numbers.pop();
+document.write(numbers);   		// 10
+
+
+map compatibility:
+
+This method is a JavaScript extension to the ECMA-262 standard; as such it may not be present in other implementations 
+of the standard. To make it work, you need to add the following code at the top of your script.
+
+if (!Array.prototype.map) {
+   Array.prototype.map = function(fun /*, thisp*/) {
+      var len = this.length;
+      
+      if (typeof fun != "function")
+      throw new TypeError();
+      
+      var res = new Array(len);
+      var thisp = arguments[1];
+      
+      for (var i = 0; i < len; i++) {
+         if (i in this)
+         res[i] = fun.call(thisp, this[i], i, this);
+      }
+      return res;
+   };
+}
+
+
+<html>
+   <head>
+      <title>JavaScript Array map Method</title>
+   </head>
+   
+   <body>
+      <script type = "text/javascript">
+         if (!Array.prototype.map) {
+            Array.prototype.map = function(fun /*, thisp*/) {
+               var len = this.length;
+               
+               if (typeof fun != "function")
+               throw new TypeError();
+               
+               var res = new Array(len);
+               var thisp = arguments[1];
+               
+               for (var i = 0; i < len; i++) {
+                  if (i in this)
+                  res[i] = fun.call(thisp, this[i], i, this);
+               }
+               return res;
+            };
+         }
+         var numbers = [1, 4, 9];
+         var roots = numbers.map(Math.sqrt);
+         document.write("roots is : " + roots ); 
+      </script>      
+   </body>
+</html>
+
+O/P:
+
+roots is : 1,2,3  
+
+
+
+forEach compatbility:
+
+if (!Array.prototype.forEach) {
+   Array.prototype.forEach = function(fun /*, thisp*/) {
+      var len = this.length;
+      if (typeof fun != "function")
+      throw new TypeError();
+      
+      var thisp = arguments[1];
+      for (var i = 0; i < len; i++) {
+         if (i in this)
+         fun.call(thisp, this[i], i, this);
+      }
+   };
+}
+
+
+<html>
+   <head>
+      <title>JavaScript Array forEach Method</title>
+   </head>
+   
+   <body>   
+      <script type = "text/javascript">
+         if (!Array.prototype.forEach) {
+            Array.prototype.forEach = function(fun /*, thisp*/) {
+               var len = this.length;
+               
+               if (typeof fun != "function")
+               throw new TypeError();
+               
+               var thisp = arguments[1];
+               for (var i = 0; i < len; i++) {
+                  if (i in this)
+                  fun.call(thisp, this[i], i, this);
+               }
+            };
+         }
+         function printBr(element, index, array) {
+            document.write("<br />[" + index + "] is " + element ); 
+         }
+         [12, 5, 8, 130, 44].forEach(printBr);
+      </script>      
+   </body>
+</html>
+ 
+
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Date:
+
+new Date( )
+new Date(milliseconds)
+new Date(datestring)
+new Date(year,month,date[,hour,minute,second,millisecond ])
+
+var dateobject = new Date(1993, 6, 28, 14, 39, 7);
+document.write( dateobject.toUTCString() ); 			// Wed, 28 Jul 1993 09:09:07 GMT
+document.write(dt.getTime() ); 					// 819913520000
+document.write(dt.getDate());  					// 25
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+MATH
+
+var property_value = Math.PI;		// 3.141592653589793 
+var property_value = Math.LN10;		// 2.302585092994046
+var value = Math.abs(-1);		// 1
+var value = Math.ceil(45.95);		// 46
+var value = Math.floor(10.3);		// 10
+         	
+-----------------------------------------------------------------------------------------------------------------------------
+
+The Document Object Model (DOM) is a programming interface for HTML and XML documents. It represents the page so that programs 
+can change the document structure, style, and content. The DOM represents the document as nodes and objects. That way, programming 
+languages can connect to the page.
+
+A Web page is a document. This document can be either displayed in the browser window or as the HTML source. But it is the same 
+document in both cases. The Document Object Model (DOM) represents that same document so it can be manipulated. The DOM is an 
+object-oriented representation of the web page, which can be modified with a scripting language such as JavaScript.
+
+For example, the standard DOM specifies that the getElementsByTagName method in the code below must return a list of all the <p> elements in the document:
+
+const paragraphs = document.getElementsByTagName("p");
+// paragraphs[0] is the first <p> element
+// paragraphs[1] is the second <p> element, etc.
+alert(paragraphs[0].nodeName);
+
+
+Another example. This function creates a new H1 element, adds text to that element, and then adds the H1 to the tree for this document:
+
+<html>
+  <head>
+    <script>
+       // run this function when the document is loaded
+       window.onload = function() {
+
+         // create a couple of elements in an otherwise empty HTML page
+         const heading = document.createElement("h1");
+         const heading_text = document.createTextNode("Big Head!");
+         heading.appendChild(heading_text);
+         document.body.appendChild(heading);
+      }
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+try-catch-finally
+
+
+e.g 1
+
+<html>
+   <head>
+      
+      <script type = "text/javascript">
+         <!--
+            function myFunc() {
+               var a = 100;
+               
+               try {
+                  alert("Value of variable a is : " + a );
+               }
+               catch ( e ) {
+                  alert("Error: " + e.description );
+               }
+               finally {
+                  alert("Finally block will always execute!" );
+               }
+            }
+         //-->
+      </script>
+      
+   </head>
+   <body>
+      <p>Click the following to see the result:</p>
+      
+      <form>
+         <input type = "button" value = "Click Me" onclick = "myFunc();" />
+      </form>
+      
+   </body>
+</html>
+
+
+e.g 2
+
+<html>
+   <head>
+      
+      <script type = "text/javascript">
+         <!--
+            function myFunc() {
+               var a = 100;
+               var b = 0;
+               
+               try {
+                  if ( b == 0 ) {
+                     throw( "Divide by zero error." ); 
+                  } else {
+                     var c = a / b;
+                  }
+               }
+               catch ( e ) {
+                  alert("Error: " + e );
+               }
+            }
+         //-->
+      </script>
+      
+   </head>
+   <body>
+      <p>Click the following to see the result:</p>
+      
+      <form>
+         <input type = "button" value = "Click Me" onclick = "myFunc();" />
+      </form>
+      
+   </body>
+</html>
+
+
+The onerror() Method:
+
+The onerror event handler was the first feature to facilitate error handling in JavaScript. The error event is fired on the
+window object whenever an exception occurs on the page.
+
+<html>
+   <head>
+      
+      <script type = "text/javascript">
+         <!--
+            window.onerror = function () {
+               alert("An error occurred.");
+            }
+         //-->
+      </script>
+      
+   </head>
+   <body>
+      <p>Click the following to see the result:</p>
+      
+      <form>
+         <input type = "button" value = "Click Me" onclick = "myFunc();" />
+      </form>
+      
+   </body>
+</html>
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+validation:
+
+Form validation normally used to occur at the server, after the client had entered all the necessary data and then pressed the
+Submit button. If the data entered by a client was incorrect or was simply missing, the server would have to send all the data
+back to the client and request that the form be resubmitted with correct information. This was really a lengthy process which 
+used to put a lot of burden on the server.
+
+<html>   
+   <head>
+      <title>Form Validation</title>      
+      <script type = "text/javascript">
+         <!--
+            // Form validation code will come here.
+         //-->
+      </script>      
+   </head>
+   
+   <body>
+      <form action = "/cgi-bin/test.cgi" name = "myForm" onsubmit = "return(validate());">
+         <table cellspacing = "2" cellpadding = "2" border = "1">
+            
+            <tr>
+               <td align = "right">Name</td>
+               <td><input type = "text" name = "Name" /></td>
+            </tr>
+            
+            <tr>
+               <td align = "right">EMail</td>
+               <td><input type = "text" name = "EMail" /></td>
+            </tr>
+            
+            <tr>
+               <td align = "right">Zip Code</td>
+               <td><input type = "text" name = "Zip" /></td>
+            </tr>
+            
+            <tr>
+               <td align = "right">Country</td>
+               <td>
+                  <select name = "Country">
+                     <option value = "-1" selected>[choose yours]</option>
+                     <option value = "1">USA</option>
+                     <option value = "2">UK</option>
+                     <option value = "3">INDIA</option>
+                  </select>
+               </td>
+            </tr>
+            
+            <tr>
+               <td align = "right"></td>
+               <td><input type = "submit" value = "Submit" /></td>
+            </tr>
+            
+         </table>
+      </form>      
+   </body>
+</html>
+
+
+
+Basic validation: the form must be checked to make sure all the mandatory fields are filled in.
+
+<script type = "text/javascript">
+   <!--
+      // Form validation code will come here.
+      function validate() {
+      
+         if( document.myForm.Name.value == "" ) {
+            alert( "Please provide your name!" );
+            document.myForm.Name.focus() ;
+            return false;
+         }
+         if( document.myForm.EMail.value == "" ) {
+            alert( "Please provide your Email!" );
+            document.myForm.EMail.focus() ;
+            return false;
+         }
+         if( document.myForm.Zip.value == "" || isNaN( document.myForm.Zip.value ) ||
+            document.myForm.Zip.value.length != 5 ) {
+            
+            alert( "Please provide a zip in the format #####." );
+            document.myForm.Zip.focus() ;
+            return false;
+         }
+         if( document.myForm.Country.value == "-1" ) {
+            alert( "Please provide your country!" );
+            return false;
+         }
+         return( true );
+      }
+   //-->
+</script>
+
+
+Data Format Validation : Secondly, the data that is entered must be checked for correct form and value. 
+
+<script type = "text/javascript">
+   <!--
+      function validateEmail() {
+         var emailID = document.myForm.EMail.value;
+         atpos = emailID.indexOf("@");
+         dotpos = emailID.lastIndexOf(".");
+         
+         if (atpos < 1 || ( dotpos - atpos < 2 )) {
+            alert("Please enter correct email ID")
+            document.myForm.EMail.focus() ;
+            return false;
+         }
+         return( true );
+      }
+   //-->
+</script>
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+javascript animation:
+	   
+e.g 1
+
+	   var imgObj = null;
+
+	   function init() {
+               imgObj = document.getElementById('myImage');
+               imgObj.style.position= 'relative'; 
+               imgObj.style.left = '0px'; 
+            }
+            function moveRight() {
+               imgObj.style.left = parseInt(imgObj.style.left) + 10 + 'px';         // manual shifting image by 10px on every call.
+            }
+
+
+
+e.g 2
+
+	   var imgObj = null;
+            var animate ;
+            
+            function init() {
+               imgObj = document.getElementById('myImage');
+               imgObj.style.position= 'relative'; 
+               imgObj.style.left = '0px'; 
+            }
+            function moveRight() {
+               imgObj.style.left = parseInt(imgObj.style.left) + 10 + 'px';
+               animate = setTimeout(moveRight,20);    				// automated shifting image by 10px every 20 mili seconds
+            }
+            function stop() {
+               clearTimeout(animate);
+               imgObj.style.left = '0px'; 
+            }
+            
+            window.onload = init;
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+
+Multimedia:
+
+The JavaScript navigator object includes a child object called plugins. This object is an array, with one entry for each plug-in 
+installed on the browser. The navigator.plugins object is supported only by Netscape, Firefox, and Mozilla only.
+
+<html>
+   <head>
+      <title>List of Plug-Ins</title>
+   </head>
+   
+   <body>
+      <table border = "1">
+         <tr>
+            <th>Plug-in Name</th>
+            <th>Filename</th>
+            <th>Description</th>
+         </tr>
+         
+         <script language = "JavaScript" type = "text/javascript">
+            for (i = 0; i<navigator.plugins.length; i++) {
+               document.write("<tr><td>");
+               document.write(navigator.plugins[i].name);
+               document.write("</td><td>");
+               document.write(navigator.plugins[i].filename);
+               document.write("</td><td>");
+               document.write(navigator.plugins[i].description);
+               document.write("</td></tr>");
+            }
+         </script>
+      </table>      
+   </body>
+</html>
+
+
+Output
+
+	Plug-in Name  			Filename   		Description
+        Chrome PDF Plugin      		internal-pdf-viewer     Portable Document Format	
+ 	abcd				efgh			ijkl
+
+
+e.g 2
+
+Each plug-in has an entry in the array. Each entry has the following properties −
+
+name − is the name of the plug-in.
+filename − is the executable file that was loaded to install the plug-in.
+description − is a description of the plug-in, supplied by the developer.
+mimeTypes − is an array with one entry for each MIME type supported by the plug-in.
+
+<html>   
+   <head>
+      <title>Using Plug-Ins</title>
+   </head>
+   
+   <body>   
+      <script language = "JavaScript" type = "text/javascript">
+         media = navigator.mimeTypes["video/quicktime"];
+         
+         if (media) {
+            document.write("<embed src = 'quick.mov' height = 100 width = 100>");
+         } else {
+            document.write("<img src = 'quick.gif' height = 100 width = 100>");
+         }
+      </script>      
+   </body>
+</html>
+
+O/P:
+
+image of the plugin
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Navigator:
+
+It is important to understand the differences between different browsers in order to handle each in the way it is expected.
+So it is important to know which browser your web page is running in. To get information about the browser your webpage is 
+currently running in, use the built-in navigator object.
+
+Navigator Properties
+
+appCodeName: name of the browser i.e Netscape, Microsoft Internet Explorer etc
+appVersion:  version of the browser
+language:    language used
+mimTypes[]:  supported mime types
+platform[]:  32 bit / 64 bit
+plugins[]:   plugins supported
+userAgent[]: This property is a string that contains the code name and version of the browser. 
+
+e.g
+
+<html>   
+   <head>
+      <title>Browser Detection Example</title>
+   </head>
+   
+   <body>      
+      <script type = "text/javascript">
+         <!--
+            var userAgent   = navigator.userAgent;
+            var opera       = (userAgent.indexOf('Opera') != -1);
+            var ie          = (userAgent.indexOf('MSIE') != -1);
+            var gecko       = (userAgent.indexOf('Gecko') != -1);
+            var netscape    = (userAgent.indexOf('Mozilla') != -1);
+            var version     = navigator.appVersion;
+            
+            if (opera) {
+               document.write("Opera based browser");
+               // Keep your opera specific URL here.
+            } else if (gecko) {
+               document.write("Mozilla based browser");
+               // Keep your gecko specific URL here.
+            } else if (ie) {
+               document.write("IE based browser");
+               // Keep your IE specific URL here.
+            } else if (netscape) {
+               document.write("Netscape based browser");
+               // Keep your Netscape specific URL here.
+            } else {
+               document.write("Unknown browser");
+            }
+            
+            // You can include version to along with any above condition.
+            document.write("<br /> Browser version info : " + version );
+         //-->
+      </script>      
+   </body>
+</html>
+
+O/P:
+
+Mozilla based browser
+Browser version info : 5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36
+
+-----------------------------------------------------------------------------------------------------------------------------

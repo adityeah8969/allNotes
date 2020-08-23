@@ -1,0 +1,1190 @@
+Design Patterns: A design pattern provides a general reusable solution for the common problems occurs in software design. The patterns typically show 
+relationships and interactions between classes or objects. The idea is to speed up the development process by providing well tested, proven development
+/design paradigm. Design patterns are programming language independent strategies for solving a common problem. By using the design patterns you can 
+make your code more flexible, reusable and maintainable.
+
+Types of Design Patterns: 
+
+i>  Creational:	These design patterns are all about class instantiation or object creation. e.g
+		
+		Factory
+		Abstract Factory
+		Singleton
+		Builder
+
+ii> Structural: These design patterns are about organizing different classes and objects to form larger structures and provide new functionality. e.g
+		
+		Adapter
+		Bridge
+		Decorator
+		Proxy
+
+iii>Behavioral: Behavioral patterns are about identifying common communication patterns between objects and realize these patterns. e.g
+		
+		Iterator
+		Observer
+		Strategy (or Policy)
+		
+-------------------------------------------------------------
+
+Factory:	The idea is to use a static member-function (static factory method) which creates & returns instances, hiding the details of class 
+		modules from user.
+
+public interface Shape { void draw(); }
+
+public class Rectangle implements Shape {
+
+   @Override
+   public void draw() {
+      System.out.println("Inside Rectangle::draw() method.");
+   }
+}
+
+public class Square implements Shape {
+
+   @Override
+   public void draw() {
+      System.out.println("Inside Square::draw() method.");
+   }
+}
+
+public class Circle implements Shape {
+
+   @Override
+   public void draw() {
+      System.out.println("Inside Circle::draw() method.");
+   }
+}
+
+public class ShapeFactory {							// Main Factory Method
+	
+   //use getShape method to get object of type shape 
+   public Shape getShape(String shapeType){					// note the return type = Shape
+      if(shapeType == null){
+         return null;
+      }		
+      if(shapeType.equalsIgnoreCase("CIRCLE")){
+         return new Circle();
+         
+      } else if(shapeType.equalsIgnoreCase("RECTANGLE")){
+         return new Rectangle();
+         
+      } else if(shapeType.equalsIgnoreCase("SQUARE")){
+         return new Square();
+      }
+      
+      return null;
+   }
+}
+
+public class FactoryPatternDemo {
+
+   public static void main(String[] args) {
+      ShapeFactory shapeFactory = new ShapeFactory();
+
+      //get an object of Circle and call its draw method.
+      Shape shape1 = shapeFactory.getShape("CIRCLE");
+
+      //call draw method of Circle
+      shape1.draw();
+
+      //get an object of Rectangle and call its draw method.
+      Shape shape2 = shapeFactory.getShape("RECTANGLE");
+
+      //call draw method of Rectangle
+      shape2.draw();
+
+      //get an object of Square and call its draw method.
+      Shape shape3 = shapeFactory.getShape("SQUARE");
+
+      //call draw method of square
+      shape3.draw();
+   }
+}
+
+
+O/P:
+
+Inside Circle::draw() method.
+Inside Rectangle::draw() method.
+Inside Square::draw() method.
+
+
+-------------------------------------------------------------
+
+Observer Pattern:	The Observer Pattern defines a one to many dependency between objects so that one object changes state, all of its dependents
+		        are notified and updated automatically.
+
+Advantages:	Provides a loosely coupled design between objects that interact, interacting objects should have less information about each other.
+		Subject only knows that observer implement Observer interface.
+
+Disadvantages:  Because the subject holds strong references to the observers, keeping them alive. The leak happens when an observer fails to unsubscribe
+	        from the subject when it no longer needs to listen. (Lapsed listener problem)
+
+
+
+import java.util.ArrayList; 
+import java.util.Iterator; 
+
+interface Subject 
+{ 
+	public void registerObserver(Observer o); 
+	public void unregisterObserver(Observer o); 
+	public void notifyObservers(); 
+} 
+
+class CricketData implements Subject 
+{ 
+	int runs; 
+	int wickets; 
+	float overs; 
+	ArrayList<Observer> observerList; 
+
+	public CricketData() { 
+		observerList = new ArrayList<Observer>(); 
+	} 
+
+	@Override
+	public void registerObserver(Observer o) { observerList.add(o); } 
+
+	@Override
+	public void unregisterObserver(Observer o) { observerList.remove(observerList.indexOf(o)); } 
+
+	@Override
+	public void notifyObservers() 
+	{ 
+		for (Iterator<Observer> it = 
+			observerList.iterator(); it.hasNext();) 
+		{ 
+			Observer o = it.next(); 
+			o.update(runs,wickets,overs); 
+		} 
+	} 
+
+	private int getLatestRuns() { return 90; } 
+	private int getLatestWickets() { return 2; } 
+	private float getLatestOvers() { return (float)10.2; } 
+
+	// This method is used update displays 
+	// when data changes 
+	public void dataChanged() 
+	{ 
+		//get latest data 
+		runs = getLatestRuns(); 
+		wickets = getLatestWickets(); 
+		overs = getLatestOvers(); 
+
+		notifyObservers(); 
+	} 
+} 
+
+// This interface is implemented by all those 
+// classes that are to be updated whenever there 
+// is an update from CricketData 
+interface Observer 
+{ 
+	public void update(int runs, int wickets, float overs); 
+} 
+
+class AverageScoreDisplay implements Observer 
+{ 
+	private float runRate; 
+	private int predictedScore; 
+
+	public void update(int runs, int wickets, float overs) 
+	{ 
+		this.runRate =(float)runs/overs; 
+		this.predictedScore = (int)(this.runRate * 50); 
+		display(); 
+	} 
+
+	public void display() 
+	{ 
+		System.out.println("\nAverage Score Display: \n"
+						+ "Run Rate: " + runRate + 
+						"\nPredictedScore: " + 
+						predictedScore); 
+	} 
+} 
+
+class CurrentScoreDisplay implements Observer 
+{ 
+	private int runs, wickets; 
+	private float overs; 
+
+	public void update(int runs, int wickets, 
+					float overs) 
+	{ 
+		this.runs = runs; 
+		this.wickets = wickets; 
+		this.overs = overs; 
+		display(); 
+	} 
+
+	public void display() 
+	{ 
+		System.out.println("\nCurrent Score Display:\n"
+						+ "Runs: " + runs + 
+						"\nWickets:" + wickets + 
+						"\nOvers: " + overs ); 
+	} 
+} 
+
+// Driver Class 
+class Main 
+{ 
+	public static void main(String args[]) 
+	{ 
+		
+		AverageScoreDisplay averageScoreDisplay = new AverageScoreDisplay(); 			// Observer
+		CurrentScoreDisplay currentScoreDisplay = new CurrentScoreDisplay(); 			// Observer
+
+	
+		CricketData cricketData = new CricketData(); 						// Subject
+
+		
+		cricketData.registerObserver(averageScoreDisplay); 					// registration of observers
+		cricketData.registerObserver(currentScoreDisplay); 
+
+		
+		cricketData.dataChanged(); 								// This method represents state change in subject
+													// The implementation triggers 'notify()' to all
+													// the observers.
+		
+					
+		cricketData.unregisterObserver(averageScoreDisplay); 					// Un-registration
+
+		cricketData.dataChanged(); 
+	} 
+} 
+
+
+O/P:
+
+Average Score Display: 
+Run Rate: 8.823529
+PredictedScore: 441
+
+Current Score Display:
+Runs: 90
+Wickets:2
+Overs: 10.2
+
+Current Score Display:
+Runs: 90
+Wickets:2
+Overs: 10.2
+
+
+-------------------------------------------------------------
+
+Singleton:	The singleton pattern is a design pattern that restricts the instantiation of a class to one object.
+		e.g. a single DB connection shared by multiple objects as creating a separate DB connection for every object may be costly.
+
+
+Method 1:
+
+class Singleton 
+{ 
+    private static Singleton obj; 
+  
+    private Singleton() {} 
+  
+    // Only one thread can execute this at a time 
+    public static synchronized Singleton getInstance() 
+    { 
+        if (obj==null) 
+            obj = new Singleton(); 
+        return obj; 
+    } 
+} 
+
+
+Method 2 (Only for light objects):
+
+JVM executes static initializer when the class is loaded and hence this is guaranteed to be thread safe. Use this method only when your singleton 
+class is light and is used throughout the execution of your program.
+
+class Singleton 
+{ 
+    private static Singleton obj = new Singleton(); 
+  
+    private Singleton() {} 
+  
+    public static Singleton getInstance() 
+    { 
+        return obj; 
+    } 
+}
+
+
+-------------------------------------------------------------
+
+Decorator Pattern:	Decorator pattern allows a user to add new functionality to an existing object without altering its structure. This type of 
+			design pattern comes under structural pattern as this pattern acts as a wrapper to existing class. This pattern creates a 
+			decorator class which wraps the original class and provides additional functionality keeping class methods signature intact.
+
+
+public interface Shape {void draw();}
+
+public class Rectangle implements Shape {
+   @Override
+   public void draw() {
+      System.out.println("Shape: Rectangle");
+   }
+}
+
+
+public class Circle implements Shape {
+   @Override
+   public void draw() {
+      System.out.println("Shape: Circle");
+   }
+}
+
+
+public abstract class ShapeDecorator implements Shape {
+   protected Shape decoratedShape;
+
+   public ShapeDecorator(Shape decoratedShape){
+      this.decoratedShape = decoratedShape;
+   }
+
+   public void draw(){
+      decoratedShape.draw();
+   }	
+}
+
+public class RedShapeDecorator extends ShapeDecorator {
+
+   public RedShapeDecorator(Shape decoratedShape) {
+      super(decoratedShape);		
+   }
+
+   @Override
+   public void draw() {
+      decoratedShape.draw();	       
+      setRedBorder(decoratedShape);						// wrapping here
+   }
+
+   private void setRedBorder(Shape decoratedShape){				// wrapper function implementation			
+      System.out.println("Border Color: Red");
+   }
+}
+
+public class DecoratorPatternDemo {
+   public static void main(String[] args) {
+
+      Shape circle = new Circle();
+
+      Shape redCircle = new RedShapeDecorator(new Circle());
+
+      Shape redRectangle = new RedShapeDecorator(new Rectangle());
+
+      System.out.println("Circle with normal border");
+      circle.draw();
+
+      System.out.println("\nCircle of red border");
+      redCircle.draw();
+
+      System.out.println("\nRectangle of red border");
+      redRectangle.draw();
+   }
+}
+
+
+O/P:
+
+Circle with normal border
+Shape: Circle
+
+Circle of red border
+Shape: Circle
+Border Color: Red
+
+Rectangle of red border
+Shape: Rectangle
+Border Color: Red
+
+
+-------------------------------------------------------------
+
+Strategy Pattern:	The strategy pattern (also known as the policy pattern) is a software design pattern that enables an algorithm’s behavior 
+			to be selected at runtime. In Strategy pattern, we create objects which represent various strategies and a context object 
+			whose behavior varies as per its strategy object. The strategy object changes the executing algorithm of the context object.
+
+
+
+public interface Strategy {
+   public int doOperation(int num1, int num2);
+}
+
+public class OperationAdd implements Strategy{
+   @Override
+   public int doOperation(int num1, int num2) {
+      return num1 + num2;
+   }
+}
+
+public class OperationSubstract implements Strategy{
+   @Override
+   public int doOperation(int num1, int num2) {
+      return num1 - num2;
+   }
+}
+
+public class OperationMultiply implements Strategy{
+   @Override
+   public int doOperation(int num1, int num2) {
+      return num1 * num2;
+   }
+}
+
+public class Context {							// Context Object uses delegation to Strategy object (not inheritance)
+   private Strategy strategy;
+
+   public Context(Strategy strategy){					// setting up strategy at run time
+      this.strategy = strategy;
+   }
+
+   public int executeStrategy(int num1, int num2){			// executing strategy
+      return strategy.doOperation(num1, num2);
+   }
+}
+
+
+public class StrategyPatternDemo {
+   public static void main(String[] args) {
+      Context context = new Context(new OperationAdd());		
+      System.out.println("10 + 5 = " + context.executeStrategy(10, 5));
+
+      context = new Context(new OperationSubstract());		
+      System.out.println("10 - 5 = " + context.executeStrategy(10, 5));
+
+      context = new Context(new OperationMultiply());		
+      System.out.println("10 * 5 = " + context.executeStrategy(10, 5));
+   }
+}
+
+
+O/P:
+
+10 + 5 = 15
+10 - 5 = 5
+10 * 5 = 50
+
+-------------------------------------------------------------
+
+
+Adapter Pattern:	The adapter pattern convert the interface of a class into another interface clients expect. Adapter lets classes work together
+			that couldn’t otherwise because of incompatible interfaces.
+
+To use an adapter:
+
+i>   The client makes a request to the adapter by calling a method on it using the target interface.
+ii>  The adapter translates that request on the adaptee using the adaptee interface.
+iii> Client receive the results of the call and is unaware of adapter’s presence.
+
+Example:
+
+Suppose you have a Bird class with fly() , and makeSound() methods. And also a ToyDuck class with squeak() method. Let’s assume that you are short on
+ToyDuck objects and you would like to use Bird objects in their place. Birds have some similar functionality but implement a different interface, so
+we can’t use them directly. So we will use adapter pattern.
+
+
+interface Bird 
+{ 
+	public void fly(); 
+	public void makeSound(); 
+} 
+
+class Sparrow implements Bird 
+{ 
+	public void fly() 
+	{ 
+		System.out.println("Flying"); 
+	} 
+	public void makeSound() 
+	{ 
+		System.out.println("Chirp Chirp"); 
+	} 
+} 
+
+interface ToyDuck 
+{ 
+	public void squeak(); 
+} 
+
+class PlasticToyDuck implements ToyDuck 
+{ 
+	public void squeak() 
+	{ 
+		System.out.println("Squeak"); 
+	} 
+} 
+
+class BirdAdapter implements ToyDuck 						// BirdAdapter is just another implementation of the interface ToyDuck 
+{ 										
+
+	Bird bird; 
+	public BirdAdapter(Bird bird) 						// Takes in Bird
+	{ 
+		this.bird = bird; 
+	} 
+
+	public void squeak() 
+	{ 
+		bird.makeSound(); 
+	} 
+} 
+
+class Main 
+{ 
+	public static void main(String args[]) 
+	{ 
+		Sparrow sparrow = new Sparrow(); 
+		ToyDuck toyDuck = new PlasticToyDuck(); 
+
+		ToyDuck birdAdapter = new BirdAdapter(sparrow); 		// Wrap a bird in a birdAdapter so that it behaves like toy duck 
+
+		System.out.println("Sparrow..."); 
+		sparrow.fly(); 
+		sparrow.makeSound(); 
+
+		System.out.println("ToyDuck..."); 
+		toyDuck.squeak(); 
+
+		// toy duck behaving like a bird 
+		System.out.println("BirdAdapter..."); 
+		birdAdapter.squeak(); 
+	} 
+} 
+
+O/P:
+
+Sparrow...
+Flying
+Chirp Chirp
+ToyDuck...
+Squeak
+BirdAdapter...
+Chirp Chirp
+
+
+Advantages:
+
+i>  Helps achieve reusability and flexibility.
+ii> Client class is not complicated by having to use a different interface and can use polymorphism to swap between different implementations of adapters.
+
+
+Disadvantages:
+
+i>  All requests are forwarded, so there is a slight increase in the overhead.
+ii> Sometimes many adaptations are required along an adapter chain to reach the type which is required.
+
+
+
+-------------------------------------------------------------
+
+Iterator pattern:
+
+
+// A simple Notification class 
+class Notification 
+{ 
+	// To store notification message 
+	String notification; 
+
+	public Notification(String notification) 
+	{ 
+		this.notification = notification; 
+	} 
+	public String getNotification() 
+	{ 
+		return notification; 
+	} 
+} 
+
+// Collection interface 
+interface Collection 
+{ 
+	public Iterator createIterator(); 
+} 
+
+// Collection of notifications 
+class NotificationCollection implements Collection 
+{ 
+	static final int MAX_ITEMS = 6; 
+	int numberOfItems = 0; 
+	Notification[] notificationList; 
+
+	public NotificationCollection() 
+	{ 
+		notificationList = new Notification[MAX_ITEMS]; 
+
+		// Let us add some dummy notifications 
+		addItem("Notification 1"); 
+		addItem("Notification 2"); 
+		addItem("Notification 3"); 
+	} 
+
+	public void addItem(String str) 
+	{ 
+		Notification notification = new Notification(str); 
+		if (numberOfItems >= MAX_ITEMS) 
+			System.err.println("Full"); 
+		else
+		{ 
+			notificationList[numberOfItems] = notification; 
+			numberOfItems = numberOfItems + 1; 
+		} 
+	} 
+
+	public Iterator createIterator() 
+	{ 
+		return new NotificationIterator(notificationList); 
+	} 
+} 
+
+// We could also use Java.Util.Iterator 
+interface Iterator 
+{ 
+	// indicates whether there are more elements to 
+	// iterate over 
+	boolean hasNext(); 
+
+	// returns the next element 
+	Object next(); 
+} 
+
+// Notification iterator 
+class NotificationIterator implements Iterator 
+{ 
+	Notification[] notificationList; 
+
+	// maintains curr pos of iterator over the array 
+	int pos = 0; 
+
+	// Constructor takes the array of notifiactionList are 
+	// going to iterate over. 
+	public NotificationIterator (Notification[] notificationList) 
+	{ 
+		this.notificationList = notificationList; 
+	} 
+
+	public Object next() 
+	{ 
+		// return next element in the array and increment pos 
+		Notification notification = notificationList[pos]; 
+		pos += 1; 
+		return notification; 
+	} 
+
+	public boolean hasNext() 
+	{ 
+		if (pos >= notificationList.length || 
+			notificationList[pos] == null) 
+			return false; 
+		else
+			return true; 
+	} 
+} 
+
+class NotificationBar 
+{ 
+	NotificationCollection notifications; 
+
+	public NotificationBar(NotificationCollection notifications) 
+	{ 
+		this.notifications = notifications; 
+	} 
+
+	public void printNotifications() 
+	{ 
+		Iterator iterator = notifications.createIterator(); 
+		System.out.println("-------NOTIFICATION BAR------------"); 
+		while (iterator.hasNext()) 
+		{ 
+			Notification n = (Notification)iterator.next(); 
+			System.out.println(n.getNotification()); 
+		} 
+	} 
+} 
+
+class Main 
+{ 
+	public static void main(String args[]) 
+	{ 
+		NotificationCollection nc = new NotificationCollection(); 
+		NotificationBar nb = new NotificationBar(nc); 
+		nb.printNotifications(); 
+	} 
+} 
+
+
+-------------------------------------------------------------
+
+Proxy Pattern: Proxies are also called surrogates, handles, and wrappers. They are closely related in structure, but not purpose, to Adapters 
+	       and Decorators.
+
+e.g 	       A very simple real life scenario is our college internet, which restricts few site access. 
+
+
+
+package com.saket.demo.proxy; 
+
+public interface Internet 
+{ 
+	public void connectTo(String serverhost) throws Exception; 
+} 
+
+
+
+package com.saket.demo.proxy; 
+
+public class RealInternet implements Internet 
+{ 
+	@Override
+	public void connectTo(String serverhost) 
+	{ 
+		System.out.println("Connecting to "+ serverhost); 
+	} 
+} 
+
+
+
+package com.saket.demo.proxy; 
+
+import java.util.ArrayList; 
+import java.util.List; 
+
+
+public class ProxyInternet implements Internet 
+{ 
+	private Internet internet = new RealInternet(); 
+	private static List<String> bannedSites; 
+	
+	static
+	{ 
+		bannedSites = new ArrayList<String>(); 
+		bannedSites.add("abc.com"); 
+		bannedSites.add("def.com"); 
+		bannedSites.add("ijk.com"); 
+		bannedSites.add("lnm.com"); 
+	} 
+	
+	@Override
+	public void connectTo(String serverhost) throws Exception 
+	{ 
+		if(bannedSites.contains(serverhost.toLowerCase())) 
+		{ 
+			throw new Exception("Access Denied"); 
+		} 
+		
+		internet.connectTo(serverhost); 
+	} 
+
+} 
+
+
+package com.saket.demo.proxy; 
+
+public class Client 
+{ 
+	public static void main (String[] args) 
+	{ 
+		Internet internet = new ProxyInternet(); 
+		try
+		{ 
+			internet.connectTo("geeksforgeeks.org"); 
+			internet.connectTo("abc.com"); 
+		} 
+		catch (Exception e) 
+		{ 
+			System.out.println(e.getMessage()); 
+		} 
+	} 
+} 
+
+
+O/P:
+
+Connecting to geeksforgeeks.org
+Access Denied
+
+
+-------------------------------------------------------------
+
+Abstract Factory :
+
+
+public interface Shape {void draw();}
+
+
+public class RoundedRectangle implements Shape {
+   @Override
+   public void draw() {
+      System.out.println("Inside RoundedRectangle::draw() method.");
+   }
+}
+
+
+public class RoundedSquare implements Shape {
+   @Override
+   public void draw() {
+      System.out.println("Inside RoundedSquare::draw() method.");
+   }
+}
+
+
+public class Rectangle implements Shape {
+   @Override
+   public void draw() {
+      System.out.println("Inside Rectangle::draw() method.");
+   }
+}
+
+
+public abstract class AbstractFactory {
+   abstract Shape getShape(String shapeType) ;
+}
+
+
+public class ShapeFactory extends AbstractFactory {
+   @Override
+   public Shape getShape(String shapeType){    
+      if(shapeType.equalsIgnoreCase("RECTANGLE")){
+         return new Rectangle();         
+      }else if(shapeType.equalsIgnoreCase("SQUARE")){
+         return new Square();
+      }	 
+      return null;
+   }
+}
+
+
+public class RoundedShapeFactory extends AbstractFactory {
+   @Override
+   public Shape getShape(String shapeType){    
+      if(shapeType.equalsIgnoreCase("RECTANGLE")){
+         return new RoundedRectangle();         
+      }else if(shapeType.equalsIgnoreCase("SQUARE")){
+         return new RoundedSquare();
+      }	 
+      return null;
+   }
+}
+
+
+public class FactoryProducer {
+   public static AbstractFactory getFactory(boolean rounded){   
+      if(rounded){
+         return new RoundedShapeFactory();         
+      }else{
+         return new ShapeFactory();
+      }
+   }
+}
+
+
+public class AbstractFactoryPatternDemo {
+   public static void main(String[] args) {
+      //get shape factory
+      AbstractFactory shapeFactory = FactoryProducer.getFactory(false);
+      //get an object of Shape Rectangle
+      Shape shape1 = shapeFactory.getShape("RECTANGLE");
+      //call draw method of Shape Rectangle
+      shape1.draw();
+      //get an object of Shape Square 
+      Shape shape2 = shapeFactory.getShape("SQUARE");
+      //call draw method of Shape Square
+      shape2.draw();
+      //get shape factory
+      AbstractFactory shapeFactory1 = FactoryProducer.getFactory(true);
+      //get an object of Shape Rectangle
+      Shape shape3 = shapeFactory1.getShape("RECTANGLE");
+      //call draw method of Shape Rectangle
+      shape3.draw();
+      //get an object of Shape Square 
+      Shape shape4 = shapeFactory1.getShape("SQUARE");
+      //call draw method of Shape Square
+      shape4.draw();
+      
+   }
+}
+
+O/P:
+
+Inside Rectangle::draw() method.
+Inside Square::draw() method.
+Inside RoundedRectangle::draw() method.
+Inside RoundedSquare::draw() method.
+
+-------------------------------------------------------------
+
+Builder Design Pattern: Builder pattern aims to “Separate the construction of a complex object from its representation so that the same construction
+		        process can create different representations.” It is used to construct a complex object step by step and the final step will
+			return the object. The process of constructing an object should be generic so that it can be used to create different repre-
+			sentations of the same object.
+
+
+interface HousePlan 
+{ 
+	public void setBasement(String basement); 
+
+	public void setStructure(String structure); 
+
+	public void setRoof(String roof); 
+
+	public void setInterior(String interior); 
+} 
+
+class House implements HousePlan 					// Product
+{ 
+
+	private String basement; 
+	private String structure; 
+	private String roof; 
+	private String interior; 
+
+	public void setBasement(String basement) 
+	{ 
+		this.basement = basement; 
+	} 
+
+	public void setStructure(String structure) 
+	{ 
+		this.structure = structure; 
+	} 
+
+	public void setRoof(String roof) 
+	{ 
+		this.roof = roof; 
+	} 
+
+	public void setInterior(String interior) 
+	{ 
+		this.interior = interior; 
+	} 
+
+} 
+
+
+interface HouseBuilder 							// Builder
+{ 
+
+	public void buildBasement(); 
+
+	public void buildStructure(); 
+
+	public void bulidRoof(); 
+
+	public void buildInterior(); 
+
+	public House getHouse(); 
+} 
+
+class IglooHouseBuilder implements HouseBuilder 			// ConcreteBuilder 
+{ 
+	private House house; 
+
+	public IglooHouseBuilder() 
+	{ 
+		this.house = new House(); 
+	} 
+
+	public void buildBasement() 
+	{ 
+		house.setBasement("Ice Bars"); 
+	} 
+
+	public void buildStructure() 
+	{ 
+		house.setStructure("Ice Blocks"); 
+	} 
+
+	public void buildInterior() 
+	{ 
+		house.setInterior("Ice Carvings"); 
+	} 
+
+	public void bulidRoof() 
+	{ 
+		house.setRoof("Ice Dome"); 
+	} 
+
+	public House getHouse() 
+	{ 
+		return this.house; 
+	} 
+} 
+
+class TipiHouseBuilder implements HouseBuilder 				// ConcreteBuilder 
+{ 
+	private House house; 
+
+	public TipiHouseBuilder() 
+	{ 
+		this.house = new House(); 
+	} 
+
+	public void buildBasement() 
+	{ 
+		house.setBasement("Wooden Poles"); 
+	} 
+
+	public void buildStructure() 
+	{ 
+		house.setStructure("Wood and Ice"); 
+	} 
+
+	public void buildInterior() 
+	{ 
+		house.setInterior("Fire Wood"); 
+	} 
+
+	public void bulidRoof() 
+	{ 
+		house.setRoof("Wood, caribou and seal skins"); 
+	} 
+
+	public House getHouse() 
+	{ 
+		return this.house; 
+	} 
+
+} 
+
+class CivilEngineer 							// Director 
+{ 
+
+	private HouseBuilder houseBuilder; 					
+		
+	public CivilEngineer(HouseBuilder houseBuilder) 
+	{ 
+		this.houseBuilder = houseBuilder; 
+	} 
+
+	public House getHouse() 
+	{ 
+		return this.houseBuilder.getHouse(); 
+	} 
+
+	public void constructHouse() 
+	{ 
+		this.houseBuilder.buildBasement(); 
+		this.houseBuilder.buildStructure(); 
+		this.houseBuilder.bulidRoof(); 
+		this.houseBuilder.buildInterior(); 
+	} 
+} 
+
+class Builder 
+{ 
+	public static void main(String[] args) 
+	{ 
+		HouseBuilder iglooBuilder = new IglooHouseBuilder(); 
+		CivilEngineer engineer = new CivilEngineer(iglooBuilder); 
+
+		engineer.constructHouse(); 
+
+		House house = engineer.getHouse(); 
+
+		System.out.println("Builder constructed: "+ house); 
+	} 
+} 
+
+
+O/P:
+
+Builder constructed: House@6d06d69c
+
+-------------------------------------------------------------
+
+Bridge Design Pattern: The Bridge design pattern allows you to separate the abstraction from the implementation. Bridge is used when we need to 
+		       decouple an abstraction from its implementation so that the two can vary independently. This type of design pattern comes
+		       under structural pattern as this pattern decouples implementation class and abstract class by providing a bridge structure
+		       between them. This pattern involves an interface which acts as a bridge which makes the functionality of concrete classes
+		       independent from interface implementer classes. 
+
+		       The abstraction contains a reference to the implementor. Children of the abstraction are referred to as refined abstractions, 
+		       and children of the implementor are concrete implementors. Since we can change the reference to the implementor in the abstr-
+		       action, we are able to change the abstraction’s implementor at run-time. 
+
+
+
+public interface DrawAPI {					// Implementor Interface
+   public void drawCircle(int radius, int x, int y);
+}
+
+
+public class RedCircle implements DrawAPI {			// Concrete Implementor
+   @Override
+   public void drawCircle(int radius, int x, int y) {
+      System.out.println("Drawing Circle[ color: red, radius: " + radius + ", x: " + x + ", " + y + "]");
+   }
+}
+
+public class GreenCircle implements DrawAPI {			// Concrete Implementor
+   @Override
+   public void drawCircle(int radius, int x, int y) {
+      System.out.println("Drawing Circle[ color: green, radius: " + radius + ", x: " + x + ", " + y + "]");
+   }
+}
+
+
+public abstract class Shape {					// Abstract Class
+   protected DrawAPI drawAPI;
+   
+   protected Shape(DrawAPI drawAPI){
+      this.drawAPI = drawAPI;
+   }
+   public abstract void draw();	
+}
+
+
+public class Circle extends Shape {				// Refined abstraction
+   private int x, y, radius;	
+
+   public Circle(int x, int y, int radius, DrawAPI drawAPI) {
+      super(drawAPI);
+      this.x = x;  
+      this.y = y;  
+      this.radius = radius;
+   }
+
+   public void draw() {
+      drawAPI.drawCircle(radius,x,y);
+   }
+}
+
+
+public class BridgePatternDemo {
+   public static void main(String[] args) {
+      Shape redCircle = new Circle(100,100, 10, new RedCircle());
+      Shape greenCircle = new Circle(100,100, 10, new GreenCircle());
+
+      redCircle.draw();
+      greenCircle.draw();
+   }
+}
+
+
+O/P:
+
+Drawing Circle[ color: red, radius: 10, x: 100, 100]
+Drawing Circle[  color: green, radius: 10, x: 100, 100]
+
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+

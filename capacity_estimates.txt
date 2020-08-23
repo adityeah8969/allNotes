@@ -6,7 +6,9 @@ Trillion - TB - 10^12
 
 5 yrs -> 150 Million seconds
 
-Modern day server capacity -> 256 GB
+Modern day server capacity -> 256 GB / 4TB
+Modern day high-end server capacity -> 144 GB
+Modern day server concurrent connections holding capacity -> 50k
 
 Consistency can take a hit (in the interest of availability)
 
@@ -119,17 +121,15 @@ client , Block server ( ---> cloud storage) , Metadata server (------> metadata 
 
 client:
 
-I. Internal Metadata Database
-II. Chunker 
+I.   Internal Metadata Database
+II.  Chunker 
 III. Watcher
-IV. Indexer
+IV.  Indexer
 
 
 Synchronization Service :
 
 Metadata DB(contains info about the modified chunks(their IDs & Hash values)), Message Queuing Service 
-
-
 
 
 Cloud/Block Storage
@@ -177,7 +177,7 @@ Frequency of video tweet = (100 M/day) / 10
 
 
 Total ingress = 100M * 300 bytes + (100M/5 photos * 200KB) + (100M/10 videos * 2MB) = 24TB/day == 290MB/sec
-
+0
 Egress:
 
 Lets assume avrage user goes through 20 tweets every session with 7 sessions/ day,
@@ -230,10 +230,36 @@ assuming 2% new queries everyday,
 storage estimation: 0.02*365*3GB => 25 GB/ year
 
 -----------------------------------------------------------------
-API Rate Limiter  (N/A)
+API Rate Limiter 
+
+
+User ID: 8 bytes
+Count:   2 bytes
+epoch:   4 bytes
+
+Since we’ll keep a count for each minute, at max, we would need 60 entries for each user. 
+
+8 + (4 + 2 + 20(Redis overhead))*60 + 20(hash table overhead) = 1.6 Kb
+
+considering the same for 1M users:
+
+1.6 Kb * 1 M ~= 1.6 GB
+
+
+Note:
+
+Without above partioning of an hour into 60 minutes, if we had to consider 500 requests per hour using a sorted set(sliding window),
+following would have been the memory estimate:
+
+8 + (4 + 2 + 20(sorted set overhead))*500 + 20(hash table overhead) = 12 Kb
+
+considering the same for 1M users:
+
+12 Kb * 1 M ~= 12 GB (86% more than what is required)
+
+
 -----------------------------------------------------------------
------------------------------------------------------------------
-Twitter
+Twitter Search:
 -----------------------------------------------------------------
 
 Total users : 1.5 B
@@ -242,10 +268,25 @@ avg size of a tweet : 300 bytes
 number of searches/day : 500 M
 number of new tweets/day : 400 M
 
-Storage Capacity: 400M * 300 => 120GB/day ~= 1.38MB/second
-
+Storage Capacity: 400M * 300 bytes => 120GB/day ~= 1.38MB/second
 120GB * 365days * 5years ~= 200TB  (storage for 5 yrs)
+400M * 365days * 5years ~= 730B = Number of tweets in 5 yrs (need 5/6 Bytes to store the info)
 
+Index:
+
+assuming 500K popular words with an avg length of 5 characters(1 byte each)
+
+500k * 5 bytes = 2.5 MB (memory for storing all the words)
+
+Let’s assume that we want to keep the index in memory for all the tweets from only past two years i.e 290B tweets
+
+290B * 5bytes(tweetID) ~= 1460 GB
+
+Assume that we need to index 15 words from every tweet, this means TweetID will be stored 15 times (one against every word)
+
+(1460*15) + 2.5 MB ~= 21 TB
+
+Assuming a high-end server has 144GB of memory, we would need 152 such servers to hold our index.
 
 -----------------------------------------------------------------
 Web Crawler
@@ -274,7 +315,7 @@ Total fetched timelines/ day : 1.5 B ~= 17500/sec
 
 Storage estimates:
 
-500 posts / day seen by the user
+500 posts / day seen by the user (inside a users feed)
 
 500 KB of data seen / day / user
 
@@ -288,6 +329,22 @@ Yelp
 
 places: 500M
 queries/sec: 100K
+
+Sharding/ Partitioning the index(Quad-Tree) : 
+
+Let the main QuadTree with no partition be Q.
+
+While Building the QuadTree, location ID of the place will decide the server it goes to. We are expecting a set of partitioned QuadTrees
+with similar struture to the main one (Q) but distributed across multiple servers. For example if a leaf node in the main Q had 400
+location IDs, we will hash them all to among 'n' (say 20) different servers. Let's assume that on an avg each server gets 20 locations.
+Now since these 20 locations belonged to the same leaf node in the main tree, so will belong to the same leaf node in the new partitioned 
+tree as well. This way the mini QuadTrees will be generated for each server and while querying for a places nearby a particular location
+we have to query all the servers and aggregate the results.
+
+
+Alternative Soln: We can also have a master-slave configuration where replicas(slaves) will only serve read traffic and write traffic is
+supposed to go via master.
+
 
 -----------------------------------------------------------------
 Uber Backend
@@ -312,6 +369,12 @@ We would also need to store information about movies and cinemas; let’s assume
 500 cities * 10 cinemas * 2000 seats * 2 shows * (50+50) bytes = 2GB / day
 
 To store five years of this data, we would need around 3.6TB.
+
+Order Masks
+
+Tulika garg
+Pranjal Bhatnagar (cpp)
+Vivek Mishra (cpp)
 
 
 

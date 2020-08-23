@@ -152,6 +152,7 @@ This is also an example of how symmetric and assymetric keys work together.
 
 Circuit switch vs Message switch vs Packet switch
 
+Switching is process to forward packets coming in from one port to a port leading towards the destination.
 
 Circuit switching and packet switching are the two switching methods that are used to connect the multiple communicating devices with one another. Circuit Switching was particularly designed for voice communication and it was less suitable for data transmission. 
 
@@ -182,7 +183,7 @@ iii> If the forwarder is not available, then it will try to resolve the query by
 
 What do you understand by MAC address?
 
-MAC stands for Media Access Control. It is the address of the device at the Media Access Control Layer of Network Architecture. It is a unique address means no two devices can have same MAC addresses.
+MAC stands for Media Access Control. It is the address of the device at the Media Access Control Layer of Network Architecture. It is a unique address means no two devices can have same MAC addresses. Its a 12-digit hexadecimal number.
 
 ---------------------------------------------
 
@@ -238,11 +239,43 @@ What is DHCP, how does it work?
 # The device sends a broadcast message saying “I am new here”
 # The DHCP server sees the message and responds back to the device and typically allocates an IP address. All other devices on network ignore  	 the message of the new device as they are not DHCP server.
 
+The DHCP server is given a list of IPs to manage, and it leases and reclaims those IPs to and from clients according to the DHCP protocol.
+
+It doesn't care whether the IPs are public or private.
+
+Usually your ISP would be running a DHCP server that gives you public addresses, and your router would be running a DHCP server that gives you private addresses (and route all traffic through the IP it got from the ISP's DHCP server).
+
 ---------------------------------------------
 
+Multiplexing:
+
+Multiplexing is a technique by which different analog and digital streams of transmission can be simultaneously processed over a shared link. Multiplexing divides the high capacity medium into low capacity logical medium which is then shared by different streams.
+
+Communication is possible over the air (radio frequency), using a physical media (cable), and light (optical fiber). All mediums are capable of multiplexing.
+
+When multiple senders try to send over a single medium, a device called Multiplexer divides the physical channel and allocates one to each. On the other end of communication, a De-multiplexer receives data from a single medium, identifies each, and sends to different receivers.
 
 
+---------------------------------------------
 
+Tunneling:
+
+Tunneling is a protocol that allows for the secure movement of data from one network to another. Tunneling involves allowing private network communications to be sent across a public network, such as the Internet, through a process called encapsulation. The encapsulation process allows for data packets to appear as though they are of a public nature to a public network when they are actually private data packets, allowing them to pass through unnoticed.
+
+Tunneling is also known as port forwarding.
+
+In tunneling, the data are broken into smaller pieces called packets as they move along the tunnel for transport. As the packets move through the tunnel, they are encrypted and another process called encapsulation occurs. The private network data and the protocol information that goes with it are encapsulated in public network transmission units for sending. The units look like public data, allowing them to be transmitted across the Internet. Encapsulation allows the packets to arrive at their proper destination. At the final destination, de-capsulation and decryption occur.
+
+---------------------------------------------
+
+Types of delays:
+
+i>   Transmission Delay: Time taken to put a packet onto link. = Data size / bandwidth = (L/B) second.
+ii>  Propagation delay : The time required for bits to reach the destination from the start point. 
+iii> Queuing delay: 	It is the time a job waits in a queue until it can be executed. It depends on congestion. It is the time difference 		    		between when the packet arrived Destination and when the packet data was processed 
+iv>  Processing Delay :	Processing delay is the time it takes routers to process the packet header. Processing of packets helps in detecting 			       	bit-level errors that occur during transmission of a packet to the destination. 
+
+---------------------------------------------
 
 
 
