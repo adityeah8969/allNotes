@@ -1,0 +1,54 @@
+Q. Given a string, find the length of the longest substring without repeating characters?
+
+Sample: Given "abcabcbb", the answer is "abc", which the length is 3.
+
+public static void longestSubstring(String str){
+        
+        int l = 0;
+        int r = 1;
+        
+        int n = str.length();
+        
+        Map<Character, Integer> map = new HashMap<Character, Integer>();
+        map.put(str.charAt(0), 0);
+        
+        
+        int ansCount = 1;
+        
+        for(;r<n;){
+            
+            while( r<n && (map.get(str.charAt(r)) == null || map.get(str.charAt(r)) < l) ){
+                map.put(str.charAt(r), r);
+                ansCount = Integer.max(ansCount, (r-l+1));
+                r++;
+            }
+            
+            l++;
+            if(l==r){map.put(str.charAt(r), r);r++;}
+        }
+        
+        System.out.println("ans: "+ ansCount);        
+}
+
+
+------------------------------------------------------------------
+
+Q Given a 32-bit signed integer, reverse digits of an integer?
+
+public static void reverseDigit(int temp){
+        
+        int ans = 0;
+        
+        while(temp>0){
+            int curr = temp%10;
+            temp/=10;
+            ans = ans*10 + curr;
+        }
+        
+        System.out.println("ans: "+ ans);
+}
+
+------------------------------------------------------------------
+
+
+

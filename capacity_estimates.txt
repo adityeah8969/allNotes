@@ -370,11 +370,105 @@ We would also need to store information about movies and cinemas; let’s assume
 
 To store five years of this data, we would need around 3.6TB.
 
-Order Masks
 
-Tulika garg
-Pranjal Bhatnagar (cpp)
-Vivek Mishra (cpp)
+-----------------------------------------------------------------
+GOOGLE DOCS:
+-----------------------------------------------------------------
+
+Pessimistic Concurrency control : Having a lock on the doc and using time sharing strategies to obtain the lock and edit the doc. 
+				  Not a feasible solution as the user might have to wait for their turn everytime.
+
+Optimistic Concurrency control : Allowing all the users to edit at the same time and hoping nothing can go wrong. In case there is a 
+				 conflict we use sync strategies to overcome the issue. 
+
+
+Sync Strategies:
+				
+1> Event Passing (or Operational Transformation)
+2> Differential Sync
+
+
+# Event Passing (or Operational Transformation) :
+
+Operational Transformation, at its core, is an optimistic concurrency control mechanism. It allows two editors to modify the same section 
+of a document at the same time without conflict. Or rather, it provides a mechanism for sanely resolving those conflicts so that neither 
+user intervention nor locking becomes necessary.
+
+An event(or operation) is something which get passed on to the main server whenever there is an edit to the doc. This might futher get
+passed on to fellow editors.
+
+There can be various types of events like Insert, Update, Delete, font change, style change etc. We will mostly be considering the following
+four events for simlicity :
+
+Insert('A', 1)		// insert 'A' at position 1
+Update('B', 'C', 2)	// update 'B' to 'C' at position 2
+Delete(3)		// delete charcater at position 3
+Retain(4)		// retain character at position 4
+
+Note: Events do carry some info regarding itself.
+
+
+Lets say client 1 and client 2 are both editing a doc with contetnt 'AT' (0 based indexing).
+
+say client 1 wants to delete 'T' and client 2 wants to insert 'H' at the beginning.
+
+CLIENT		OPERATION		RESULT		EVENT NAME
+
+1		Delete(1) 		'A'		a
+2		Insert('H', 0)		'HAT'		b
+
+
+If client 1 copy is operated upon by event b , the result would be HA
+If client 2 copy is operated upon by event a , the result would be HT
+
+Since both the copies are of out of sync, the above steps cannot be adopted. Operational Transformation states a computational logic 
+which results in some events a' & b' corresponding to a & b, which when applied upon client 2 copy & client 1 copy respectively renders 
+the doc with same content.
+
+xform(a, b) = (a', b')
+
+In the above example a' = delete(2) & b' = b
+
+If client 1 copy is operated upon by event b' , the result would be HA
+If client 2 copy is operated upon by event a' , the result would be HA
+
+Both the copies are in sync.
+
+# Differential Sync:
+
+Differential sync works similar to git diff command where the difference between the branches are considered as 'patch' which later get 
+merged as per need. Both clients and the main server maitains a content-copy other than the main content doc. The client's modification 
+(or diff) is calculated by observing the difference between its main and copy doc. Before communicating the diff to the server copy & main
+docs are made the same. On the server side the patch gets merged on the server copy doc the difference between the server copy & server main doc (diff of server) gets broadcasted to other clients. The other cliets also follow the same routine till the first initiated diff reached all the clients.
+
+
+Google Doc system design : /home/pictures/Google_Docs_System_Design
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

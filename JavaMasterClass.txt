@@ -1,0 +1,616 @@
+
+JIT v/s JVM:
+
+
+The main difference between JIT and JVM is that JIT is part of JVM itself and its main function is to improve the performance of JVM by directly compiling some hot code (code which executes above a certain threshold) into native instruction.
+
+JVM is a virtual machine used in Java programming platform to execute or run Java programs. The main advantage of JVM is that JVM  makes Java platform-independent by executing bytecodes. Java source code is compiled into class files, which contain bytecode. These byte codes are then executed by JVM. Now here comes JIT. Since the execution of bytecode is slower than the execution of machine language code because JVM first needs to translate bytecode into machine language code.
+
+JIT helps JVM here by compiling currently executing byte code into machine language. JIT also offers caching of compiled code which results in improved performance of JVM. By the way, it's not guaranteed that which code will be compiled and when. JIT usually compiles hot code in Hotspot JVM once its execution cross certain limit e.g. a method will be converted into machine language if it is called more than 10K times etc.
+
+
+Differences:
+
+The main difference between JVM and JIT is their purpose, the main goal of JVM is to provide platform independence while the objective of JIT is to improve performance of JVM, by compiling more code into machine language. Just keep in mind that this compilation also takes time, so translating all code into native code is not worth doing. That's why JIT mostly compiles frequently used code into native code.
+
+Another difference between JIT and JVM is that JIT is part of JVM.
+
+JVM is an older concept than JIT. JIT actually invented to improve the performance of JVM after years of the initial release of Java
+
+-------------------------------------------------------------
+
+Final Keyword:
+
+final keyword is used in different contexts. First of all, final is a non-access modifier applicable only to a variable, a method or a class.
+
+Final variable  -> value cannot be modified
+Final reference -> variable cannot be re-bound to reference another object
+Final method 	-> method cannot be overridden
+Final classe 	-> class cannot be inherited
+
+
+
+Final variable :
+
+class FinalVariable {
+        final int var = 50;
+        var = 60 		//This line would give an error
+}
+
+
+Final reference :
+
+If the final variable is a reference, this means that the variable cannot be re-bound to reference another object, but internal state of the object pointed by that reference variable can be changed.
+
+
+Snipeet:
+
+class Gfg 
+{ 
+    public static void main(String[] args)  
+    { 
+        
+        final StringBuilder sb = new StringBuilder("Geeks"); 		// a final reference variable sb 
+          
+        System.out.println(sb); 
+          
+        sb.append("ForGeeks"); 						// changing internal state of object  (Possible)
+          
+        System.out.println(sb); 
+    }     
+} 
+
+O/P:
+
+Geeks
+GeeksForGeeks
+
+
+Initializing a final variable:
+
+class Gfg  
+{ 
+
+    
+    final int THRESHOLD = 5; 			// direct initialize 
+         
+    final int CAPACITY; 			// a blank final variable 
+      
+    final int  MINIMUM; 			// another blank final variable 
+    
+    static final double PI = 3.141592653589793; // direct initialize 
+      
+
+    static final double EULERCONSTANT; 		// a  blank final static  variable 
+      
+    { 
+        CAPACITY = 25; 				// initializing CAPACITY 
+    } 
+      
+
+    static{ 
+        EULERCONSTANT = 2.3; 			// initializing EULERCONSTANT 
+    } 
+      
+    // constructor for initializing MINIMUM 
+    // Note that if there are more than one 
+    // constructor, you must initialize MINIMUM 
+    // in them also 
+    public GFG()  
+    { 
+        MINIMUM = -1; 
+    } 
+          
+} 
+
+
+Note: final with foreach loop : final with for-each statement is a legal statement
+
+class Gfg  
+{ 
+    public static void main(String[] args)  
+    { 
+        int arr[] = {1, 2, 3}; 
+          
+        // final with for-each statement 
+        // legal statement 
+        for (final int i : arr) 
+            System.out.print(i + " "); 
+    }     
+} 
+
+
+O/P:
+
+1 2 3
+
+EXplanation: Since the i variable goes out of scope with each iteration of the loop, it is actually re-declaration each iteration, allowing the same token (i.e. i) to be used to represent multiple variables.
+
+
+Final Classes:
+
+When a class is declared with final keyword, it is called a final class. A final class cannot be extended(inherited).
+
+There are two uses of a final class :
+
+i> One is definitely to prevent inheritance, as final classes cannot be extended. For example, all Wrapper Classes like Integer,Float etc. are 	  final classes. We can not extend them.
+
+	final class A
+	{
+     		// methods and fields
+	}
+	// The following class is illegal.
+	class B extends A 
+	{ 
+    		// COMPILE-ERROR! Can't subclass A
+	}
+
+ii> The other use of final with classes is to create an immutable class like the predefined String class.You can not make a class immutable 	without making it final.
+
+
+Final methods: When a method is declared with final keyword, it is called a final method. A final method cannot be overridden.
+
+class A 
+{
+    final void m1() 
+    {
+        System.out.println("This is a final method.");
+    }
+}
+
+class B extends A 
+{
+    void m1()
+    { 
+        // COMPILE-ERROR! Can't override.
+        System.out.println("Illegal!");
+    }
+}
+
+-------------------------------------------------------------
+
+Enums :
+
+Enumerations serve the purpose of representing a group of named constants in a programming language. For example the 4 suits in a deck of playing cards may be 4 enumerators named Club, Diamond, Heart, and Spade.
+
+Enums are used when we know all possible values at compile time
+
+Snippet :
+
+public class Test 
+{ 
+    enum Color 
+    { 
+        RED, GREEN, BLUE; 
+    } 
+  
+    // Driver method 
+    public static void main(String[] args) 
+    { 
+        Color c1 = Color.RED; 
+        System.out.println(c1); 
+    } 
+}
+
+O/P: RED
+
+
+Every enum internally implemented by using Class.
+/* internally above enum Color is converted to
+class Color
+{
+     public static final Color RED = new Color();
+     public static final Color BLUE = new Color();
+     public static final Color GREEN = new Color();
+}*/
+Every enum constant represents an object of type enum.
+enum type can be passed as an argument to switch statement.
+
+
+Enum and Inheritance :
+
+i>  All enums implicitly extend java.lang.Enum class. As a class can only extend one parent in Java, so an enum cannot extend anything else.
+ii> toString() method is overridden in java.lang.Enum class,which returns enum constant name.
+iii>enum can implement many interfaces.
+
+
+values(), ordinal() and valueOf() methods :
+
+i>   These methods are present inside java.lang.Enum.
+ii>  values() method can be used to return all values present inside enum.
+iii> Order is important in enums.By using ordinal() method, each enum constant index can be found, just like array index.
+iv>  valueOf() method returns the enum constant of the specified string value, if exists.
+
+enum Color 
+{ 
+    RED, GREEN, BLUE; 
+} 
+  
+public class Test 
+{ 
+    public static void main(String[] args) 
+    { 
+        Color arr[] = Color.values(); 
+  
+        for (Color col : arr) 
+        { 
+            System.out.println(col + " at index "
+                             + col.ordinal()); 
+        } 
+        System.out.println(Color.valueOf("RED")); 
+    } 
+} 
+
+
+enum and methods:
+
+
+enum Color 
+{ 
+	RED, GREEN, BLUE; 
+
+	// enum constructor called separately for each 
+	// constant 
+	private Color() 
+	{ 
+		System.out.println("Constructor called for : " + 
+		this.toString()); 
+	} 
+
+	public void colorInfo() 
+	{ 
+		System.out.println("Universal Color"); 
+	} 
+} 
+
+public class Test 
+{	 
+	// Driver method 
+	public static void main(String[] args) 
+	{ 
+		Color c1 = Color.RED; 
+		System.out.println(c1); 
+		c1.colorInfo(); 
+	} 
+} 
+
+
+O/P:
+
+Constructor called for : RED
+Constructor called for : GREEN
+Constructor called for : BLUE
+RED
+Universal Color
+
+
+
+Enum with Customized Value in Java:
+
+
+enum TrafficSignal 
+{ 
+	// This will call enum constructor with one 
+	// String argument 
+	RED("STOP"), GREEN("GO"), ORANGE("SLOW DOWN"); 
+
+	// declaring private variable for getting values 
+	private String action; 
+
+	// getter method 
+	public String getAction() 
+	{ 
+		return this.action; 
+	} 
+
+	// enum constructor - cannot be public or protected 
+	private TrafficSignal(String action) 
+	{ 
+		this.action = action; 
+	} 
+} 
+
+// Driver code 
+public class EnumConstructorExample 
+{ 
+	public static void main(String args[]) 
+	{ 
+		TrafficSignal[] signals = TrafficSignal.values(); 
+
+		for (TrafficSignal signal : signals) 
+		{ 
+			System.out.println("name : " + signal.name() + 
+						" action: " + signal.getAction() ); 
+		} 
+	} 
+} 
+
+
+O/P:
+
+name : RED action: STOP
+name : GREEN action: GO 
+name : ORANGE action: SLOW DOWN 
+
+-------------------------------------------------------------
+
+Difference Primitive and Reference :
+
+There are two types of variables in Java, primitive and reference type. All the basic types e.g. int, boolean, char, short, float, long and double are known as primitive types. JVM treats them differently than reference types, which is used to point objects e.g. String, Thread, File, and others. Reference variables are not pointers but a handle to the object which is created in heap memory. The main difference between primitive and reference type is that primitive type always has a value, it can never be null but reference type can be null, which denotes the absence of value. So if you create a primitive variable of type int and forget to initialize it then it's value would be 0, the default value of integral type in Java, but a reference variable by default has a null value, which means no reference is assigned to it.
+
+
+In short, the main difference between the two types is that primitive types store actual values but reference type stores handle to object in the heap.
+
+Differences:
+
+i> First difference between primitive and reference type is that former can never be null if no value is assigned they take their default value e.g. boolean variable will be initialized with false, byte, short, char,int and long will be initialized with zero, and float and double variables will be initialized with 0.0 value in Java.
+
+ii> When you assign a value to primitive data types, the primitive value is copied, but when you assign an object to reference type, the handle is copied.
+
+iii> Assigning value using Assignment Variable (=)
+When you assign a value to primitive data types, the primitive value is copied, but when you assign an object to reference type, the handle is copied.
+
+public class PrimitiveVsReference{
+
+    private static class Counter {
+        private int count;
+
+        public void advance(int number) {
+            count += number;
+        }
+
+        public int getCount() {
+            return count;
+        }
+    }
+
+    public static void main(String args[]) {        
+        int i = 30;
+        System.out.println("value of i before passing to method : " + i);
+        print(30);
+        System.out.println("value of i after passing to method : " + i);
+        
+        Counter myCounter = new Counter();
+        System.out.println("counter before passing to method : " + myCounter.getCount());
+        print(myCounter);
+        System.out.println("counter after passing to method : " + myCounter.getCount());
+    }
+
+    /*
+     * print given reference variable's value
+     */
+    public static void print(Counter ctr) {
+        ctr.advance(2);
+    }
+    
+    /**
+     * print given primitive value
+     */
+    public static void print(int value) {
+        value++;
+    }
+
+}
+
+Output :
+
+value of i before passing to method : 30
+value of i after passing to method : 30
+counter before passing to method : 0
+counter after passing to method : 2
+
+
+iv> Return value of a method
+When you return primitive types from a method then the primitive value is returned but when you return a reference type, again only handle to the is returned. This means a locally created object can survive even after method finishes its execution, if it was returned from a method or if it was stored in any member variable, why? because object is always created in heap memory. while all primitive local variables are destroyed after method finishes execution.
+
+
+v> Stack vs Heap
+Primitive variables are created in the stack while reference variable is created in heap space, which is managed by Garbage Collector
+
+vi> Memory consumption or Size
+Primitive variables take less memory than reference variable because they don't need to maintain object metadata e.g. object header. An int primitive variable will take less memory than Integer object for storing same value e.g. 5.
+
+
+Primitives		Size(Bytes)		Range			Estimate
+
+byte			1			-2^7 to 2^7-1		-128 to 127
+
+short			2			-2^15 to 2^15-1		-32768 to 32767
+
+int			4			-2^31 to 2^31-1		-2,147,483,648 to 2,147,483,647
+
+long			8			-2^63 to 2^63-1		-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807
+
+Double 			8			-2^63 to 2^63-1	
+
+float 			4			-2^31 to 2^31-1	
+
+char 			2			 0 to 65535		'\u0000' (or 0) to '\uffff' (or 65,535 inclusive)
+
+
+-------------------------------------------------------------
+
+Literals:
+
+Any constant value which can be assigned to the variable is called as literal/constant.
+
+# Integral literals
+
+public class Test { 
+    public static void main(String[] args) 
+    { 
+        int a = 101; 	// decimal-form literal 
+        int b = 0100; 	// octal-form literal 
+        int c = 0xFace; // Hexa-decimal form literal 
+        int d = 0b1111; // Binary literal 
+        System.out.println(a); 
+        System.out.println(b); 
+        System.out.println(c); 
+        System.out.println(d); 
+    } 
+} 
+
+
+O/P:
+
+101
+64
+64206
+15
+
+NOTE : By default, every literal is of int type, we can specify explicitly as long type by suffixed with l or L.
+
+
+# Floating-Point literal:
+
+public class Test { 
+    public static void main(String[] args) 
+    { 
+        float a = 101.230; 	// decimal-form literal 
+        float b = 0123.222; 	// It also acts as decimal literal 
+        float c = 0x123.222; 	// For Floating-point data types, we can specify literals in only decimal form and we 					// cant specify in octal and Hexa-decimal forms.
+        System.out.println(a); 
+        System.out.println(b); 
+        System.out.println(c); 
+    } 
+} 
+
+O/P:
+
+101.230
+123.222
+Error: malformed floating point literal
+
+
+NOTE: By default every floating point literal is of double type and hence we cant assign directly to float variable. 
+
+
+# String literal:
+
+String s = "Hello";
+
+# boolean literals:
+
+boolean b = true; 
+boolean c = false; 
+boolean d = 0; // error: incompatible types: int cannot be converted to boolean
+boolean b = 1; // error: incompatible types: int cannot be converted to boolean
+
+
+Note:
+
+We should be careful when we are mixing character literals and integers in String concatenation operations and this type of operations are known as Mixed Mode operation.
+
+
+public class Test { 
+    public static void main(String[] args) 
+    { 
+        // ASCII value of 0 is 48 
+        int first = '0'; 
+  
+        // ASCII value of 7 is 55 
+        int second = '7'; 
+        System.out.println("Geeks!" + first + second); 
+    } 
+} 
+
+
+O/P:
+
+Geeks!4855
+
+
+-------------------------------------------------------------	
+
+
+Variable types:
+
+Local:
+
+i>  Local variables are declared in methods, constructors, or blocks.
+ii> Local variables are created when the method block is entered and the variable will be destroyed once it exits.
+iii>Access modifiers cannot be used for local variables.
+iv> Visible only within the declared method.
+v>  Implemented at stack level internally.
+vi> There is no default value for local variables.
+
+
+Instance:
+
+i>  Instance variables are declared in a class, but outside a method, constructor or any block.
+ii> When a space is allocated for an object in the heap, a slot for each instance variable value is created.
+iii>Instance variables are created when an object is created & destroyed when the object is destroyed.
+iv> Access modifiers can be given for instance variables.
+v>  Instance variables have default values.
+
+Static:
+
+i>  Declared with the static keyword in a class, but outside a method, constructor or a block.
+ii> There would only be one copy of each class variable per class.
+iii>Static variables are stored in the static memory.
+iv> Static variables are created when the program starts and destroyed when the program stops.
+v>  Visibility is similar to instance variables.
+vi> Default values are same as instance variables.
+vii>Static variables can be accessed by calling with the class name ClassName.VariableName.
+
+
+-------------------------------------------------------------
+
+
+Permgen vs Metaspace :
+
+
+PermGen (Permanent Generation) is a special heap space separated from the main memory heap. The JVM keeps track of loaded class metadata in the PermGen. Additionally, the JVM stores all the static content in this memory section. This includes all the static methods, primitive variables, and references to the static objects. Furthermore, it contains data about bytecode, names, and JIT information.
+
+ 
+Simply put, Metaspace is a new memory space – starting from the Java 8 version; it has replaced the older PermGen memory space. The most significant difference is how it handles memory allocation. Specifically, this native memory region grows automatically by default. Additionally, the garbage collection process also gains some benefits from this change. The garbage collector now automatically triggers the cleaning of the dead classes once the class metadata usage reaches its maximum metaspace size.
+
+
+-------------------------------------------------------------
+
+
+Wrapper v/s primitives:
+
+
+Wrapper classes are used for converting primitive data types into objects. While working with collections in Java, we use generics for type safety like this: ArrayList<Integer> instead of this ArrayList<int>. The Integer is a wrapper class of int primitive type. We use wrapper class in this case because generics needs objects not primitives. 
+
+All the wrapper classes (Integer, Long, Byte, Double, Float, Short) are subclasses of the abstract class Number.
+
+Primitive	Wrapper class
+
+boolean		Boolean
+char		Character
+byte		Byte
+short		Short
+int		Integer
+long		Long
+float		Float
+double		Double
+
+
+Why we need wrapper class in Java?
+
+i>  One of the reason why we need wrapper is to use them in collections API. On the other hand the wrapper objects hold much more memory compared to primitive types. So use primitive types when you need efficiency and use wrapper class when you need objects instead of primitive types.
+
+ii>  Wrapper class objects allow null values while primitive data type doesn’t allow it.
+
+
+Snippet:
+
+public class Test {
+
+   public static void main(String args[]) {
+      Integer x = 5; // boxes int to an Integer object
+      x =  x + 10;   // unboxes the Integer to a int
+      System.out.println(x); 
+   }
+}
+
+
+The object of the wrapper class contains or wraps its respective primitive data type. Converting primitive data types into object is called boxing, and this is taken care by the compiler. Wrapper object will be converted back to a primitive data type, and this process is called unboxing.
+
+
+-------------------------------------------------------------
+
+
+

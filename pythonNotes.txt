@@ -114,11 +114,17 @@ print(a['k1'])									      //1
 print(a['k2'])									      //abcd
 print(a['k3'][2])								      //55.89
 print(a['k4']['key1'].upper())							      //BAZ
-a['k5']='Shyam'
+
+a['k5']='Shyam'									      // item addition
+
 print(a)		//{'k1': 1, 'k2': 'abcd', 'k3': ['abc', 44, 55.89], 'k4': {'key1': 'Baz', 'key2': 98}, 'k5': 'Shyam'}
 print(a.keys())         //dict_keys(['k1', 'k2', 'k3', 'k4', 'k5'])
 print(a.values())       //dict_values([1, 'abcd', ['abc', 44, 55.89], {'key1': 'Baz', 'key2': 98}, 'Shyam'])
 print(a.items()) //dict_items([('k1', 1), ('k2', 'abcd'), ('k3', ['abc', 44, 55.89]), ('k4', {'key1': 'Baz', 'key2': 98}), ('k5', 'Shyam')])
+
+
+a.pop('k5')
+print(a)		//{'k1': 1, 'k2': 'abcd', 'k3': ['abc', 44, 55.89], 'k4': {'key1': 'Baz', 'key2': 98}}
 
 
 Tuples:
@@ -130,6 +136,18 @@ print(a)				//(1, 'abcd', 78.9, 22, 'Thirty One', 1)
 print(type(a))				//<class 'tuple'>
 print(a.count(1))			//2
 print(a.index('Thirty One'))		//4
+
+
+No pop/add method available to maintain immutability.
+
+a = (1,2,3)
+a =a + (4,)
+
+print(a)
+
+O/P:
+(1, 2, 3, 4)
+
 
 
 Set:
@@ -145,6 +163,12 @@ mySet.add(1)
 print(mySet)			//{'abcd', 1, 2}
 myList={1,1,1,2,2,3,3}
 print(set(myList))		//{1, 2, 3}
+
+
+myset.remove(1)
+print(mySet)			//{'abcd', 2}
+
+Note: pop() will remove and return an arbitrary element from the set
 
 
 Booleans:
@@ -585,10 +609,10 @@ O/P:
 
 
 def myfunc(*args):
-    print(args)			// (1, 2, 3, 4, 5)
+    print(args)			// (1, 2, 3, 4, 5)  				(<class 'tuple'>)
 
 def myfunc1(**kwargs):
-    print(kwargs)		//{'k1': 1, 'k2': 2, 'k3': 3}
+    print(kwargs)		//{'k1': 1, 'k2': 2, 'k3': 3}			(<class 'dict'>)
 
 def myfunc2(*args,**kwargs):
     print('Value mapped for {} is {}'.format(args[0], kwargs['k2']))      // Value mapped for (1, 2, 3, 4, 5) is 2
@@ -847,6 +871,7 @@ NameError: name 'myBook' is not defined
 Command exited with non-zero status 1
 
 
+Also have a look at: https://www.geeksforgeeks.org/dunder-magic-methods-python/
 
 
 Modules & Packages:
@@ -1373,7 +1398,7 @@ o
 Counter:
 
 
-Counter is a dictionalry sub-class which helps count hashable objects.
+Counter is a dictionary sub-class which helps count hashable objects.
 
 
 from collections import Counter
@@ -1574,7 +1599,7 @@ from collections import deque
 d = deque('abcdef') 
 
 print(d)
-d.append('h')
+d.append('h')					// appendleft is used for adding to beginning
 d.pop()
 print(d)
 d.popleft()
@@ -1709,7 +1734,7 @@ print(hex(56))
 print(bin(56))
 print(abs(-2))
 print(pow(5,3))
-print(pow(5,3,2))
+print(pow(5,3,2))		// pow(5,3)%2
 
 
 O/P:
@@ -1927,7 +1952,7 @@ print(l)
 print("extend------------------------")
 
 l.remove([6,7,8])
-l.extend([6,7,8])
+l.extend([6,7,8])							//*
 print(l)
 
 print("insert remove------------------------")

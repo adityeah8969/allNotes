@@ -1,0 +1,67 @@
+# Association : Association is a semantically weak relationship (a semantic dependency) between otherwise unrelated objects. An association is a “using” relationship between two or more objects in which the objects have their own lifetime and there is no owner.
+
+As an example, imagine the relationship between a doctor and a patient. A doctor can be associated with multiple patients. At the same time, one patient can visit multiple doctors for treatment or consultation. Each of these objects has its own life cycle and there is no “owner” or parent.
+
+In UML an association relationship is represented by a single arrow. An association relationship can be represented as one-to-one, one-to-many, or many-to-many (also known as cardinality). Essentially, an association relationship between two or more objects denotes a path of communication (also called a link) between them so that one object can send a message to another.
+
+snippet:
+
+public class IDGBlogAccount
+   {
+       private IDGBlogEntry[] blogEntries;
+       //Other members of the IDGBlogAccount class
+   }
+public class IDGBlogEntry
+   {
+       Int32 blogId;
+       string caption;
+       string text;
+       //Other members of the IDGBlogEntry class
+   }
+
+
+# Aggregation : Aggregation is a specialized form of association between two or more objects in which each object has its own life cycle but there exists an ownership as well. Aggregation is a typical whole/part or parent/child relationship but it may or may not denote physical containment. An essential property of an aggregation relationship is that the whole or parent (i.e. the owner) can exist without the part or child and vice versa.
+
+As an example, an employee may belong to one or more departments in an organization. However, if an employee’s department is deleted, the employee object would not be destroyed but would live on. Note that the relationships between objects participating in an aggregation cannot be reciprocal—i.e., a department may “own” an employee, but the employee does not own the department.
+
+It is represented using a line with a hollow diamond (on the owners side).
+
+
+snippet:								// PREVIOUS SNIPPET ONLY
+
+public class IDGBlogAccount
+   {
+       private IDGBlogEntry[] blogEntries;
+       //Other members of the IDGBlogAccount class
+   }
+public class IDGBlogEntry
+   {
+       Int32 blogId;
+       string caption;
+       string text;
+       //Other members of the IDGBlogEntry class
+   }
+
+
+# Composition: Composition is a specialized form of aggregation. In composition, if the parent object is destroyed, then the child objects also cease to exist. Composition is actually a strong type of aggregation and is sometimes referred to as a “death” relationship. As an example, a house may be composed of one or more rooms. If the house is destroyed, then all of the rooms that are part of the house are also destroyed.
+
+It is represented using a line with a solid diamond (on the owners side).
+
+Snippet:
+
+public class House
+{
+   private Room room;
+   public House()
+   {
+       room = new Room();					// Declaration can be done elsewhere also but the child object must get
+   }								// deleted when parent objects gets deleted.
+}
+
+# Generalization vs Specialization
+
+Generalization is a mechanism for combining similar classes of objects into a single, more general class. Generalization identifies commonalities among a set of entities. The commonality may be of attributes, behavior, or both. In other words, a superclass has the most general attributes, operations, and relationships that may be shared with subclasses. A subclass may have more specialized attributes and operations.
+
+Specialization is the reverse process of Generalization means creating new sub-classes from an existing class.
+
+

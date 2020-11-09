@@ -1,0 +1,2312 @@
+What is Multithreading?
+Multithreading means that you have multiple threads of execution inside the same application. Usually a single CPU will share its execution time among multiple threads, switching between executing each of the threads for a given amount of time. It is also possible to have the threads of an application be executed by different CPUs.
+
+Why Multithreading?
+
+i>  One of the most common reasons is to be able to better utilize the resources in the computer. For instance, if one thread is waiting for the response to a request sent over the network, then another thread could use the CPU in the meantime to do something else.
+
+ii> If a computer contains multiple CPUs or the CPU contains multiple execution cores, then you need to use multiple threads for your application to be able to utilize all of the CPUs or CPU cores.
+
+iii>Another reason to use multithreading is to provide a better user experience. For instance, if you click on a button in a GUI and this results in a request being sent over the network, then it matters which thread performs this request. If you use the same thread that is also updating the GUI, then the user might experience the GUI "hanging" while the GUI thread is waiting for the response for the request. Instead, such a request could be performed by a backgroun thread so the GUI thread is free to respond to other user requests in the meantime.
+
+iv> Imagine a server that receives requests from clients, and only has one thread to execute these requests. If a client sends a requests that takes a long time to process, then all other client's requests would have to wait until that one request has finished. By having each client's request executed by its own thread then no single task can monopolize the CPU completely. 
+
+Cost of Multithreading:
+
+i>  Code executed by multiple threads accessing shared data need special attention. Thread interaction is far from always simple. Errors arising from incorrect thread synchronization can be very hard to detect, reproduce and fix.
+
+ii> When a CPU switches from executing one thread to executing another, the CPU needs to save the local data, program pointer etc. of the current thread, and load the local data, program pointer etc. of the next thread to execute. This switch is called a "context switch". The CPU switches from executing in the context of one thread to executing in the context of another.
+
+iii>A thread needs some resources from the computer in order to run. Besides CPU time a thread needs some memory to keep its local stack. It may also take up some resources inside the operating system needed to manage the thread. 
+
+------------------------------------------------------
+
+Blocking v/s Non-Blocking IO:
+
+
+To handle 50k requests per second, thread-per-connection models do not suffice. Nginx and Vert.x instead use non-blocking models to achieve such high levels of concurrency.
+
+Blocking IO:
+
+Input/output (IO) refers to interaction with devices such as a hard drive, network or database. Generally anything that is not happening in the CPU is called IO. When you call an API that requests data from IO, you will not get a response instantly, but with some delay. This delay can be very small for requesting a file on a hard drive, and much longer when requesting data from a network. This is because the data you request from IO devices has to travel longer to the caller.
+
+Calling an API that requests data from IO will cause the running thread to “block”, i.e. it is waiting until the requested data has returned to the caller. When a thread is blocked in Linux, it will be put in a Sleep state by the kernel until data has returned to the caller. Threads in sleep state immediately give up its access to the CPU, so to not waste CPU time. After IO is ready, the thread is taken out of the Sleep state and put in Runnable state. Threads in this state are eligible to be executed on the CPU again. The thread scheduler will put the thread on a CPU when one is available. The process of taking threads on and off the CPU is called context switching.
+
+
+Non-blocking IO:
+
+The main benefit of non-blocking IO is that we need less threads to handle the same amount of IO requests. When multiple calls to IO are done using blocking IO, for each call a new thread is created. A thread costs around 1MB, and there are some costs due to context switching. If you have a web server that handles 50k connections per second, a thread per connection can be quite expensive.
+
+When data has returned from IO, the caller will be notified that the data is ready. This is generally done with a callback function that has access to the returned data.
+
+There are other ways to express a non-blocking or asynchronous action with e.g. futures, promises or coroutines. These constructs are only syntactically different. Under the hood they are all based on a routine (function) that is called the moment data has returned from IO.
+
+Under the hood non-blocking IO makes use of optimized infinite event polling to check if the response has arrived. This optimized polling
+has a computational complexity of O(number_of_events_occurred).
+
+
+------------------------------------------------------
+
+
+Concurrency Models:
+
+Concurrent systems can be implemented using different concurrency models. A concurrency model specifies how threads in the the system collaborate to complete the tasks they are are given. Different concurrency models split the tasks in different ways, and the threads may communicate and collaborate in different ways. 
+
+
+Shared State vs. Separate State:
+
+Shared state means that the different threads in the system will share some state among them. By state is meant some data, typically one or more objects or similar. When threads share state, problems like race conditions and deadlock etc. may occur. It depends on how the threads use and access the shared objects, of course.
+
+Separate statemeans that the different threads in the system do not share any state among them. In case the different threads need to communicate, they do so either by exchanging immutable objects among them, or by sending copies of objects (or data) among them. Thus, when no two threads write to the same object (data / state), you can avoid most of the common concurrency problems. Using a separate state concurrency design can often make some parts of the code easier to implement and easier to reason about, since you know that only one thread will ever write to a given object. You don't have to worry about concurrent access to that object.
+
+
+
+i>  Parallel workers:
+
+In the parallel worker concurrency model a delegator distributes the incoming jobs to different workers. Each worker completes the full job. The workers work in parallel, running in different threads, and possibly on different CPUs.
+
+e.g If the parallel worker model was implemented in a car factory, each car would be produced by one worker. The worker would get the specification of the car to build, and would build everything from start to end.
+
+Advantages:
+
+# The advantage of the parallel worker concurrency model is that it is easy to understand. To increase the parallelization of the application you just add more workers.
+
+For instance, if you were implementing a web crawler, you could crawl a certain amount of pages (or modules) with different numbers of workers
+
+Disadvantages:
+
+#  The shared workers often need access to some kind of shared data, either in memory or in a shared database. 
+#  Part of the parallelization is lost when threads are waiting for each other when accessing the shared data structures.
+#  Shared state can be modified by other threads in the system. Therefore workers must re-read the state every time it needs it, to make sure 	 it is working on the latest copy. 
+#  Job Ordering is Nondeterministic
+
+
+ii> Assembly Line / Event Driven / Reactive System:
+
+The workers are organized like workers at an assembly line in a factory. Each worker only performs a part of the full job. When that part is finished the worker forwards the job to the next worker. Each worker is running in its own thread, and shares no state with other workers. This is also sometimes referred to as a shared nothing concurrency model. Systems using the assembly line concurrency model are usually designed to use non-blocking IO.
+
+
+In reality, the jobs may not flow along a single assembly line. Since most systems can perform more than one job, jobs flows from worker to worker depending on the job that needs to be done. In reality there could be multiple different virtual assembly lines going on at the same time. Jobs may even be forwarded to more than one worker for concurrent processing.
+
+
+Advantages:
+
+# The fact that workers share no state with other workers means that they can be implemented without having to think about all the concurrency problems that may arise from concurrent access to shared state. 
+
+# Since workers know that no other threads modify their data, the workers can be stateful. By stateful I mean that they can keep the data they need to operate in memory, only writing changes back the eventual external storage systems. A stateful worker can therefore often be faster than a stateless worker.
+
+# Singlethreaded stateful workers can cache data in memory as mentioned above. When data is cached in memory there is also a higher probability that this data is also cached in the CPU cache of the CPU executing the thread. This makes accessing cached data even faster.
+
+# It is possible to implement a concurrent system according to the assembly line concurrency model in a way that guarantees job ordering. 
+
+Disadvantages:
+
+# Execution of a job is often spread out over multiple workers, and thus over multiple classes in your project. Thus it becomes harder to see exactly what code is being executed for a given job.
+
+# It may also be harder to write the code. Worker code is sometimes written as callback handlers. Having code with many nested callback handlers may result in what some developer call callback hell. Callback hell simply means that it gets hard to track what the code is really doing across all the callbacks, as well as making sure that each callback has access to the data it needs.
+
+iii> Functional Parallelism: ?
+
+
+
+iv> Same threading:
+
+Same-threading is a concurrency model where a single-threaded systems are scaled out to N single-threaded systems. The result is N single-threaded systems running in parallel. In order to utilize all the cores in the CPU, a single-threaded system can be scaled out to utilize the whole computer (One Thread Per CPU).
+
+The difference between a same-threaded and a traditional multi-threaded system is that the threads in a same-threaded system do not share state. There is no shared memory which the threads access concurrently. No concurrent data structures etc. via which the threads share data. 
+
+
+Load Distribution:
+
+# If your system consists of multiple microservices, each microservice can run in single-threaded mode. 
+# If your system does actually need to share data, or at least a database, you may be able to shard the database.
+
+
+Thread Communication:
+
+If the threads in a same-threaded system need to communicate, they do so by message passing. If Thread A wants to send a message to Thread B, Thread A can do so by generating a message (a byte sequence). Thread B can then copy that message (byte sequence) and read it. By copying the message Thread B makes sure that Thread A cannot modify the message while Thread B reads it. Once copied, the message copy is inaccessible for Thread A.
+
+
+------------------------------------------------------
+
+Concurrency v/s Parallelism:
+
+Concurrency means that an application is making progress on more than one task at the same time. Basically the CPU is somehow dealing with multiple processes, may (multiple core) or may not (single core) be executing them simultaneously. For instance if there is 1 core available then it context switches between processes and deals with both the processes concurrently.
+
+Parallelism means that an application splits its tasks up into smaller subtasks which can be processed in parallel, for instance on multiple CPUs at the exact same time. Sub tasks do execute simultaneously. It literally physically run parts of tasks OR multiple tasks, at the same time using the multi-core infrastructure of CPU, by assigning one core to each task or sub-task.
+
+
+Difference:
+
+Concurrency is about dealing with lots of things at once. Parallelism is about doing lots of things at once.
+
+
+Example cases:
+
+Test Case						Concurrency			Parallelism
+
+
+Dealing (switching context) multiple tasks		True				False
+but no two tasks are executing at the same 
+time instant.
+
+Processes multiple sub-tasks of a task in 		False				True
+multi-core CPU at the same time.
+
+Processes all tasks one at a time, seque-
+ntially							False				False
+
+processes multiple tasks concurrently in 		True				True
+multi-core CPU at the same time
+
+
+
+------------------------------------------------------
+
+Creating and Starting Threads:
+
+
+Thread thread = new Thread();
+thread.start();
+
+There are two ways to specify what code the thread should execute,
+
+i> To create a subclass of Thread and override the run() method.
+ii>The second method is to pass an object that implements Runnable.
+
+
+# Way 1:
+
+  public class MyThread extends Thread {
+
+    public void run(){
+       System.out.println("MyThread running");
+    }
+  }
+
+  MyThread myThread = new MyThread();
+  myTread.start();
+
+
+
+# Way 2:
+
+  public class MyRunnable implements Runnable {
+
+    public void run(){
+       System.out.println("MyRunnable running");
+    }
+  }
+
+
+  Runnable runnable = new MyRunnable(); // or an anonymous class, or lambda...
+
+  Thread thread = new Thread(runnable);
+  thread.start();
+
+
+
+# Thread Names:
+
+When you create a Java thread you can give it a name. The name can help you distinguish different threads from each other. e.g,
+
+   MyRunnable runnable = new MyRunnable();
+   Thread thread = new Thread(runnable, "New Thread");
+
+   thread.start();
+   System.out.println(thread.getName());
+
+# Current Thread:
+
+The Thread.currentThread() method returns a reference to the Thread instance executing currentThread() . This way you can get access to the Java Thread object representing the thread executing a given block of code.
+
+String threadName = Thread.currentThread().getName();
+
+
+# Pause a thread:
+
+A thread can pause itself by calling the static method Thread.sleep() . The sleep() takes a number of milliseconds as parameter. The sleep() method will attempt to sleep that number of milliseconds before resuming execution. The Thread sleep() is not 100% precise, but it is pretty good still. 
+
+try {
+    Thread.sleep(10L * 1000L);
+} catch (InterruptedException e) {
+    e.printStackTrace();
+}
+
+
+# Stop a thread:
+
+The Java Thread class contains a stop() method, but it is deprecated. Instead of calling the stop() method you will have to implement your thread code so it can be stopped.
+
+public class MyRunnable implements Runnable {
+
+    private boolean doStop = false;
+
+    public synchronized void doStop() {
+        this.doStop = true;
+    }
+
+    private synchronized boolean keepRunning() {
+        return this.doStop == false;
+    }
+
+    @Override
+    public void run() {
+        while(keepRunning()) {
+            // keep doing what this thread should do.
+            System.out.println("Running");
+
+            try {
+                Thread.sleep(3L * 1000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+}
+
+
+------------------------------------------------------
+
+Race Conditions and Critical Sections:
+
+A race condition is a special condition that may occur inside a critical section. A critical section is a section of code that is executed by multiple threads and where the sequence of execution for the threads makes a difference in the result of the concurrent execution of the critical section.
+
+When the result of multiple threads executing a critical section may differ depending on the sequence in which the threads execute, the critical section is said to contain a race condition. The term race condition stems from the metaphor that the threads are racing through the critical section, and that the result of that race impacts the result of executing the critical section.
+
+Snippet:
+
+  public class Counter {
+
+     protected long count = 0;
+
+     public void add(long value){
+         this.count = this.count + value;
+     }
+  }
+
+
+Imagine if two threads, A and B, are executing the add method on the same instance of the Counter class. There is no way to know when the operating system switches between the two threads. The code in the add() method is not executed as a single atomic instruction by the Java virtual machine. Rather it is executed as a set of smaller instructions, similar to this:
+
+Read this.count from memory into register.
+Add value to register.
+Write register to memory.
+
+
+   Steps by JVM:
+
+   this.count = 0;
+
+   A:  Reads this.count into a register (0)
+   B:  Reads this.count into a register (0)
+   B:  Adds value 2 to register
+   B:  Writes register value (2) back to memory. this.count now equals 2
+   A:  Adds value 3 to register
+   A:  Writes register value (3) back to memory. this.count now equals 3
+
+
+The two threads wanted to add the values 2 and 3 to the counter. Thus the value should have been 5 after the two threads complete execution. However, since the execution of the two threads is interleaved, the result ends up being different.
+
+
+Preventing Race Conditions:
+
+To prevent race conditions from occurring you must make sure that the critical section is executed as an atomic instruction. That means that once a single thread is executing it, no other threads can execute it until the first thread has left the critical section.
+
+Snippet:
+
+public class TwoSums {
+    
+    private int sum1 = 0;
+    private int sum2 = 0;
+    
+    public void add(int val1, int val2){
+        synchronized(this){
+            this.sum1 += val1;   
+            this.sum2 += val2;
+        }
+    }
+}
+
+
+------------------------------------------------------
+
+Thread safety and shared resources:
+
+Code that is safe to call by multiple threads simultaneously is called thread safe. If a piece of code is thread safe, then it contains no race conditions.
+
+# Local variables:
+
+Local variables are stored in each thread's own stack. That means that local variables are never shared between threads. That also means that all local primitive variables are thread safe.
+
+# Local Object References:
+
+Local references to objects are a bit different. The reference itself is not shared. The object referenced however, is not stored in each threads's local stack. All objects are stored in the shared heap.
+
+If an object created locally never escapes the method it was created in, it is thread safe. In fact you can also pass it on to other methods and objects as long as none of these methods or objects make the passed object available to other threads.
+
+Snippet:
+
+public void someMethod(){
+
+  LocalObject localObject = new LocalObject();
+
+  localObject.callMethod();
+  method2(localObject);
+}
+
+public void method2(LocalObject localObject){
+  localObject.setValue("value");
+}
+
+The LocalObject instance in this example is not returned from the method, nor is it passed to any other objects that are accessible from outside the someMethod() method. Each thread executing the someMethod() method will create its own LocalObject instance and assign it to the localObject reference. Therefore the use of the LocalObject here is thread safe.
+
+In fact, the whole method someMethod() is thread safe. Even if the LocalObject instance is passed as parameter to other methods in the same class, or in other classes, the use of it is thread safe.
+
+The only exception is of course, if one of the methods called with the LocalObject as parameter, stores the LocalObject instance in a way that allows access to it from other threads.
+
+
+# Object Member Variables:
+
+Object member variables (fields) are stored on the heap along with the object. Therefore, if two threads call a method on the same object instance and this method updates object member variables, the method is not thread safe. 
+
+Snippet:
+
+public class NotThreadSafe{
+    StringBuilder builder = new StringBuilder();
+
+    public add(String text){
+        this.builder.append(text);
+    }
+}
+
+
+NotThreadSafe sharedInstance = new NotThreadSafe();
+
+new Thread(new MyRunnable(sharedInstance)).start();
+new Thread(new MyRunnable(sharedInstance)).start();
+
+public class MyRunnable implements Runnable{
+  NotThreadSafe instance = null;
+
+  public MyRunnable(NotThreadSafe instance){
+    this.instance = instance;
+  }
+
+  public void run(){
+    this.instance.add("some text");
+  }
+}
+
+
+Note:
+
+Even if the use of an object is thread safe, if that object points to a shared resource like a file or database, your application as a whole may not be thread safe. For instance, if thread 1 and thread 2 each create their own database connections, connection 1 and connection 2, the use of each connection itself is thread safe. But the use of the database the connections point to may not be thread safe. For example, if both threads execute code like this:
+
+check if record X exists
+if not, insert record X
+
+If two threads execute this simultaneously, and the record X they are checking for happens to be the same record, there is a risk that both of the threads end up inserting it.
+
+
+------------------------------------------------------
+
+Thread safety while read:
+
+Race conditions occur only if multiple threads are accessing the same resource, and one or more of the threads write to the resource. If multiple threads read the same resource race conditions do not occur.
+
+We can make sure that objects shared between threads are never updated by any of the threads by making the shared objects immutable, and thereby thread safe. 
+
+public class ImmutableValue{
+
+  private int value = 0;
+
+  public ImmutableValue(int value){
+    this.value = value;
+  }
+
+  public int getValue(){
+    return this.value;
+  }
+}
+
+
+Notice how the value for the ImmutableValue instance is passed in the constructor. Notice also how there is no setter method. Once an ImmutableValue instance is created you cannot change its value. It is immutable. You can read it however, using the getValue() method.
+
+
+------------------------------------------------------
+
+# Java Memory Model:
+
+The Java memory model used internally in the JVM divides memory between thread stacks and the heap.
+
+Stack: 
+
+Each thread running in the Java virtual machine has its own thread stack. The thread stack contains information about what methods the thread has called to reach the current point of execution. As the thread executes its code, the call stack changes.
+
+The thread stack also contains all local variables for each method being executed (all methods on the call stack). A thread can only access it's own thread stack. Local variables created by a thread are invisible to all other threads than the thread who created it. Even if two threads are executing the exact same code, the two threads will still create the local variables of that code in each their own thread stack. Thus, each thread has its own version of each local variable.
+
+All local variables of primitive types ( boolean, byte, short, char, int, long, float, double) are fully stored on the thread stack and are thus not visible to other threads. One thread may pass a copy of a pritimive variable to another thread, but it cannot share the primitive local variable itself.
+
+
+Heap:
+
+The heap contains all objects created in your Java application, regardless of what thread created the object. This includes the object versions of the primitive types (e.g. Byte, Integer, Long etc.). It does not matter if an object was created and assigned to a local variable, or created as a member variable of another object, the object is still stored on the heap.
+
+
+Important Points:
+
+i>   A local variable may be of a primitive type, in which case it is totally kept on the thread stack.
+ii>  A local variable may also be a reference to an object. In that case the reference (the local variable) is stored on the thread stack,     	    but the object itself if stored on the heap.
+iii> An object may contain methods and these methods may contain local variables. These local variables are also stored on the thread stack,  	   even if the object the method belongs to is stored on the heap.
+iv>  An object's member variables are stored on the heap along with the object itself. That is true both when the member variable is of
+     a primitive type, and if it is a reference to an object.
+v>   Static class variables are also stored on the heap along with the class definition.
+
+
+# Hardware Memory Architecture:
+
+A modern computer often has 2 or more CPUs in it. Some of these CPUs may have multiple cores too. The point is, that on a modern computer with 2 or more CPUs it is possible to have more than one thread running simultaneously. Each CPU is capable of running one thread at any given time. That means that if your Java application is multithreaded, one thread per CPU may be running simultaneously (concurrently) inside your Java application.
+
+Each CPU contains a set of registers which are essentially in-CPU memory. The CPU can perform operations much faster on these registers than it can perform on variables in main memory. That is because the CPU can access these registers much faster than it can access main memory.
+
+Each CPU may also have a CPU cache memory layer. In fact, most modern CPUs have a cache memory layer of some size. The CPU can access its cache memory much faster than main memory, but typically not as fast as it can access its internal registers. So, the CPU cache memory is somewhere in between the speed of the internal registers and main memory. Some CPUs may have multiple cache layers (Level 1 and Level 2), but this is not so important to know to understand how the Java memory model interacts with memory. What matters is to know that CPUs can have a cache memory layer of some sort.
+
+A computer also contains a main memory area (RAM). All CPUs can access the main memory. The main memory area is typically much bigger than the cache memories of the CPUs.
+
+Typically, when a CPU needs to access main memory it will read part of main memory into its CPU cache. It may even read part of the cache into its internal registers and then perform operations on it. When the CPU needs to write the result back to main memory it will flush the value from its internal register to the cache memory, and at some point flush the value back to main memory.
+
+
+# Bridging The Gap Between The Java Memory Model And The Hardware Memory Architecture:
+
+The Java memory model and the hardware memory architecture are different. The hardware memory architecture does not distinguish between thread stacks and heap. On the hardware, both the thread stack and the heap are located in main memory. Parts of the thread stacks and heap may sometimes be present in CPU caches and in internal CPU registers.
+
+When objects and variables can be stored in various different memory areas in the computer, certain problems may occur. The two main problems are:
+
+
+i> Visibility of Shared Objects:
+
+Imagine that the shared object is initially stored in main memory. A thread running on CPU one then reads the shared object into its CPU cache. There it makes a change to the shared object. As long as the CPU cache has not been flushed back to main memory, the changed version of the shared object is not visible to threads running on other CPUs. 
+
+To solve this problem you can use Java's volatile keyword. The volatile keyword can make sure that a given variable is read directly from main memory, and always written back to main memory when updated.
+
+ii> Race Conditions:
+
+Imagine if thread A reads the variable count of a shared object into its CPU cache. Imagine too, that thread B does the same, but into a different CPU cache. Now thread A adds one to count, and thread B does the same. Now var1 has been incremented two times, once in each CPU cache.
+
+However, the two increments have been carried out concurrently without proper synchronization. Regardless of which of thread A and B that writes its updated version of count back to main memory, the updated value will only be 1 higher than the original value, despite the two increments.
+
+
+To solve this problem you can use a Java synchronized block. A synchronized block guarantees that only one thread can enter a given critical section of the code at any given time. Synchronized blocks also guarantee that all variables accessed inside the synchronized block will be read in from main memory, and when the thread exits the synchronized block, all updated variables will be flushed back to main memory again, regardless of whether the variable is declared volatile or not.
+
+
+Volatile v/s Synchronised:
+
+Where volatile only synchronizes the value of one variable between the thread memory and the "main" memory, synchronized synchronizes the value of all variables between the thread memory and the "main" memory and locks and releases a monitor to control the ownership between multiple threads.
+
+
+------------------------------------------------------
+
+
+Java Happens Before Guarantee:
+
+
+The Java happens before guarantee is a set of rules that govern how the Java VM and CPU is allowed to reorder instructions for performance gains. The happens before guarantee makes it possible for threads to rely on when a variable value is synchronized to or from main memory, and which other variables have been synchronized at the same time. The Java happens before guarantee are centered around access to volatile variables and variables accessed from within synchronized blocks.
+
+
+# Why instruction Reordering?
+
+Modern CPUs have the ability to execute instructions in parallel if the instructions do not depend on each other.  For instance, the following two instructions do not depend on each other, and can therefore be executed in parallel:
+
+e.g,
+
+a = b + c
+
+d = e + f
+
+Imagine the two instructions above were part of a larger set of instructions, like the following:
+
+a = b + c
+d = a + e
+
+l = m + n
+y = x + z
+
+The instructions could be reordered like below, Then the CPU can execute at least the first 3 instructions in parallel, and as soon as the first instructions is finished, it can start executing the 4th instruction.
+
+a = b + c				
+l = m + n
+y = x + z
+
+d = a + e
+
+As you can see, reordering instructions can increase parallel execution of instructions in the CPU. Increased parallelization means increased performance.
+
+
+# Instruction Reordering Problems in Multi CPU Computers
+
+
+Imagine two threads that collaborate to draw frames on the screen as fast as they can. One frame generates the frame, and the other thread draws the frame on the screen.
+
+The two threads need to exchange the frames via some communication mechanism. In the following code example I have created an example of such a communication mechanism - a Java class called FrameExchanger.
+
+
+public class FrameExchanger  {
+
+    private long framesStoredCount = 0:
+    private long framesTakenCount  = 0;
+
+    private boolean hasNewFrame = false;
+
+    private Frame frame = null;
+
+        
+    public void storeFrame(Frame frame) {				// called by Frame producing thread
+        this.frame = frame;
+        this.framesStoredCount++;
+        this.hasNewFrame = true;
+    }
+
+        
+    public Frame takeFrame() {						// called by Frame drawing thread
+        while( !hasNewFrame) {
+            //busy wait until new frame arrives
+        }
+
+        Frame newFrame = this.frame;
+        this.framesTakenCount++;
+        this.hasNewFrame = false;
+        return newFrame;
+    }
+
+}
+
+
+Though it appears if the lines getting executed inside storFrame func can be interchanged but this may lead to incosistencies, e.g,
+
+public void storeFrame(Frame frame) {
+        this.hasNewFrame = true;
+        this.framesStoredCount++;
+        this.frame = frame;
+    }
+
+In the above snippet even if 'hasNewFrame' has been updated to true but there are chances that 'takeFrame' func (after the 'hasNewFrame' boolean becoming true) still processes the old frame.
+
+
+# The Java volatile Visibility Guarantee:
+
+
+Write Visibility:
+
+When you write to a Java volatile variable the value is guaranteed to be written directly to main memory. Additionally, all variables visible to the thread writing to the volatile variable will also get synchronized to main memory.
+
+this.nonVolatileVarA = 34;
+this.nonVolatileVarB = new String("Text");
+this.volatileVarC    = 300;
+
+Read Visibility:
+
+When you read the value of a Java volatile the value is guaranteed to be read directly from memory. Furthermore, all the variables visible to the thread reading the volatile variable will also have their values refreshed from main memory.
+
+c = other.volatileVarC;
+b = other.nonVolatileB;
+a = other.nonVolatileA;
+
+
+# The Java Volatile Happens Before Guarantee:
+
+The Java volatile happens before guarantee sets some restrictions on instruction reordering around volatile variables. To illustrate why this guarantee is necessary, let us modify the FrameExchanger class from earlier in this tutorial to have the hasNewFrame variable be declared volatile:
+
+public class FrameExchanger  {
+
+...
+
+    private long framesStoredCount = 0:
+    private long framesTakenCount  = 0;
+
+    private volatile boolean hasNewFrame = false;			// declared volatile
+
+    private Frame frame = null;
+
+...
+
+}
+
+
+Now, when the hasNewFrame variable is set to true, the frame and frameStoredCount will also be synchronized to main memory. Additionally, every time the drawing thread reads the hasNewFrame variable in the while-loop inside the takeFrame() method, the frame and framesStoredCount will also be refreshed from main memory. Even framesTakenCount will get updated from main memory at this point.
+
+
+# Happens Before Guarantee for Writes to volatile Variables:
+
+A write to a non-volatile or volatile variable that happens before a write to a volatile variable is guaranteed to happen before the write to that volatile variable.
+
+
+In the case of the storeFrame() method that means that the two first write instructions cannot be reordered to happen after the last write to hasNewFrame, since hasNewFrame is a volatile variable.
+
+    public void storeFrame(Frame frame) {
+        this.frame = frame;
+        this.framesStoredCount++;
+        this.hasNewFrame = true;  // hasNewFrame is volatile
+    }
+
+
+# Happens Before Guarantee for Reads of volatile Variables:
+
+
+A read of a volatile variable will happen before any subsequent reads of volatile and non-volatile variables.
+
+
+int a = this.volatileVarA;
+int b = this.nonVolatileVarB;
+int c = this.nonVolatileVarC;
+
+The last two instructions could be freely reordered among themselves, without violating the happens before guarantee of the volatile read in the first instruction. Thus, this reordering is allowed:
+
+int a = this.volatileVarA;
+int c = this.nonVolatileVarC;
+int b = this.nonVolatileVarB;
+
+
+With regards to the takeFrame() method, the first read of a volatile variable is the read of the hasNewFrame field inside the while-loop. That means, that no read-instructions can be reordered to be located above that. In this particular case, moving any of the other read-operations above the while-loop would also break the semantics of the code, so those reorderings would not be allowed anyways.
+
+# The Java Synchronized Visibility Guarantee
+
+Java Synchronized Entry Visibility Guarantee: When a thread enters a synchronized block, all variables visible to the thread are refreshed 						      from main memory.
+
+
+Java Synchronized Exit Visibility Guarantee: When a thread exits a synchronized block, all variables visible to the thread are written back to 						     main memory.
+
+
+public class ValueExchanger {
+    private int valA;
+    private int valB;
+    private int valC;
+
+    public void set(Values v) {
+        this.valA = v.valA;
+        this.valB = v.valB;
+
+        synchronized(this) {
+            this.valC = v.valC;
+        }
+    }
+
+    public void get(Values v) {
+        synchronized(this) {
+            v.valC = this.valC;
+        }
+        v.valB = this.valB;
+        v.valA = this.valA;
+    }
+}
+
+In the set() method the synchronized block at the end of the method will force all the variables to be synchronized to main memory after being updated. This flushing of the variable values to main memory happens when the thread exits the synchronized block. That is the reason it has been placed last in the method - to guarantee that all updated variable values are flushed to main memory. The synchronized block at the end of the method will guarantee that all of the changed variables this.valA, this.valB and this.valC will be written back to (flushed) to main memory when the thread calling set() exits the synchronized blocks.
+
+
+
+In the get() method the synchronized block is placed at the beginning of the method. When the thread calling get() enters the synchronized block, all variables are re-read in from main memory. That is why this synchronized block is placed at the beginning of the method - to guarantee that all variables are refreshed from main memory before they are read. The synchronized block at the beginning of the method will guarantee that all of the variables this.valC, this.valB and this.valA are refreshed (read in) from main memory. The following reads of these variables will then use the latest value.
+
+
+------------------------------------------------------
+
+Java Synchronized Blocks
+
+Synchronized blocks in Java are marked with the synchronized keyword. A synchronized block in Java is synchronized on some object. All synchronized blocks synchronized on the same object can only have one thread executing inside them at the same time. All other threads attempting to enter the synchronized block are blocked until the thread inside the synchronized block exits the block.
+
+The synchronized keyword can be used to mark four different types of blocks:
+
+i>  Instance methods
+ii> Static methods
+iii>Code blocks inside instance methods
+iv> Code blocks inside static methods
+
+
+Synchronized Instance Methods:
+
+
+public class MyCounter {
+
+  private int count = 0;
+
+  public synchronized void add(int value){
+      this.count += value;
+  }
+
+}
+
+Only one thread can execute inside either of the two synchronized methods. e.g,
+
+
+public class MyCounter {
+
+  private int count = 0;
+
+  public synchronized void add(int value){
+      this.count += value;
+  }
+  public synchronized void subtract(int value){
+      this.count -= value;
+  }
+
+}
+
+In the above example if Thread A is executing add() then Thread B can neither execute add() or subtract().
+
+
+Synchronized Static Methods:
+
+public static MyStaticCounter{
+
+  private static int count = 0;
+
+  public static synchronized void add(int value){
+      count += value;
+  }
+
+
+}
+
+
+Synchronized Blocks in Instance Methods:
+
+  public void add(int value){
+
+    synchronized(this){
+       this.count += value;   
+    }
+  }
+
+
+Synchronized Block Limitations and Alternatives:
+
+i> What if two threads just wanted to read a shared value, and not update it? That might be safe to allow. As alternative to a synchronized   	 block you could guard the code with a Read / Write Lock which as more advanced locking semantics than a synchronized block. Java actually 	comes with a built in ReadWriteLock class you can use.
+
+ii> What if you want to allow N threads to enter a synchronized block, and not just one? You could use a Semaphore to achieve that behaviour. 	  Java actually comes with a built-in Java Semaphore class you can use.
+
+iii> Synchronized blocks do not guarantee in what order threads waiting to enter them are granted access to the synchronized block.
+
+iv> There is a small performance overhead associated with entering and exiting a synchronized block in Java.
+
+v>  If you have the same Java application running on multiple Java VMs - in a cluster - then it is possible for one thread within each Java VM 	   to enter that synchronized block at the same time.
+
+
+Synchronized Block Reentrance:
+
+Once a thread has entered a synchronized block the thread is said to "hold the lock" on the monitoring object the synchronized block is synchronized on. If the thread calls another method which calls back to the first method with the synchronized block inside, the thread holding the lock can reenter the synchronized block. It is not blocked just because a thread (itself) is holding the lock. 
+
+public class MyClass {
+    
+  List<String> elements = new ArrayList<String>();
+    
+  public void count() {
+    if(elements.size() == 0) {
+        return 0;
+    }
+    synchronized(this) {
+       elements.remove();
+       return 1 + count();  
+    }
+  }
+    
+}
+
+
+The synchronized block inside the count() method calls the count() method recursively. Thus, the thread calling count() may eventually enter the same synchronized block multiple times. This is allowed. 
+
+
+------------------------------------------------------
+
+Java Volatile Keyword
+
+The Java volatile keyword is used to mark a Java variable as "being stored in main memory". More precisely that means, that every read of a volatile variable will be read from the computer's main memory, and not from the CPU cache, and that every write to a volatile variable will be written to main memory, and not just to the CPU cache.
+
+
+In a multithreaded application where the threads operate on non-volatile variables, each thread may copy variables from main memory into a CPU cache while working on them, for performance reasons. If your computer contains more than one CPU, each thread may run on a different CPU. That means, that each thread may copy the variables into the CPU cache of different CPUs. With non-volatile variables there are no guarantees about when the Java Virtual Machine (JVM) reads data from main memory into CPU caches, or writes data from CPU caches to main memory. 
+
+
+# The Java volatile Visibility Guarantee:
+
+By declaring the variable volatile all writes to the variable will be written back to main memory immediately. Also, all reads of the  variable will be read directly from main memory.
+
+# The Java volatile Happens-Before Guarantee:
+
+i> Reads from and writes to other variables cannot be reordered to occur after a write to a volatile variable, if the reads / writes originally occurred before the write to the volatile variable.
+
+ii> Reads from and writes to other variables cannot be reordered to occur before a read of a volatile variable, if the reads / writes originally occurred after the read of the volatile variable.
+
+# Limitations
+
+i> As soon as a thread needs to first read the value of a volatile variable, and based on that value generate a new value for the shared volatile variable, a volatile variable is no longer enough to guarantee correct visibility. The short time gap in between the reading of the volatile variable and the writing of its new value, creates an race condition where multiple threads might read the same value of the volatile variable, generate a new value for the variable, and when writing the value back to main memory - overwrite each other's values.
+
+The situation where multiple threads are incrementing the same variable is exactly such a situation where a volatile variable is not enough. 
+
+ii> Reading from and writing to main memory is more expensive than accessing the CPU cache. 
+
+
+------------------------------------------------------
+
+
+ThreadLocal:
+
+The Java ThreadLocal class enables you to create variables that can only be read and written by the same thread. Thus, even if two threads are executing the same code, and the code has a reference to the same ThreadLocal variable, the two threads cannot see each other's ThreadLocal variables. Thus, the Java ThreadLocal class provides a simple way to make code thread safe.
+
+
+private ThreadLocal threadLocal = new ThreadLocal();	// Initialization
+
+threadLocal.set("A thread local value");		// Set the value			(By default it's null)
+
+String threadLocalValue = (String) threadLocal.get();	// Get the value
+
+threadLocal.remove();					// Remove the set value 
+
+
+
+private ThreadLocal<String> myThreadLocal = new ThreadLocal<String>(); // Initialization with a specific type
+
+
+# Initial ThreadLocal Value:
+
+Way to specify an initial value for a Java ThreadLocal variable is to create a subclass of ThreadLocal which overrides its initialValue() method. The easiest way to create a subclass of ThreadLocal is to simply create an anonymous subclass, right where you create the ThreadLocal variable.
+
+private ThreadLocal myThreadLocal = new ThreadLocal<String>() {
+    @Override protected String initialValue() {
+        return String.valueOf(System.currentTimeMillis());
+    }
+};  
+
+# Lazy Setting of ThreadLocal Value:
+
+public class MyDateFormatter {
+
+    private ThreadLocal<SimpleDateFormat> simpleDateFormatThreadLocal = new ThreadLocal<>();
+
+    public String format(Date date) {
+        SimpleDateFormat simpleDateFormat = getThreadLocalSimpleDateFormat();
+        return simpleDateFormat.format(date);
+    }
+    
+    
+    private SimpleDateFormat getThreadLocalSimpleDateFormat() {
+        SimpleDateFormat simpleDateFormat = simpleDateFormatThreadLocal.get();
+        if(simpleDateFormat == null) {
+            simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            simpleDateFormatThreadLocal.set(simpleDateFormat);
+        }
+        return simpleDateFormat;
+    }
+}
+
+
+Notice how the format() method calls the getThreadLocalSimpleDateFormat() method to obtain a Java SimpleDatFormat instance. If a SimpleDateFormat instance has not been set in the ThreadLocal, a new SimpleDateFormat is created and set in the ThreadLocal variable. Once a thread has set its own SimpleDateFormat in the ThreadLocal variable, the same SimpleDateFormat object is used for that thread going forward. But only for that thread. Each thread creates its own SimpleDateFormat instance, as they cannot see each others instances set on the ThreadLocal variable.
+
+The SimpleDateFormat class is not thread safe, so multiple threads cannot use it at the same time. To solve this problem, the MyDateFormatter class above creates a SimpleDateFormat per thread, so each thread calling the format() method will use its own SimpleDateFormat instance.
+
+# ThreadLocal Example:
+
+public class ThreadLocalExample {
+
+    public static void main(String[] args) {
+        MyRunnable sharedRunnableInstance = new MyRunnable();
+
+        Thread thread1 = new Thread(sharedRunnableInstance);
+        Thread thread2 = new Thread(sharedRunnableInstance);
+
+        thread1.start();
+        thread2.start();
+
+        thread1.join(); //wait for thread 1 to terminate
+        thread2.join(); //wait for thread 2 to terminate
+    }
+
+}
+
+
+public class MyRunnable implements Runnable {
+
+    private ThreadLocal<Integer> threadLocal = new ThreadLocal<Integer>();
+
+    @Override
+    public void run() {
+        threadLocal.set( (int) (Math.random() * 100D) );
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+        }
+
+        System.out.println(threadLocal.get());
+    }
+}
+
+
+This example creates a single MyRunnable instance which is passed to two different threads. Both threads execute the run() method, and thus sets different values on the ThreadLocal instance. If the access to the set() call had been synchronized, and it had not been a ThreadLocal object, the second thread would have overridden the value set by the first thread.
+
+However, since it is a ThreadLocal object then the two threads cannot see each other's values. Thus, they set and get different values.
+
+
+# InheritableThreadLocal:
+
+The InheritableThreadLocal class is a subclass of ThreadLocal. Instead of each thread having its own value inside a ThreadLocal, the InheritableThreadLocal grants access to values to a thread and all child threads created by that thread.
+
+
+public class InheritableThreadLocalBasicExample {
+
+    public static void main(String[] args) {
+
+        ThreadLocal<String> threadLocal = new ThreadLocal<>();
+        InheritableThreadLocal<String> inheritableThreadLocal =
+                new InheritableThreadLocal<>();
+
+        Thread thread1 = new Thread(() -> {
+            System.out.println("===== Thread 1 =====");
+            threadLocal.set("Thread 1 - ThreadLocal");
+            inheritableThreadLocal.set("Thread 1 - InheritableThreadLocal");
+
+            System.out.println(threadLocal.get());
+            System.out.println(inheritableThreadLocal.get());
+
+            Thread childThread = new Thread( () -> {
+                System.out.println("===== ChildThread =====");
+                System.out.println(threadLocal.get());
+                System.out.println(inheritableThreadLocal.get());
+            });
+            childThread.start();
+        });
+
+        thread1.start();
+
+        Thread thread2 = new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            System.out.println("===== Thread2 =====");
+            System.out.println(threadLocal.get());
+            System.out.println(inheritableThreadLocal.get());
+        });
+        thread2.start();
+    }
+}
+
+
+O/P:
+
+===== Thread 1 =====
+Thread 1 - ThreadLocal
+Thread 1 - InheritableThreadLocal
+===== ChildThread =====
+null
+Thread 1 - InheritableThreadLocal
+===== Thread2 =====
+null
+null
+
+
+------------------------------------------------------
+
+
+Thread Signalling:
+
+The purpose of thread signalling is to enable threads to send signals to each other. Additionally, thread signalling enables threads to wait for signals from other threads. For instance, a thread B might wait for a signal from thread A indicating that data is ready to be processed.
+
+A simple way for threads to send signals to each other is by setting the signal values in some shared object variable. But here we have to do busy waiting on the shared object member/variable which is not a very efficient utilization of the CPU.
+
+Java has a builtin wait mechanism that enable threads to become inactive while waiting for signals. The class java.lang.Object defines three methods, wait(), notify(), and notifyAll(), to facilitate this.
+
+A thread that calls wait() on any object becomes inactive until another thread calls notify() on that object. In order to call either wait() or notify the calling thread must first obtain the lock on that object. In other words, the calling thread must call wait() or notify() from inside a synchronized block. Here is a modified version of MySignal called MyWaitNotify that uses wait() and notify().
+
+public class MonitorObject{
+}
+
+public class MyWaitNotify{
+
+  MonitorObject myMonitorObject = new MonitorObject();
+
+  public void doWait(){
+    synchronized(myMonitorObject){
+      try{
+        myMonitorObject.wait();
+      } catch(InterruptedException e){...}
+    }
+  }
+
+  public void doNotify(){
+    synchronized(myMonitorObject){
+      myMonitorObject.notify();
+    }
+  }
+}
+
+
+The waiting thread would call doWait(), and the notifying thread would call doNotify(). When a thread calls notify() on an object, one of the threads waiting on that object are awakened and allowed to execute. There is also a notifyAll() method that will wake all threads waiting on a given object.
+
+As you can see both the waiting and notifying thread calls wait() and notify() from within a synchronized block. This is mandatory! A thread cannot call wait(), notify() or notifyAll() without holding the lock on the object the method is called on. If it does, an IllegalMonitorStateException is thrown.
+
+Once a thread calls wait() it releases the lock it holds on the monitor object. This allows other threads to call wait() or notify() too, since these methods must be called from inside a synchronized block.
+
+Once a thread is awakened it cannot exit the wait() call until the thread calling notify() has left its synchronized block. In other words: The awakened thread must reobtain the lock on the monitor object before it can exit the wait() call, because the wait call is nested inside a synchronized block. If multiple threads are awakened using notifyAll() only one awakened thread at a time can exit the wait() method, since each thread must obtain the lock on the monitor object in turn before exiting wait().
+
+
+# Missed Signals:
+
+The methods notify() and notifyAll() do not save the method calls to them in case no threads are waiting when they are called. The notify signal is then just lost. Therefore, if a thread calls notify() before the thread to signal has called wait(), the signal will be missed by the waiting thread.
+
+To avoid losing signals they should be stored inside the signal class. In the MyWaitNotify example the notify signal should be stored in a member variable inside the MyWaitNotify instance. 
+
+public class MyWaitNotify2{
+
+  MonitorObject myMonitorObject = new MonitorObject();
+  boolean wasSignalled = false;
+
+  public void doWait(){
+    synchronized(myMonitorObject){
+      if(!wasSignalled){
+        try{
+          myMonitorObject.wait();
+         } catch(InterruptedException e){...}
+      }
+      //clear signal and continue running.
+      wasSignalled = false;
+    }
+  }
+
+  public void doNotify(){
+    synchronized(myMonitorObject){
+      wasSignalled = true;
+      myMonitorObject.notify();
+    }
+  }
+}
+
+Notice how the doNotify() method now sets the wasSignalled variable to true before calling notify(). Also, notice how the doWait() method now checks the wasSignalled variable before calling wait(). In fact it only calls wait() if no signal was received in between the previous doWait() call and this.
+
+# Spurious Wakeups:
+
+For inexplicable reasons it is possible for threads to wake up even if notify() and notifyAll() has not been called. This is known as spurious wakeups. 
+
+To guard against spurious wakeups the signal member variable is checked inside a while loop instead of inside an if-statement. Such a while loop is also called a spin lock. The thread awakened spins around until the condition in the spin lock (while loop) becomes false.
+
+public class MyWaitNotify3{
+
+  MonitorObject myMonitorObject = new MonitorObject();
+  boolean wasSignalled = false;
+
+  public void doWait(){
+    synchronized(myMonitorObject){
+      while(!wasSignalled){
+        try{
+          myMonitorObject.wait();
+         } catch(InterruptedException e){...}
+      }
+      //clear signal and continue running.
+      wasSignalled = false;
+    }
+  }
+
+  public void doNotify(){
+    synchronized(myMonitorObject){
+      wasSignalled = true;
+      myMonitorObject.notify();
+    }
+  }
+}
+
+Notice how the wait() call is now nested inside a while loop instead of an if-statement. If the waiting thread wakes up without having received a signal, the wasSignalled member will still be false, and the while loop will execute once more, causing the awakened thread to go back to waiting.
+
+# Multiple Threads Waiting for the Same Signals
+
+The while loop is also a nice solution if you have multiple threads waiting, which are all awakened using notifyAll(), but only one of them should be allowed to continue. Only one thread at a time will be able to obtain the lock on the monitor object, meaning only one thread can exit the wait() call and clear the wasSignalled flag. Once this thread then exits the synchronized block in the doWait() method, the other threads can exit the wait() call and check the wasSignalled member variable inside the while loop. However, this flag was cleared by the first thread waking up, so the rest of the awakened threads go back to waiting, until the next signal arrives.
+
+
+# wait() on constant String's or global objects:
+
+The problem with calling wait() and notify() on the empty string, or any other constant string is, that the JVM/Compiler internally translates constant strings into the same object. That means, that even if you have two different MyWaitNotify instances, they both reference the same empty string instance. This also means that threads calling doWait() on the first MyWaitNotify instance risk being awakened by doNotify() calls on the second MyWaitNotify instance.
+
+
+------------------------------------------------------
+
+Thread Deadlock:
+
+A deadlock is when two or more threads are blocked waiting to obtain locks that some of the other threads in the deadlock are holding. Deadlock can occur when multiple threads need the same locks, at the same time, but obtain them in different order.
+
+For instance, if thread 1 locks A, and tries to lock B, and thread 2 has already locked B, and tries to lock A, a deadlock arises. 
+
+public class TreeNode {
+ 
+  TreeNode parent   = null;  
+  List     children = new ArrayList();
+
+  public synchronized void addChild(TreeNode child){
+    if(!this.children.contains(child)) {
+      this.children.add(child);
+      child.setParentOnly(this);
+    }
+  }
+  
+  public synchronized void addChildOnly(TreeNode child){
+    if(!this.children.contains(child){
+      this.children.add(child);
+    }
+  }
+  
+  public synchronized void setParent(TreeNode parent){
+    this.parent = parent;
+    parent.addChildOnly(this);
+  }
+
+  public synchronized void setParentOnly(TreeNode parent){
+    this.parent = parent;
+  }
+}
+
+
+If a thread (1) calls the parent.addChild(child) method at the same time as another thread (2) calls the child.setParent(parent) method, on the same parent and child instances, a deadlock can occur. 
+
+Thread 1: parent.addChild(child); //locks parent
+          --> child.setParentOnly(parent);
+
+Thread 2: child.setParent(parent); //locks child
+          --> parent.addChildOnly()
+
+
+First thread 1 calls parent.addChild(child). Since addChild() is synchronized thread 1 effectively locks the parent object for access from other treads.
+
+Then thread 2 calls child.setParent(parent). Since setParent() is synchronized thread 2 effectively locks the child object for acces from other threads.
+
+Now both child and parent objects are locked by two different threads. Next thread 1 tries to call child.setParentOnly() method, but the child object is locked by thread 2, so the method call just blocks. Thread 2 also tries to call parent.addChildOnly() but the parent object is locked by thread 1, causing thread 2 to block on that method call. Now both threads are blocked waiting to obtain locks the other thread holds.
+
+Note: The threads really need to take the locks *at the same time*.
+
+# Complicated deadlocks:
+
+Deadlock can also include more than two threads,
+
+Thread 1  locks A, waits for B
+Thread 2  locks B, waits for C
+Thread 3  locks C, waits for D
+Thread 4  locks D, waits for A
+
+Thread 1 waits for thread 2, thread 2 waits for thread 3, thread 3 waits for thread 4, and thread 4 waits for thread 1.
+
+# Database Deadlocks:
+
+A more complicated situation in which deadlocks can occur, is a database transaction. A database transaction may consist of many SQL update requests. When a record is updated during a transaction, that record is locked for updates from other transactions, until the first transaction completes. Each update request within the same transaction may therefore lock some records in the database.
+
+Transaction 1, request 1, locks record 1 for update
+Transaction 2, request 1, locks record 2 for update
+Transaction 1, request 2, tries to lock record 2 for update.
+Transaction 2, request 2, tries to lock record 1 for update.
+
+------------------------------------------------------
+
+Deadlock Prevention:
+
+In some situations it is possible to prevent deadlocks using the following techniques,
+
+1. Lock Ordering
+2. Lock Timeout
+3. Deadlock Detection
+
+# Lock Ordering:
+
+Deadlock occurs when multiple threads need the same locks but obtain them in different order.
+
+If you make sure that all locks are always taken in the same order by any thread, deadlocks cannot occur.
+
+Thread 1:
+
+  lock A 
+  lock B
+
+
+Thread 2:
+
+   wait for A
+   lock C (when A locked)
+
+
+Thread 3:
+
+   wait for A
+   wait for B
+   wait for C
+
+If a thread, like Thread 3, needs several locks, it must take them in the decided order. It cannot take a lock later in the sequence until it has obtained the earlier locks.
+
+For instance, neither Thread 2 or Thread 3 can lock C until they have locked A first. Since Thread 1 holds lock A, Thread 2 and 3 must first wait until lock A is unlocked. Then they must succeed in locking A, before they can attempt to lock B or C.
+
+Lock ordering is a simple yet effective deadlock prevention mechanism. However, it can only be used if you know about all locks needed ahead of taking any of the locks. This is not always the case.
+
+# Lock Timeout:
+
+Another deadlock prevention mechanism is to put a timeout on lock attempts meaning a thread trying to obtain a lock will only try for so long before giving up. If a thread does not succeed in taking all necessary locks within the given timeout, it will backup, free all locks taken, wait for a random amount of time and then retry.
+
+Thread 1 locks A
+Thread 2 locks B
+
+Thread 1 attempts to lock B but is blocked
+Thread 2 attempts to lock A but is blocked
+
+Thread 1's lock attempt on B times out
+Thread 1 backs up and releases A as well
+Thread 1 waits randomly (e.g. 257 millis) before retrying.
+
+Thread 2's lock attempt on A times out
+Thread 2 backs up and releases B as well
+Thread 2 waits randomly (e.g. 43 millis) before retrying.
+
+Issues with above approach,
+
+i> If enough threads compete for the same resources they still risk trying to take the threads at the same time again and again, even 	       	  if timing out and backing up. 
+
+ii> A problem with the lock timeout mechanism is that it is not possible to set a timeout for entering a synchronized block in Java. You will 	  have to create a custom lock class or use one of the Java 5 concurrency constructs in the java.util.concurrency package. 
+
+
+# Deadlock Prevention:
+
+Deadlock detection is a heavier deadlock prevention mechanism aimed at cases in which lock ordering isn't possible, and lock timeout isn't feasible.
+
+Every time a thread takes a lock it is noted in a data structure (map, graph etc.) of threads and locks. Additionally, whenever a thread requests a lock this is also noted in this data structure.
+
+One possible action is to release all locks, backup, wait a random amount of time and then retry. This is similar to the simpler lock timeout mechanism except threads only backup when a deadlock has actually occurred.Not just because their lock requests timed out.
+
+A better option is to determine or assign a priority of the threads so that only one (or a few) thread backs up. The rest of the threads continue taking the locks they need as if no deadlock had occurred. If the priority assigned to the threads is fixed, the same threads will always be given higher priority. To avoid this you may assign the priority randomly whenever a deadlock is detected.
+
+------------------------------------------------------
+
+Starvation and Fairness:
+
+If a thread is not granted CPU time because other threads grab it all, it is called "starvation". The thread is "starved to death" because other threads are allowed the CPU time instead of it. The solution to starvation is called "fairness" - that all threads are fairly granted a chance to execute.
+
+# Causes of Starvation in Java:
+
+i>  Threads with high priority swallow all CPU time from threads with lower priority.
+ii> Threads are blocked indefinetely waiting to enter a synchronized block, because other threads are constantly allowed access before it.
+iii>Threads waiting on an object (called wait() on it) remain waiting indefinitely because other threads are constantly awakened instead of it.
+
+# Implementing Fairness in Java:
+
+It is not possible to implement 100% fairness in Java we can still implement our synchronization constructs to increase fairness between threads.
+
+
+public class Synchronizer{
+
+  public synchronized void doSynchronized(){
+    //do a lot of work which takes a long time
+  }
+
+}
+
+If more than one thread call the doSynchronized() method, some of them will be blocked until the first thread granted access has left the method. If more than one thread are blocked waiting for access there is no guarantee about which thread is granted access next.
+
+# Using Locks Instead of Synchronized Blocks:
+
+To increase the fairness of waiting threads first we will change the code block to be guarded by a lock rather than a synchronized block:
+
+public class Synchronizer{
+  Lock lock = new Lock();
+
+  public void doSynchronized() throws InterruptedException{
+    this.lock.lock();
+      //critical section, do a lot of work which takes a long time
+    this.lock.unlock();
+  }
+
+}
+Notice how the doSynchronized() method is no longer declared synchronized. Instead the critical section is guarded by the lock.lock() and lock.unlock() calls.
+
+A simple implementation of the Lock class could look like this:
+
+public class Lock{
+  private boolean isLocked      = false;
+  private Thread  lockingThread = null;
+
+  public synchronized void lock() throws InterruptedException{
+    while(isLocked){
+      wait();
+    }
+    isLocked      = true;
+    lockingThread = Thread.currentThread();
+  }
+
+  public synchronized void unlock(){
+    if(this.lockingThread != Thread.currentThread()){
+      throw new IllegalMonitorStateException(
+        "Calling thread has not locked this lock");
+    }
+    isLocked      = false;
+    lockingThread = null;
+    notify();
+  }
+}
+If you look at the Synchronizer class above and look into this Lock implementation you will notice that threads are now blocked trying to access the lock() method, if more than one thread calls lock() simultanously. Second, if the lock is locked, the threads are blocked in the wait() call inside the while(isLocked) loop in the lock() method. Remember that a thread calling wait() releases the synchronization lock on the Lock instance, so threads waiting to enter lock() can now do so. The result is that multiple threads can end up having called wait() inside lock().
+
+If you look back at the doSynchronized() method you will notice that the comment between lock() and unlock() states, that the code in between these two calls take a "long" time to execute. Let us further assume that this code takes long time to execute compared to entering the lock() method and calling wait() because the lock is locked. This means that the majority of the time waited to be able to lock the lock and enter the critical section is spent waiting in the wait() call inside the lock() method, not being blocked trying to enter the lock() method.
+
+As stated earlier synchronized blocks makes no guarantees about what thread is being granted access if more than one thread is waiting to enter. Nor does wait() make any guarantees about what thread is awakened when notify() is called. So, the current version of the Lock class makes no different guarantees with respect to fairness than synchronized version of doSynchronized(). But we can change that.
+
+# Fair Lock:
+
+The above version of the Lock class calls its own wait() method. If instead each thread calls wait() on a separate object, so that only one thread has called wait() on each object, the Lock class can decide which of these objects to call notify() on, thereby effectively selecting exactly what thread to awaken.
+
+
+public class FairLock {
+    private boolean           isLocked       = false;
+    private Thread            lockingThread  = null;
+    private List<QueueObject> waitingThreads =
+            new ArrayList<QueueObject>();
+
+  public void lock() throws InterruptedException{
+    QueueObject queueObject           = new QueueObject();
+    boolean     isLockedForThisThread = true;
+    synchronized(this){
+        waitingThreads.add(queueObject);
+    }
+
+    while(isLockedForThisThread){
+      synchronized(this){
+        isLockedForThisThread =
+            isLocked || waitingThreads.get(0) != queueObject;
+        if(!isLockedForThisThread){
+          isLocked = true;
+           waitingThreads.remove(queueObject);
+           lockingThread = Thread.currentThread();
+           return;
+         }
+      }
+      try{
+        queueObject.doWait();
+      }catch(InterruptedException e){
+        synchronized(this) { waitingThreads.remove(queueObject); }
+        throw e;
+      }
+    }
+  }
+
+  public synchronized void unlock(){
+    if(this.lockingThread != Thread.currentThread()){
+      throw new IllegalMonitorStateException(
+        "Calling thread has not locked this lock");
+    }
+    isLocked      = false;
+    lockingThread = null;
+    if(waitingThreads.size() > 0){
+      waitingThreads.get(0).doNotify();
+    }
+  }
+}
+
+
+public class QueueObject {
+
+  private boolean isNotified = false;
+
+  public synchronized void doWait() throws InterruptedException {
+    while(!isNotified){
+        this.wait();
+    }
+    this.isNotified = false;
+  }
+
+  public synchronized void doNotify() {
+    this.isNotified = true;
+    this.notify();
+  }
+
+  public boolean equals(Object o) {
+    return this == o;
+  }
+}
+
+
+First you might notice that the lock() method is no longer declared synchronized. Instead only the blocks necessary to synchronize are nested inside synchronized blocks.
+
+FairLock creates a new instance of QueueObject and enqueue it for each thread calling lock(). The thread calling unlock() will take the top QueueObject in the queue and call doNotify() on it, to awaken the thread waiting on that object. This way only one waiting thread is awakened at a time, rather than all waiting threads. This part is what governs the fairness of the FairLock.
+
+
+------------------------------------------------------
+
+Nested Monitor Lockout:
+
+public class Lock{
+  protected MonitorObject monitorObject = new MonitorObject();
+  protected boolean isLocked = false;						
+
+  public void lock() throws InterruptedException{
+    synchronized(this){
+      while(isLocked){
+        synchronized(this.monitorObject){
+            this.monitorObject.wait();
+        }
+      }
+      isLocked = true;
+    }
+  }
+
+  public void unlock(){
+    synchronized(this){
+      this.isLocked = false;
+      synchronized(this.monitorObject){
+        this.monitorObject.notify();
+      }
+    }
+  }
+}
+
+
+Notice how the lock() method first synchronizes on "this", then synchronizes on the monitorObject member. If isLocked is false there is no problem. The thread does not call monitorObject.wait(). If isLocked is true however, the thread calling lock() is parked waiting in the monitorObject.wait() call.
+
+The problem with this is, that the call to monitorObject.wait() only releases the synchronization monitor on the monitorObject member, and not the synchronization monitor associated with "this". In other words, the thread that was just parked waiting is still holding the synchronization lock on "this".
+
+The thread waiting in lock() needs an unlock() call to execute successfully for it to exit lock() and the synchronized blocks inside it. But, no thread can actually execute unlock() until the thread waiting in lock() leaves the outer synchronized block.
+
+This result is that any thread calling either lock() or unlock() will become blocked indefinately. This is called a nested monitor lockout.
+
+------------------------------------------------------
+
+Slipped Condition:
+
+Slipped conditions means, that from the time a thread has checked a certain condition until it acts upon it, the condition has been changed by another thread so that it is errornous for the first thread to act.
+
+Example: Suppose there are two thread A and thread B which want to process a string S. Firstly, thread A is started, it checks if there are any more characters left to process, initially the whole string is available for processing, so the condition is true. Now, thread A is suspended and thread B starts. It again checks the condition, which evaluates to true and then processes the whole string S. Now, when thread A again starts execution, the string S is completely processed by this time and hence an error occurs. This is known as a slipped condition.
+
+
+public class Main { 
+    public static void main(String[] args) 
+    { 
+        ReadingThread readingThread 
+            = new ReadingThread(); 
+        SlippedThread slippedThread 
+            = new SlippedThread(); 
+  
+        slippedThread.start(); 
+        readingThread.start(); 
+    } 
+} 
+  
+class CommonResource { 
+    static final String string = "Hello"; 
+    static int pointerPosition = 0; 
+} 
+  
+// Thread to demonstrate a slipped condition 
+class SlippedThread extends Thread { 
+    @Override
+    public void run() 
+    { 
+        // Check if any characters 
+        // are left to process 
+        if (CommonResource.pointerPosition 
+            != CommonResource.string.length()) { 
+            System.out.println("Characters left! "
+                               + "I can process the string"); 
+  
+            // Cause the thread to wait to cause 
+            // a slipped condition 
+            try { 
+                synchronized (this) 
+                { 
+                    wait(500); 
+                } 
+            } 
+  
+            catch (InterruptedException e) { 
+                System.out.println(e); 
+            } 
+  
+            try { 
+                while (CommonResource.pointerPosition 
+                       < CommonResource.string.length()) { 
+  
+                    System.out.println("Thread1 "
+                                       + CommonResource.string 
+                                             .charAt( 
+                                                 CommonResource 
+                                                     .pointerPosition)); 
+                    CommonResource.pointerPosition++; 
+                } 
+            } 
+  
+            catch (StringIndexOutOfBoundsException e) { 
+                System.out.println("No more character left to process. This is a slipped condition");                         
+            } 
+        } 
+    } 
+} 
+  
+// Thread to process the whole String 
+class ReadingThread extends Thread { 
+    @Override
+    public void run() 
+    { 
+        System.out.println("Thread2 trying to process the string"); 
+        while (CommonResource.pointerPosition < CommonResource.string.length()) { 
+            System.out.print("Thread2 "+ CommonResource.string.charAt(CommonResource.pointerPosition));                       
+            CommonResource.pointerPosition++; 
+        } 
+    } 
+} 
+
+
+O/P:
+
+Characters left! I can process the string
+Thread2 trying to process the string
+Thread2 H
+Thread2 e
+Thread2 l
+Thread2 l
+Thread2 o
+No more character left to process. This is a slipped condition
+
+
+
+The solution to the problem of Slipped Conditions is fairly simple and straightforward. Any resources that a thread is going to access after checking the condition, must be locked by the thread and should only be released after the work is performed by the thread. All the access must be synchronized.
+
+
+
+public class Main { 
+    public static void main(String[] args) 
+    { 
+        ReadingThread readingThread 
+            = new ReadingThread(); 
+        SlippedThread slippedThread 
+            = new SlippedThread(); 
+  
+        slippedThread.start(); 
+        readingThread.start(); 
+    } 
+} 
+  
+class CommonResource { 
+  
+    static final String string = "Hello"; 
+    static int pointerPosition = 0; 
+  
+    // A static variable added 
+    // to lock the String object 
+    static boolean isLocked = false; 
+} 
+  
+// Thread to demonstrate a slipped condition 
+class SlippedThread extends Thread { 
+    @Override
+    public void run() 
+    { 
+        // Check if any characters 
+        // are left to process 
+        if (CommonResource.isLocked 
+                != true
+            && CommonResource.pointerPosition 
+                   != CommonResource.string.length()) { 
+  
+            System.out.println("Characters left! "
+                               + "I can process the string"); 
+            CommonResource.isLocked = true; 
+  
+            // Cause the thread to wait to cause 
+            // a slipped condition 
+            try { 
+                synchronized (this) 
+                { 
+                    wait(250); 
+                } 
+            } 
+  
+            catch (InterruptedException e) { 
+                System.out.println(e); 
+            } 
+  
+            try { 
+                while (CommonResource.pointerPosition 
+                       < CommonResource.string.length()) { 
+  
+                    System.out.println("Thread1 "
+                                       + CommonResource 
+                                             .string.charAt( 
+                                                 CommonResource 
+                                                     .pointerPosition)); 
+                    CommonResource.pointerPosition++; 
+                } 
+            } 
+  
+            catch (StringIndexOutOfBoundsException e) { 
+                System.out.println("\nNo more character "
+                                   + "left to process. This is "
+                                   + "a slipped condition"); 
+            } 
+            CommonResource.isLocked = false; 
+        } 
+    } 
+} 
+  
+// Thread to process the whole String 
+class ReadingThread extends Thread { 
+    @Override
+    public void run() 
+    { 
+        System.out.println("Thread2 trying to"
+                           + " process the string"); 
+        if (CommonResource.isLocked == false) { 
+            CommonResource.isLocked = true; 
+            synchronized (this) 
+            { 
+                while (CommonResource.pointerPosition 
+                       < CommonResource.string.length()) { 
+                    System.out.println("Thread2 "
+                                       + CommonResource.string 
+                                             .charAt( 
+                                                 CommonResource 
+                                                     .pointerPosition)); 
+                    CommonResource.pointerPosition++; 
+                } 
+            } 
+        } 
+        CommonResource.isLocked = false; 
+    } 
+} 
+
+
+O/P:
+
+Characters left! I can process the string
+Thread2 trying to process the string
+Thread1 H
+Thread1 e
+Thread1 l
+Thread1 l
+Thread1 o
+
+In the above program, a new static boolean member isLocked is added to the CommonResource class. Now, whenever a thread tries to process the string, it first obtains the lock and then processes it. In this example, the SlippedCondition thread checks whether the isLocked is false and there is string left to be processed. If it is, it obtains the lock and then waits and finally processes the string. Meanwhile, the ReadingThread tries to process the string but it can’t as isLocked was set true by the SlippedThread.
+
+
+------------------------------------------------------
+
+Locks in Java:
+
+A lock is a thread synchronization mechanism like synchronized blocks except locks can be more sophisticated than Java's synchronized blocks. 
+
+Synchronized block of Java code:
+
+public class Counter{
+
+  private int count = 0;
+
+  public int inc(){
+    synchronized(this){
+      return ++count;
+    }
+  }
+}
+
+
+The advantages of a lock are
+
+i>  possible to make them fair.
+ii> possible to make a thread responsive to interruption while waiting on a Lock object.
+iii>possible to try to acquire the lock, but return immediately or after a timeout if the lock can't be acquired.
+iv> possible to acquire and release locks in different scopes, and in different orders.
+
+Using a Lock instead of a synchronized block:
+
+public class Counter{
+
+  private Lock lock = new Lock();
+  private int count = 0;
+
+  public int inc(){
+    lock.lock();
+    int newCount = ++count;
+    lock.unlock();
+    return newCount;
+  }
+}
+
+public class Lock{
+
+  private boolean isLocked = false;
+
+  public synchronized void lock()
+  throws InterruptedException{
+    while(isLocked){
+      wait();
+    }
+    isLocked = true;
+  }
+
+  public synchronized void unlock(){
+    isLocked = false;
+    notify();
+  }
+}
+
+# Lock Reentrance:
+
+Synchronized blocks in Java are reentrant. This means, that if a Java thread enters a synchronized block of code, then the thread can enter other Java code blocks synchronized on the same monitor object.
+
+public class Reentrant{
+
+  public synchronized outer(){
+    inner();
+  }
+
+  public synchronized inner(){
+    //do something
+  }
+}
+
+
+If a thread calls outer() there is no problem calling inner() from inside outer(), since both methods (or blocks) are synchronized on the same monitor object ("this"). If a thread already holds the lock on a monitor object, it has access to all blocks synchronized on the same monitor object. This is called reentrance. 
+
+# Rewiring Locks:
+
+The lock implementation shown earlier is not reentrant. Following changes have to be incorporated to make the make the Lock class reentrant,
+
+public class Reentrant2{
+
+  Lock lock = new Lock();
+
+  public outer(){
+    lock.lock();
+    inner();
+    lock.unlock();
+  }
+
+  public synchronized inner(){
+    lock.lock();
+    //do something
+    lock.unlock();
+  }
+}
+
+
+public class Lock{
+
+  boolean isLocked = false;
+  Thread  lockedBy = null;
+  int     lockedCount = 0;
+
+  public synchronized void lock()
+  throws InterruptedException{
+    Thread callingThread = Thread.currentThread();
+    while(isLocked && lockedBy != callingThread){
+      wait();
+    }
+    isLocked = true;
+    lockedCount++;
+    lockedBy = callingThread;
+  }
+
+
+  public synchronized void unlock(){
+    if(Thread.curentThread() == this.lockedBy){
+      lockedCount--;
+
+      if(lockedCount == 0){
+        isLocked = false;
+        notify();
+      }
+    }
+  }
+
+  ...
+}
+
+Notice how the while loop (spin lock) now also takes the thread that locked the Lock instance into consideration. If either the lock is unlocked (isLocked = false) or the calling thread is the thread that locked the Lock instance, the while loop will not execute, and the thread calling lock() will be allowed to exit the method.
+
+Additionally, we need to count the number of times the lock has been locked by the same thread. Otherwise, a single call to unlock() will unlock the lock, even if the lock has been locked multiple times. We don't want the lock to be unlocked until the thread that locked it, has executed the same amount of unlock() calls as lock() calls.
+
+# Calling unlock() From a finally-clause
+
+When guarding a critical section with a Lock, and the critical section may throw exceptions, it is important to call the unlock() method from inside a finally-clause. Doing so makes sure that the Lock is unlocked so other threads can lock it.
+
+lock.lock();
+try{
+  //do critical section code, which may throw exception
+} finally {
+  lock.unlock();
+}
+
+------------------------------------------------------
+
+Read / Write Locks in Java:
+
+A read / write lock is more sophisticated lock than the Lock implementations shown in the text Locks in Java. Imagine you have an application that reads and writes some resource, but writing it is not done as much as reading it is. Two threads reading the same resource does not cause problems for each other, so multiple threads that want to read the resource are granted access at the same time, overlapping. But, if a single thread wants to write to the resource, no other reads nor writes must be in progress at the same time. To solve this problem of allowing multiple readers but only one writer, you will need a read / write lock.
+
+Read Access   	If no threads are writing, and no threads have requested write access.
+Write Access   	If no threads are reading or writing.
+
+
+Fully Reentrant ReadWriteLock snippet:
+
+
+public class ReadWriteLock{
+
+   private Map<Thread, Integer> readingThreads = new HashMap<Thread, Integer>(); // multiple threads can read
+
+   private int writeAccesses    = 0;						 // Only one thread can have a write-access
+   private int writeRequests    = 0;
+   private Thread writingThread = null;
+
+
+  public synchronized void lockRead() throws InterruptedException{
+    Thread callingThread = Thread.currentThread();
+    while(! canGrantReadAccess(callingThread)){
+      wait();
+    }
+
+    readingThreads.put(callingThread,
+     (getReadAccessCount(callingThread) + 1));
+  }
+
+  private boolean canGrantReadAccess(Thread callingThread){			// deny if there is writer or there are writeRequests
+    if( isWriter(callingThread) ) return true;
+    if( hasWriter()             ) return false;
+    if( isReader(callingThread) ) return true;
+    if( hasWriteRequests()      ) return false;
+    return true;
+  }
+
+
+  public synchronized void unlockRead(){
+    Thread callingThread = Thread.currentThread();
+    if(!isReader(callingThread)){
+      throw new IllegalMonitorStateException("Calling Thread does not" +
+        " hold a read lock on this ReadWriteLock");
+    }
+    int accessCount = getReadAccessCount(callingThread);
+    if(accessCount == 1){ readingThreads.remove(callingThread); }
+    else { readingThreads.put(callingThread, (accessCount -1)); }
+    notifyAll();
+  }
+
+  public synchronized void lockWrite() throws InterruptedException{
+    writeRequests++;
+    Thread callingThread = Thread.currentThread();
+    while(! canGrantWriteAccess(callingThread)){
+      wait();
+    }
+    writeRequests--;
+    writeAccesses++;
+    writingThread = callingThread;
+  }
+
+  public synchronized void unlockWrite() throws InterruptedException{
+    if(!isWriter(Thread.currentThread()){
+      throw new IllegalMonitorStateException("Calling Thread does not" +
+        " hold the write lock on this ReadWriteLock");
+    }
+    writeAccesses--;
+    if(writeAccesses == 0){
+      writingThread = null;
+    }
+    notifyAll();
+  }
+
+  private boolean canGrantWriteAccess(Thread callingThread){			// deny if there are readers or if the calling thread
+    if(isOnlyReader(callingThread))    return true;				// is not the same as one having the write lock
+    if(hasReaders())                   return false;
+    if(writingThread == null)          return true;
+    if(!isWriter(callingThread))       return false;
+    return true;
+  }
+  
+
+  // Helper functions below
+
+  private int getReadAccessCount(Thread callingThread){
+    Integer accessCount = readingThreads.get(callingThread);
+    if(accessCount == null) return 0;
+    return accessCount.intValue();
+  }
+
+
+  private boolean hasReaders(){
+    return readingThreads.size() > 0;
+  }
+
+  private boolean isReader(Thread callingThread){
+    return readingThreads.get(callingThread) != null;
+  }
+
+  private boolean isOnlyReader(Thread callingThread){
+    return readingThreads.size() == 1 &&
+           readingThreads.get(callingThread) != null;
+  }
+
+  private boolean hasWriter(){
+    return writingThread != null;
+  }
+
+  private boolean isWriter(Thread callingThread){
+    return writingThread == callingThread;
+  }
+
+  private boolean hasWriteRequests(){
+      return this.writeRequests > 0;
+  }
+
+}
+
+	
+------------------------------------------------------
+
+Semaphore:
+
+A semaphore controls access to a shared resource through the use of a counter.
+
+Working of semaphore
+
+In general, to use a semaphore, the thread that wants access to the shared resource tries to acquire a permit.
+
+i>  If the semaphore’s count is greater than zero, then the thread acquires a permit, which causes the semaphore’s count to be decremented.
+ii> Otherwise, the thread will be blocked until a permit can be acquired.
+iii>When the thread no longer needs an access to the shared resource, it releases the permit, which causes the semaphore’s count to be 	  incremented.
+iv> If there is another thread waiting for a permit, then that thread will acquire a permit at that time.
+
+
+Constructors in Semaphore class : There are two constructors in Semaphore class.
+
+Semaphore(int num)
+Semaphore(int num, boolean how)
+
+Here, num specifies the initial permit count. Thus, it specifies the number of threads that can access a shared resource at any one time. If it is one, then only one thread can access the resource at any one time. By default, all waiting threads are granted a permit in an undefined order. By setting how to true, you can ensure that waiting threads are granted a permit in the order in which they requested access.
+
+import java.util.concurrent.*; 
+
+//A shared resource/class. 
+class Shared 
+{ 
+	static int count = 0; 
+} 
+
+class MyThread extends Thread 
+{ 
+	Semaphore sem; 
+	String threadName; 
+	public MyThread(Semaphore sem, String threadName) 
+	{ 
+		super(threadName); 
+		this.sem = sem; 
+		this.threadName = threadName; 
+	} 
+
+	@Override
+	public void run() { 
+		
+		// run by thread A 
+		if(this.getName().equals("A")) 
+		{ 
+			System.out.println("Starting " + threadName); 
+			try
+			{ 
+				// First, get a permit. 
+				System.out.println(threadName + " is waiting for a permit."); 
+			
+				// acquiring the lock 
+				sem.acquire(); 
+			
+				System.out.println(threadName + " gets a permit."); 
+		
+				// Now, accessing the shared resource. 
+				// other waiting threads will wait, until this 
+				// thread release the lock 
+				for(int i=0; i < 5; i++) 
+				{ 
+					Shared.count++; 
+					System.out.println(threadName + ": " + Shared.count); 
+		
+					// Now, allowing a context switch -- if possible. 
+					// for thread B to execute 
+					Thread.sleep(1); 
+				} 
+			} catch (InterruptedException exc) { 
+					System.out.println(exc); 
+				} 
+		
+				// Release the permit. 
+				System.out.println(threadName + " releases the permit."); 
+				sem.release(); 
+		} 
+		
+		// run by thread B 
+		else
+		{ 
+			System.out.println("Starting " + threadName); 
+			try
+			{ 
+				// First, get a permit. 
+				System.out.println(threadName + " is waiting for a permit."); 
+			
+				// acquiring the lock 
+				sem.acquire(); 
+			
+				System.out.println(threadName + " gets a permit."); 
+		
+				// Now, accessing the shared resource. 
+				// other waiting threads will wait, until this 
+				// thread release the lock 
+				for(int i=0; i < 5; i++) 
+				{ 
+					Shared.count--; 
+					System.out.println(threadName + ": " + Shared.count); 
+		
+					// Now, allowing a context switch -- if possible. 
+					// for thread A to execute 
+					Thread.sleep(1); 
+				} 
+			} catch (InterruptedException exc) { 
+					System.out.println(exc); 
+				} 
+				System.out.println(threadName + " releases the permit."); 
+				sem.release(); 
+		} 
+	} 
+} 
+
+public class SemaphoreDemo 
+{ 
+	public static void main(String args[]) throws InterruptedException 
+	{ 
+
+		Semaphore sem = new Semaphore(1);                   // creating a Semaphore object with number of permits 1 
+		
+		MyThread mt1 = new MyThread(sem, "A"); 
+		MyThread mt2 = new MyThread(sem, "B"); 
+		
+		mt1.start(); 
+		mt2.start(); 
+		
+		mt1.join(); 
+		mt2.join(); 
+		
+		System.out.println("count: " + Shared.count); 
+	} 
+} 
+
+
+O/P:
+
+Starting A
+Starting B
+A is waiting for a permit.
+B is waiting for a permit.
+A gets a permit.
+A: 1
+A: 2
+A: 3
+A: 4
+A: 5
+A releases the permit.
+B gets a permit.
+B: 4
+B: 3
+B: 2
+B: 1
+B: 0
+B releases the permit.
+count: 0
+
+Note : The output can be different in different executions of above program, but final value of count variable will always remain 0.
+
+Notice the call to sleep( ) within run( ) method inside MyThread class. It is used to “prove” that accesses to Shared.count are synchronized by the semaphore. In run( ), the call to sleep( ) causes the invoking thread to pause between each access to Shared.count. This would normally enable the second thread to run. However, because of the semaphore, the second thread must wait until the first has released the permit, which happens only after all accesses by the first thread are complete. Thus, Shared.count is first incremented five times by thread A and then decremented five times by thread B. The increments and decrements are not intermixed at assembly code.
+
+------------------------------------------------------
+
+Blocking Queue:
+
+A blocking queue is a queue that blocks(makes the call wait) when you try to dequeue from it if the queue is empty, or if you try to enqueue items to it and the queue is already full. A thread trying to dequeue from an empty queue is blocked until some other thread inserts an item into the queue. A thread trying to enqueue an item in a full queue is blocked until some other thread makes space in the queue, either by dequeuing one or more items or clearing the queue completely.
+
+Blocking Queue Implementation:
+
+public class BlockingQueue {
+
+  private List queue = new LinkedList();
+  private int  limit = 10;
+
+  public BlockingQueue(int limit){
+    this.limit = limit;
+  }
+
+
+  public synchronized void enqueue(Object item)
+  throws InterruptedException  {
+    while(this.queue.size() == this.limit) {
+      wait();
+    }
+    this.queue.add(item);
+    if(this.queue.size() == 1) {
+      notifyAll();						// For enqueue notifyAll() getting called when all the space is left.
+    }								
+  }
+
+
+  public synchronized Object dequeue()
+  throws InterruptedException{
+    while(this.queue.size() == 0){
+      wait();
+    }
+    if(this.queue.size() == this.limit){
+      notifyAll();						// For dequeue notifyAll() getting called when queue is full to its limit.
+    }
+
+    return this.queue.remove(0);
+  }
+
+}
+    
+
+------------------------------------------------------
+
+Non Blocking data structures 
+
+Types of Non-Blocking Data Structures:
+
+i>   Obstruction-Free: One thread is guaranteed to proceed if all other threads are suspended.
+ii>  Lock-Free: A data structure provides lock-freedom if, at any time, at least one thread can proceed. 
+iii> Wait-Free: A data structure is wait-free if it's lock-free and every thread is guaranteed to proceed after a finite number of steps.
+
+# Non-Blocking algorithms
+
+i> Compare-and-Swap (CAS) operation.
+
+The idea of compare-and-swap is, that a variable is only updated if it still has the same value as at the time we had fetched the value of the variable from the main memory. CAS is an atomic operation, which means that fetch and update together are one single operation.
+
+The important thing here is that CAS does not acquire a lock on the data structure but returns true if the update was successful, otherwise it returns false.
+
+ii> Fetch and Add:
+
+This operation increments the variable in the main memory by a given value. Again, the important point is that the operation happens atomically, which means no other thread can interfere.
+
+Java provides an implementation of fetch-and-add in its atomic classes. Examples are AtomicInteger.incrementAndGet(), which increments the value and returns the new value; and AtomicInteger.getAndIncrement(), which returns the old value and then increments the value.
+
+# Sample Example:
+
+Accessing a Linked Queue from Multiple Threads:
+
+Of course, one way to solve this problem is to have one thread acquire a lock on the queue. The solution we'll look at in the following chapter will solve the problem with the help of a lock-free operation by using the CAS operation we've seen earlier.
+
+Code snippet for a Non-Blocking Queue in Java:
+
+public class NonBlockingQueue<T> {
+ 
+    private final AtomicReference<Node<T>> head, tail;
+    private final AtomicInteger size;
+ 
+    public NonBlockingQueue() {
+        head = new AtomicReference<>(null);
+        tail = new AtomicReference<>(null);
+        size = new AtomicInteger();
+        size.set(0);
+    }
+}
+
+The important part above is the declaration of the head and tail references as AtomicReferences, which ensures that any update on these references is an atomic operation. 
+
+
+
+private class Node<T> {
+    private volatile T value;
+    private volatile Node<T> next;
+    private volatile Node<T> previous;
+ 
+    public Node(T value) {
+        this.value = value;
+        this.next = null;
+    }
+ 
+    // getters and setters 
+}
+
+Here, the important part above is to declare the references to the previous and next node as volatile. This ensures that we update these references always in the main memory (thus are directly visible to all threads). The same for the actual node value.
+
+
+Lock-Free add:
+
+public void add(T element) {
+    if (element == null) {
+        throw new NullPointerException();
+    }
+ 
+    Node<T> node = new Node<>(element);
+    Node<T> currentTail;
+    do {
+        currentTail = tail.get();
+        node.setPrevious(currentTail);
+    } while(!tail.compareAndSet(currentTail, node));		//*
+ 
+    if(node.previous != null) {
+        node.previous.next = node;
+    }
+ 
+    head.compareAndSet(null, node); // for inserting the first element
+    size.incrementAndGet();
+}
+
+The essential part to pay attention to is the highlighted line(*). We attempt to add the new node to the queue until the CAS operation succeeds to update the tail, which must still be the same tail to which we appended the new node.
+
+Lock-Free get:
+
+public T get() {
+    if(head.get() == null) {
+        throw new NoSuchElementException();
+    }
+ 
+    Node<T> currentHead;
+    Node<T> nextNode;
+    do {
+        currentHead = head.get();
+        nextNode = currentHead.getNext();
+    } while(!head.compareAndSet(currentHead, nextNode));
+ 
+    size.decrementAndGet();
+    return currentHead.getValue();
+}
+
+Again, the essential part to pay attention to is the highlighted line. The CAS operation ensures that we move the current head only if no other node has been removed in the meantime
+
+------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -292,6 +292,9 @@ AND name != 'Art Garfunkel'
 
 
 // COALESCE can be useful when you want to replace a NULL value with some other value.
+// COALESCE(e1, e2, ..., en) the COALESCE() function returns the first non-null expression in the list
+// COALESCE(NULL,1) -- return 1
+// COALESCE(NULL,NULL,NULL) -- return NULL
 
 
 SELECT name, party

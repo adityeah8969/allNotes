@@ -158,7 +158,7 @@ Circuit switching and packet switching are the two switching methods that are us
 
 The main difference between circuit switching and packet switching is that Circuit Switching is connection oriented whereas, Packet Switching is connectionless.
 
-Message switching is a network switching technique in which data is routed in its entirety from the source node to the destination node, one hope at a time. During message routing, every intermediate switch in the network stores the whole message. If the entire network's resources are engaged or the network becomes blocked, the message-switched network stores and delays the message until ample resources become available for effective transmission of the message.
+Message switching is a network switching technique in which data is routed in its entirety from the source node to the destination node, one hop at a time. During message routing, every intermediate switch in the network stores the whole message. If the entire network's resources are engaged or the network becomes blocked, the message-switched network stores and delays the message until ample resources become available for effective transmission of the message.
 
 
 Packet switching is basically a special case of message switching type. After advancement of computer communication and networking, packet switching came into existence.

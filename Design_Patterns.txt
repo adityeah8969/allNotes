@@ -1,7 +1,4 @@
-Design Patterns: A design pattern provides a general reusable solution for the common problems occurs in software design. The patterns typically show 
-relationships and interactions between classes or objects. The idea is to speed up the development process by providing well tested, proven development
-/design paradigm. Design patterns are programming language independent strategies for solving a common problem. By using the design patterns you can 
-make your code more flexible, reusable and maintainable.
+Design Patterns: A design pattern provides a general reusable solution for the common problems occurs in software design. The patterns typically show relationships and interactions between classes or objects. The idea is to speed up the development process by providing well tested, proven development/design paradigm. Design patterns are programming language independent strategies for solving a common problem. By using the design patterns you can make your code more flexible, reusable and maintainable.
 
 Types of Design Patterns: 
 
@@ -27,8 +24,8 @@ iii>Behavioral: Behavioral patterns are about identifying common communication p
 		
 -------------------------------------------------------------
 
-Factory:	The idea is to use a static member-function (static factory method) which creates & returns instances, hiding the details of class 
-		modules from user.
+Factory:	The idea is to use a static member-function (static factory method) which creates & returns instances, hiding the details of 			class modules from user.
+		
 
 public interface Shape { void draw(); }
 
@@ -112,16 +109,13 @@ Inside Square::draw() method.
 
 -------------------------------------------------------------
 
-Observer Pattern:	The Observer Pattern defines a one to many dependency between objects so that one object changes state, all of its dependents
-		        are notified and updated automatically.
+Observer Pattern:	The Observer Pattern defines a one to many dependency between objects so that one object changes state, all of its 				dependents are notified and updated automatically.
+		        
 
-Advantages:	Provides a loosely coupled design between objects that interact, interacting objects should have less information about each other.
-		Subject only knows that observer implement Observer interface.
+Advantages:	Provides a loosely coupled design between objects that interact, interacting objects should have less information about each 			other. Subject only knows that observer implement Observer interface.
 
-Disadvantages:  Because the subject holds strong references to the observers, keeping them alive. The leak happens when an observer fails to unsubscribe
-	        from the subject when it no longer needs to listen. (Lapsed listener problem)
-
-
+Disadvantages:  Because the subject holds strong references to the observers, keeping them alive. The leak happens when an observer fails to 			unsubscribe from the subject when it no longer needs to listen. (Lapsed listener problem)
+	        
 
 import java.util.ArrayList; 
 import java.util.Iterator; 
@@ -247,12 +241,12 @@ class Main
 		cricketData.registerObserver(currentScoreDisplay); 
 
 		
-		cricketData.dataChanged(); 								// This method represents state change in subject
-													// The implementation triggers 'notify()' to all
-													// the observers.
+		cricketData.dataChanged(); 					// This method represents state change in subject
+										// The implementation triggers 'notify()' to all
+										// the observers.
 		
 					
-		cricketData.unregisterObserver(averageScoreDisplay); 					// Un-registration
+		cricketData.unregisterObserver(averageScoreDisplay); 					// Un-register
 
 		cricketData.dataChanged(); 
 	} 
@@ -302,8 +296,7 @@ class Singleton
 
 Method 2 (Only for light objects):
 
-JVM executes static initializer when the class is loaded and hence this is guaranteed to be thread safe. Use this method only when your singleton 
-class is light and is used throughout the execution of your program.
+JVM executes static initializer when the class is loaded and hence this is guaranteed to be thread safe. Use this method only when your singleton class is light and is used throughout the execution of your program.
 
 class Singleton 
 { 
@@ -320,9 +313,7 @@ class Singleton
 
 -------------------------------------------------------------
 
-Decorator Pattern:	Decorator pattern allows a user to add new functionality to an existing object without altering its structure. This type of 
-			design pattern comes under structural pattern as this pattern acts as a wrapper to existing class. This pattern creates a 
-			decorator class which wraps the original class and provides additional functionality keeping class methods signature intact.
+Decorator Pattern:	Decorator pattern allows a user to add new functionality to an existing object without altering its structure. This 				type of design pattern comes under structural pattern as this pattern acts as a wrapper to existing class. This 			pattern creates a decorator class which wraps the original class and provides additional functionality keeping class 				methods signature intact.
 
 
 public interface Shape {void draw();}
@@ -409,9 +400,7 @@ Border Color: Red
 
 -------------------------------------------------------------
 
-Strategy Pattern:	The strategy pattern (also known as the policy pattern) is a software design pattern that enables an algorithm’s behavior 
-			to be selected at runtime. In Strategy pattern, we create objects which represent various strategies and a context object 
-			whose behavior varies as per its strategy object. The strategy object changes the executing algorithm of the context object.
+Strategy Pattern:	The strategy pattern (also known as the policy pattern) is a software design pattern that enables an algorithm’s 				behavior to be selected at runtime. In Strategy pattern, we create objects which represent various strategies and a 				context object whose behavior varies as per its strategy object. The strategy object changes the executing algorithm 				of the context object.
 
 
 
@@ -476,8 +465,7 @@ O/P:
 -------------------------------------------------------------
 
 
-Adapter Pattern:	The adapter pattern convert the interface of a class into another interface clients expect. Adapter lets classes work together
-			that couldn’t otherwise because of incompatible interfaces.
+Adapter Pattern:	The adapter pattern convert the interface of a class into another interface clients expect. Adapter lets classes work 				together that couldn’t otherwise because of incompatible interfaces.
 
 To use an adapter:
 
@@ -487,9 +475,7 @@ iii> Client receive the results of the call and is unaware of adapter’s presen
 
 Example:
 
-Suppose you have a Bird class with fly() , and makeSound() methods. And also a ToyDuck class with squeak() method. Let’s assume that you are short on
-ToyDuck objects and you would like to use Bird objects in their place. Birds have some similar functionality but implement a different interface, so
-we can’t use them directly. So we will use adapter pattern.
+Suppose you have a Bird class with fly() , and makeSound() methods. And also a ToyDuck class with squeak() method. Let’s assume that you are short on ToyDuck objects and you would like to use Bird objects in their place. Birds have some similar functionality but implement a different interface, so we can’t use them directly. So we will use adapter pattern.
 
 
 interface Bird 
@@ -523,7 +509,7 @@ class PlasticToyDuck implements ToyDuck
 	} 
 } 
 
-class BirdAdapter implements ToyDuck 						// BirdAdapter is just another implementation of the interface ToyDuck 
+class BirdAdapter implements ToyDuck 					// BirdAdapter is just another implementation of the interface ToyDuck 
 { 										
 
 	Bird bird; 
@@ -545,7 +531,7 @@ class Main
 		Sparrow sparrow = new Sparrow(); 
 		ToyDuck toyDuck = new PlasticToyDuck(); 
 
-		ToyDuck birdAdapter = new BirdAdapter(sparrow); 		// Wrap a bird in a birdAdapter so that it behaves like toy duck 
+		ToyDuck birdAdapter = new BirdAdapter(sparrow); 	// Wrap a bird in a birdAdapter so that it behaves like toy duck 
 
 		System.out.println("Sparrow..."); 
 		sparrow.fly(); 
@@ -724,10 +710,15 @@ class Main
 
 -------------------------------------------------------------
 
-Proxy Pattern: Proxies are also called surrogates, handles, and wrappers. They are closely related in structure, but not purpose, to Adapters 
-	       and Decorators.
+Proxy Pattern: 	Proxies are also called surrogates, handles, and wrappers. They are closely related in structure, but not purpose, to Adapters 
+	       	and Decorators.
 
-e.g 	       A very simple real life scenario is our college internet, which restricts few site access. 
+		The Decorator pattern is used to implement functionality on an already created object, while a Proxy pattern is used for 			controlling access to an object.
+
+		One more difference between Decorator and the Proxy design pattern is that the Decorator doesn't create an object; instead, it 			gets the Object in its constructor, while Proxy actually creates objects.
+
+
+e.g 	       	A very simple real life scenario is our college internet, which restricts few site access. 
 
 
 
@@ -922,10 +913,7 @@ Inside RoundedSquare::draw() method.
 
 -------------------------------------------------------------
 
-Builder Design Pattern: Builder pattern aims to “Separate the construction of a complex object from its representation so that the same construction
-		        process can create different representations.” It is used to construct a complex object step by step and the final step will
-			return the object. The process of constructing an object should be generic so that it can be used to create different repre-
-			sentations of the same object.
+Builder Design Pattern: Builder pattern aims to “Separate the construction of a complex object from its representation so that the same 			construction process can create different representations.” It is used to construct a complex object step by step and 				the final step will return the object. The process of constructing an object should be generic so that it can be used 				to create different representations of the same object.
 
 
 interface HousePlan 
@@ -1101,19 +1089,13 @@ Builder constructed: House@6d06d69c
 
 -------------------------------------------------------------
 
-Bridge Design Pattern: The Bridge design pattern allows you to separate the abstraction from the implementation. Bridge is used when we need to 
-		       decouple an abstraction from its implementation so that the two can vary independently. This type of design pattern comes
-		       under structural pattern as this pattern decouples implementation class and abstract class by providing a bridge structure
-		       between them. This pattern involves an interface which acts as a bridge which makes the functionality of concrete classes
-		       independent from interface implementer classes. 
+Bridge Design Pattern: 	The Bridge design pattern allows you to separate the abstraction from the implementation. Bridge is used when we need 				to decouple an abstraction from its implementation so that the two can vary independently. This type of design pattern 				comes under structural pattern as this pattern decouples implementation class and abstract class by providing a bridge 				structure between them. 
 
-		       The abstraction contains a reference to the implementor. Children of the abstraction are referred to as refined abstractions, 
-		       and children of the implementor are concrete implementors. Since we can change the reference to the implementor in the abstr-
-		       action, we are able to change the abstraction’s implementor at run-time. 
+			This pattern involves an interface which acts as a bridge which makes the functionality of 				concrete classes independent from interface implementer classes. The abstraction contains a reference to the 				implementor. Children of the abstraction are referred to as refined abstractions, and children of the implementor are 				concrete implementors. Since we can change the reference to the implementor in the abstr-action, we are able to change 				the abstraction’s implementor at run-time. 
 
 
 
-public interface DrawAPI {					// Implementor Interface
+public interface DrawAPI {					// Implementor Interface acting as a bridge
    public void drawCircle(int radius, int x, int y);
 }
 
@@ -1134,7 +1116,7 @@ public class GreenCircle implements DrawAPI {			// Concrete Implementor
 
 
 public abstract class Shape {					// Abstract Class
-   protected DrawAPI drawAPI;
+   protected DrawAPI drawAPI;					// reference to implementor interface
    
    protected Shape(DrawAPI drawAPI){
       this.drawAPI = drawAPI;
@@ -1177,6 +1159,229 @@ Drawing Circle[  color: green, radius: 10, x: 100, 100]
 
 
 -------------------------------------------------------------
+
+Composite Pattern:	Composite pattern is a partitioning design pattern and describes a group of objects that is treated the same way as a 				single instance of the same type of object. The intent of a composite is to “compose” objects into tree structures to 				represent part-whole hierarchies.
+
+The Composite Pattern has four participants:
+
+i>	Component - 	Component declares the interface for objects in the composition
+ii>	Leaf 	  - 	Leaf defines behavior for primitive objects in the composition.		
+iii>	Composite - 	Composite stores child components and implements child related operations in the component interface.
+iv>	Client    - 	Client manipulates the objects in the composition through the component interface.
+
+
+
+import java.util.ArrayList; 
+import java.util.List; 
+
+
+interface Employee 					// Component Interface
+{ 
+	public void showEmployeeDetails(); 
+} 
+		
+class Developer implements Employee 			// Leaf
+{ 
+	private String name; 
+	private long empId; 
+	private String position; 
+	
+	public Developer(long empId, String name, String position) 
+	{ 
+		// Assign the Employee id, 
+		// name and the position 
+		this.empId = empId; 
+		this.name = name; 
+		this.position = position; 
+	} 
+	
+	@Override
+	public void showEmployeeDetails() 
+	{ 
+		System.out.println(empId+" " +name+ " " + position ); 
+	} 
+} 
+
+class Manager implements Employee 			//Leaf
+{ 
+	private String name; 
+	private long empId; 
+	private String position; 
+
+	public Manager(long empId, String name, String position) 
+	{ 
+		this.empId = empId; 
+		this.name = name; 
+		this.position = position; 
+	} 
+	
+	@Override
+	public void showEmployeeDetails() 
+	{ 
+		System.out.println(empId+" " +name+ " " + position ); 
+	} 
+} 
+
+
+
+class CompanyDirectory implements Employee 				// Composite
+{ 
+	private List<Employee> employeeList = new ArrayList<Employee>(); 
+		
+	@Override
+	public void showEmployeeDetails() 
+	{ 
+		for(Employee emp:employeeList) 
+		{ 
+			emp.showEmployeeDetails(); 
+		} 
+	} 
+		
+	public void addEmployee(Employee emp) 
+	{ 
+		employeeList.add(emp); 
+	} 
+		
+	public void removeEmployee(Employee emp) 
+	{ 
+		employeeList.remove(emp); 
+	} 
+} 
+
+// Driver class 
+public class Company 						// Client
+{ 
+	public static void main (String[] args) 
+	{ 
+		Developer dev1 = new Developer(100, "Lokesh Sharma", "Pro Developer"); 
+		Developer dev2 = new Developer(101, "Vinay Sharma", "Developer"); 
+		CompanyDirectory engDirectory = new CompanyDirectory(); 
+		engDirectory.addEmployee(dev1); 
+		engDirectory.addEmployee(dev2); 
+		
+		Manager man1 = new Manager(200, "Kushagra Garg", "SEO Manager"); 
+		Manager man2 = new Manager(201, "Vikram Sharma ", "Kushagra's Manager"); 
+		
+		CompanyDirectory accDirectory = new CompanyDirectory(); 
+		accDirectory.addEmployee(man1); 
+		accDirectory.addEmployee(man2); 
+	
+		CompanyDirectory directory = new CompanyDirectory(); 
+		directory.addEmployee(engDirectory); 
+		directory.addEmployee(accDirectory); 
+		directory.showEmployeeDetails(); 
+	} 
+} 
+
+O/P:
+
+100 Lokesh Sharma Pro Developer
+101 Vinay Sharma Developer
+200 Kushagra Garg SEO Manager
+201 Vikram Sharma  Kushagra's Manager
+
+
+Adv:
+
+It describes the class hierarchy that contains primitive and complex objects.
+It makes it easy to add new kinds of the component.
+It facilitates with the flexibility of structure with a manageable class or interface.
+
+
+-------------------------------------------------------------
+
+State Design Pattern:	State pattern is one of the behavioral design pattern. State design pattern is used when an Object changes its 				behavior based on its internal state. If we have to change behavior of an object based on its state, we can have a 				state variable in the Object and use if-else condition block to perform different actions based on the state. 
+
+
+Context:	Defines an interface to client to interact.
+State:		Defines interface for declaring what each concrete state should do.
+ConcreteState:	Provides implementation for methods defined in State.
+
+
+
+interface MobileAlertState 							// State
+{ 
+	public void alert(AlertStateContext ctx); 
+} 
+
+class AlertStateContext 							// Context					
+{ 	
+	private MobileAlertState currentState; 
+
+	public AlertStateContext() 
+	{ 
+		currentState = new Vibration(); 
+	} 
+
+	public void setState(MobileAlertState state) 
+	{ 
+		currentState = state; 
+	} 
+
+	public void alert() 
+	{ 
+		currentState.alert(this); 
+	} 
+} 
+
+class Vibration implements MobileAlertState 					// ConcreteState
+{ 
+	@Override
+	public void alert(AlertStateContext ctx) 
+	{ 
+		System.out.println("vibration..."); 
+	} 
+
+} 
+
+class Silent implements MobileAlertState 					// ConcreteState
+{ 		
+	@Override
+	public void alert(AlertStateContext ctx) 
+	{ 
+		System.out.println("silent..."); 
+	} 
+
+} 
+
+class StatePattern 
+{ 
+	public static void main(String[] args) 
+	{ 
+		AlertStateContext stateContext = new AlertStateContext(); 
+		stateContext.alert(); 
+		stateContext.alert(); 
+		stateContext.setState(new Silent()); 
+		stateContext.alert(); 
+		stateContext.alert(); 
+		stateContext.alert();		 
+	} 
+} 
+
+
+O/P:
+
+vibration...
+vibration...
+silent...
+silent...
+silent...
+
+
+Q. Difference between Strategy and State design Pattern in Java?
+
+Ans: The state design pattern is used to manage and define the state of an object, while the Strategy pattern is used to describe a set of an interchangeable algorithm.
+
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+
 
 
 

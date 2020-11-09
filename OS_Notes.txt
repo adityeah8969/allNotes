@@ -99,6 +99,10 @@ From the above problem statement, it is evident that readers have higher priorit
 
 Here, we use one mutex m and a semaphore w. An integer variable read_count is used to maintain the number of readers currently accessing the resource. The variable read_count is initialized to 0. A value of 1 is given initially to m and w.
 
+read_count = 0
+m = 1
+w = 1
+
 Instead of having the process to acquire lock on the shared resource, we use the mutex m to make the process to acquire and release lock whenever it is updating the read_count variable.
 
 Note: The lock is getting acquired (on m) only when we need to update the read_count variable, not while reading.
@@ -204,9 +208,9 @@ Deadlock avoidance v/s Deadlock prevention:
 
 Deadlock prevention means to block at least one of the following four conditions required for deadlock to occur.
 
-Mutual Exclusion
+Mutual Exclusion (Each process executing the shared data (variables) excludes all others from doing so simultaneously)
 Hold and Wait
-No Preemption (any new process has to wait until the running process finishes its CPU cycle)
+Non Preemption (any new process has to wait until the running process finishes its CPU cycle)
 Circular Wait
 
 In Deadlock avoidance we have to anticipate deadlock before it really occurs and ensure that the system does not go in unsafe state.It is possible to avoid deadlock if resources are allocated carefully. For deadlock avoidance we use Banker’s and Safety algorithm for resource allocation purpose. In deadlock avoidance the maximum number of resources of each type that will be needed are stated at the beginning of the process.
@@ -324,6 +328,8 @@ Fragmentation is of two types −
 
 2. Internal fragmentation: Memory block assigned to process is bigger. Some portion of memory is left unused, as it cannot be used by another process.
 
+Note: Can happen in both secondary and main memory.
+
 -------------------------------------------------------------------------------------------------------------------------------------------
 Types of OS :
 
@@ -348,7 +354,7 @@ Multiple jobs are executed by the CPU by switching between them, but the switche
 
 Advantages of Timesharing operating systems are as follows −
 
-Provides the advantage of quick response.
+# Provides the advantage of quick response.
 # Avoids duplication of software.
 # Reduces CPU idle time.
 
@@ -423,7 +429,17 @@ Soft real-time systems are less restrictive. A critical real-time task gets prio
 
 What is spooling?
 
-Spooling is a process in which data is temporarily gathered to be used and executed by a device, program or the system. It is associated with printing. When different applications send output to the printer at the same time, spooling keeps these all jobs into a disk file and queues them accordingly to the printer.
+Spooling : Simultaneous peripheral operation online, acronym for this is Spooling. A spool is a kind of buffer that holds the jobs for a device till the device is ready to accept the job. Spooling considers disk as a huge buffer that can store as many jobs for the device till the output devices are ready to accept them.
+
+Buffering : The buffer is an area in the main memory that is used to store or hold the data temporarily that is being transmitted either between two devices or between a device or an application. In simple words, buffer temporarily stores data that is being transmitted from one place to another. The act of storing data temporarily in the buffer is called buffering.Buffering helps in matching the speed between the sender and receiver of the data stream. 
+
+Spooling vs Buffering
+
+# The key difference between spooling and buffering is that Spooling can handle the I/O of one job along with the computation of an another   
+  job at the same time while buffering handles I/O of one job along with its computation.
+
+# The buffer is a limited area in main memory while Spool uses the disk as a huge buffer.
+
 
 -------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -431,10 +447,13 @@ Registers:
 
 Registers are a type of computer memory used to quickly accept, store, and transfer data and instructions that are being used immediately by the CPU. The registers used by the CPU are often termed as Processor registers. A processor register may hold an instruction, a storage address, or any data (such as bit sequence or individual characters). The computer needs processor registers for manipulating data and a register for holding a memory address. The register holding the memory location is used to calculate the address of the next instruction after the execution of the current instruction is completed.
 
+-------------------------------------------------------------------------------------------------------------------------------------------
 
 Program counter:
 
 The “program counter,” also called the “instruction pointer,” keeps track of where a computer is in its program sequence. 
+
+-------------------------------------------------------------------------------------------------------------------------------------------
 
 Stack v/s Heap : 
 
