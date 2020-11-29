@@ -1,0 +1,82 @@
+Isolation Level:
+
+Isolation levels define how the changes made to some data repository by one transaction affect other simultaneous transactions. Using @Transactional annotation we can define the isolation level of a spring managed bean.
+
+
+Read anomalies:
+
+i>  Dirty Reads 	: This arises because of reading uncommited updated data when another transaction, in charge of updation, rolls back.
+ii> Non-repeatable Reads: Another transaction could have nipped in and updated the value between the two reads on the same data.
+iii>Phantom Reads	: Another transaction could have nipped in and written/deleted the value between the two reads on the same data.
+
+
+Spring Isolation Levels:
+
+
+				Dirty Reads		Non-repeatable		Phantom
+				
+ISOLATION_READ_UNCOMMITTED	ALLOWED			ALLOWED			ALLOWED
+ISOLATION_READ_COMMITTED	NOT ALLOWED		ALLOWED			ALLOWED
+ISOLATION_REPEATABLE_READ	NOT ALLOWED		NOT ALLOWED		ALLOWED
+ISOLATION_SERIALIZABLE		NOT ALLOWED		NOT ALLOWED		NOT ALLOWED
+
+
+Note:
+
+ISOLATION_SERIALIZABLE restricts all the anomalies at the cost of concurrency. Here all the transactions are executed with locking at all the 
+levels, making them execute in a serialized way.
+
+----------------------------------------------------------
+
+Transaction Propagation:
+
+Transaction Propagation indicates if any component or service will or will not participate in transaction and how will it behave if the calling calling component/service already has or does not have a transaction created already.
+
+There are six types of Transaction Propagations: 
+
+i>  REQUIRED
+ii> SUPPORTS
+iii>NOT_SUPPORTED
+iv> REQUIRES_NEW
+v>  NEVER
+vi> MANDATORY
+
+
+REQUIRED:
+
+The method will create a new transaction if the calling function does not have a transaction, else use the esxisting transaction of calling function.
+
+SUPPORTS:
+
+The method does not make use of a transaction of its own but uses the transaction of the calling function if there exists one.
+
+NOT_SUPPORTED:
+
+The method does not make use of a transaction.
+
+REQUIRES_NEW:
+
+The method always creates a new transaction of its own even if the calling function has a different transaction.
+
+NEVER:
+
+The method cannot create a transaction. If the calling method has a transaction of its own then an exception gets thrown.
+
+MANDATORY:
+
+The method cannot create a transaction but its mandatory for the calling method to create a transaction, otherwise throws an exception.
+
+----------------------------------------------------------
+
+Rollbacks can be used for checked (Custom) exceptions using the folowing syntax,
+
+@Transactional(rollbackFor = CustomException.class)
+public void methodName() throws CustomException{
+
+// ...
+
+}
+
+
+
+

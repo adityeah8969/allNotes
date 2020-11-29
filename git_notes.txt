@@ -1,0 +1,50 @@
+git init
+git status
+git commit -m ""
+git log
+git log -p 				(logs with details of lines added & removed)
+
+git log --pretty=onlline
+git log --pretty=short
+git log --pretty=full
+
+rf -rf .git				
+git diff                    		(Compares staging area with working directory)
+git diff --staged	    		(Compares staging area with last commit)
+git commit -a -m "Direct Commit" 	(skips untracked files/unstaged files and commits the rest) 
+git rm file_name.txt			(removes and add the file to staging area)
+git mv file_name1.txt file_name2.txt	(renames and add the file to staging area)
+git rm --cached file_name.txt		(removes the file from staging area)
+git restore --staged file_name.txt	( ,, )	
+
+
+If before adding (to stage) we need to roll back to previous commit and lose the current changes(not relevant now), following commands
+can be used, 
+
+git checkout -- file_name.txt		(restores the content of file_name.txt to the last commit)		// can't undo
+git checkout -f 			(state of the entire directory is restored to its last commit)		// can't undo
+
+Note: Above commands accnot be applied post files get added to staging area. (Security Feature)
+
+git remote add origin git@github.com:sample_url.git	(Adding a remote pointing to the repositories url on github)
+
+git remote				(lists all the remotes added to the current local repository)
+git remote -v				(lists all the remotes with url for pull / push)
+
+git push -u origin master		(pushes the local code to the master branch associated with the remote named 'origin')
+
+git checkout -b develop			(creates and switches the branch named 'develop')
+git checkout master			(switches to master branch)
+
+git merge develop			(merges the develop branch with the current branch)
+
+git branch				(lists all the branches associated with the current directory)
+git branch -v				(lists all the branches associated with the current directory along with last commit hash & message)
+
+git branch --merged			(lists already merged branches)
+git branch --no-merged			(lists branches which are not merged)
+
+git branch -d develop			(gives out a warning stating the branch cannot be deleted because it has not been merged yet)
+git branch -D develop			(Forced deletion of the branch)
+
+

@@ -1,0 +1,598 @@
+Kafka is a distributed message streaming platform that uses publish and subscribe mechanism to stream the records. This was developed originally by LinkedIn and later open-sourced.
+
+Messaging Systems:
+
+A Messaging system is responsible for transferring data from one application to another so that applications can focus on data without getting bogged down on data transmission and sharing.
+
+Two types:
+
+1. Point to Point Messaging System:
+
+i>   Messages are persisted in a queue.
+ii>  A particular message can only be consumed by one consumer.
+iii> There is no time dependency laid for the receiver to receive the message.
+iv>  On receiving the message, the receiver sends an acknowledgement back.
+
+2. Publish-Subscribe Messaging System:
+
+i>  Messages are persisted in a topic.
+ii> A particular message can be consumed by any number of consumers.
+iii>There is time dependency laid for the receiver to receive the message.
+iv> On receiving the message, the receiver does not sends an acknowledgement back.
+
+
+---------------------------------------------------------------------------
+
+Kafka Terminologies:
+
+# Topics:
+
+A stream of messages belonging to a particular category is called a topic. It is a logical feed name to which records are published. It is uniquely identified by its topic name.
+
+# Partitions:
+
+Topics get split among partitions. All the messages inside partition are ordered and immutable. Each message has a unique identifier associated with it known as Offset.
+
+# Replica:
+
+Replicas are backups of a partition. They are used only for fault tolerance and not for reading / writing.
+
+# Producers:
+
+Producers are the applications which write/publish data to topics within a cluster using the Producing APIs. Data can be published both at partition and topic levels.
+
+# Consumers:
+
+Consumers are the applications which read/consume data from topics within a cluster using the Consuming APIs. Data can be read from both partition and topic levels. A consumer is associated with a group of related consumers called Consumer Group.
+
+# Brokers
+
+Brokers (or Kafka Servers) are softwares which maintain and manage the published messages as well as the consumer-offsets for proper delivery of the messages.
+
+# Zookeeper:
+
+Zookeeper is used to monitor kafka cluster and co-ordinate with each broker. It keeps all the metadata info related to kafka cluster in the form of key-value pair. Metadata includes configuration info and health status of each broker. A set of Zookeeper nodes working together is known as Zookeeper ensemble or Zookeeper cluster.
+
+---------------------------------------------------------------------------
+
+sudo kill -9 $(sudo lsof -t -i:8080) 
+
+Start-up commands:
+
+Zookeeper start: 	
+~/apache_kafka/apache-zookeeper-3.5.8-bin/bin/zkServer.sh start
+
+Zookeeper stop:
+~/apache_kafka/apache-zookeeper-3.5.8-bin/bin/zkServer.sh stop
+
+Kafka start: 		
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-server-start.sh ~/apache_kafka/kafka_2.13-2.6.0/config/server.properties
+
+
+kafka topic creation:
+
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic myTopic --partitions 1 --replication-factor 1
+
+O/P: Created topic myTopic.
+
+
+
+listing down topics:
+
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+O/P: myTopic 
+
+
+
+Describing topics:
+
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic myTopic
+
+O/P: 
+
+Topic: myTopic	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=1073741824
+	Topic: myTopic	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+
+
+
+
+Producing message to topics:
+
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic myTopic
+
+>Hey! whats up
+>Heyo
+>Poddar Murdabad
+
+
+
+
+Consuming message from topics:
+
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic myTopic --from-beginning
+
+>Hey! whats up
+>Heyo
+>Poddar Murdabad
+
+Note: 
+
+Above command generates a default consumer group and adds the created consumer the group. Following command can be used to generate a custom consumer group instead,
+
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic myTopic --from-beginning --group  myConsumerGroup
+
+
+
+
+
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+console-consumer-18581
+
+
+
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group console-consumer-18581
+
+GROUP  			 TOPIC    PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG  CONSUMER-ID 			HOST	       CLIENT-ID 
+console-consumer-18581   myTopic  0 	     -		     3      	     -    consumer-console-consumer	/127.0.01  consumer-console-
+										  -18581-1-d3cf5b2d-9395-		   consumer-18581-1
+										  4b8a-aee7-215b138f8fe5   
+
+
+---------------------------------------------------------------------------
+
+Setting up multiple 3 separate ZooKeeper nodes:
+
+
+Create 3 directories zooKeeper1, zooKeeper2, zooKeeper3 with extracted zooKeeper binaries inside and change the /conf/zoo.cfg accordingly,
+
+
+(base) aditya@aditya-HP-Notebook:~$ cat ~/apache_kafka/zooKeeper1/conf/zoo.cfg
+# The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial 
+# synchronization phase can take
+initLimit=10
+# The number of ticks that can pass between 
+# sending a request and getting an acknowledgement
+syncLimit=5
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just 
+# example sakes.
+dataDir=/tmp/zookeeper-1				// dataDir for node 1: /tmp/zookeeper-1 					
+# the port at which the clients will connect
+clientPort=2181						// 2181 client port for node 1
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the 
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to "0" to disable auto purge feature
+#autopurge.purgeInterval=1
+4lw.commands.whitelist=*
+
+
+server.1=localhost:2788:3788				// server.1 associates 1 to the id of node 1 ('1' Present in /tmp/zookeeper-1/myid)
+server.2=localhost:2888:3888				// port1:port2 , port1 -> port to be used for communicating with the nodes internally 
+server.3=localhost:2988:3988				// port2 -> It is used for electing master node
+
+
+(base) aditya@aditya-HP-Notebook:~$ cat ~/apache_kafka/zooKeeper2/conf/zoo.cfg
+# The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial 
+# synchronization phase can take
+initLimit=10
+# The number of ticks that can pass between 
+# sending a request and getting an acknowledgement
+syncLimit=5
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just 
+# example sakes.
+dataDir=/tmp/zookeeper-2				// dataDir for node 2: /tmp/zookeeper-2 				
+# the port at which the clients will connect
+clientPort=2182						// 2182 client port for node 2
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the 
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to "0" to disable auto purge feature
+#autopurge.purgeInterval=1
+4lw.commands.whitelist=*
+
+server.1=localhost:2788:3788
+server.2=localhost:2888:3888
+server.3=localhost:2988:3988
+
+
+(base) aditya@aditya-HP-Notebook:~$ cat ~/apache_kafka/zooKeeper3/conf/zoo.cfg
+# The number of milliseconds of each tick
+tickTime=2000
+# The number of ticks that the initial 
+# synchronization phase can take
+initLimit=10
+# The number of ticks that can pass between 
+# sending a request and getting an acknowledgement
+syncLimit=5
+# the directory where the snapshot is stored.
+# do not use /tmp for storage, /tmp here is just 
+# example sakes.
+dataDir=/tmp/zookeeper-3				// dataDir for node 3: /tmp/zookeeper-3 
+# the port at which the clients will connect
+clientPort=2183						// 2183 client port for node 3
+# the maximum number of client connections.
+# increase this if you need to handle more clients
+#maxClientCnxns=60
+#
+# Be sure to read the maintenance section of the 
+# administrator guide before turning on autopurge.
+#
+# http://zookeeper.apache.org/doc/current/zookeeperAdmin.html#sc_maintenance
+#
+# The number of snapshots to retain in dataDir
+#autopurge.snapRetainCount=3
+# Purge task interval in hours
+# Set to "0" to disable auto purge feature
+#autopurge.purgeInterval=1
+4lw.commands.whitelist=*
+
+server.1=localhost:2788:3788
+server.2=localhost:2888:3888
+server.3=localhost:2988:3988
+
+
+(base) aditya@aditya-HP-Notebook:~$ mkdir /tmp/zookeeper-1
+(base) aditya@aditya-HP-Notebook:~$ mkdir /tmp/zookeeper-2
+(base) aditya@aditya-HP-Notebook:~$ mkdir /tmp/zookeeper-3
+(base) aditya@aditya-HP-Notebook:~$ echo 1 >> /tmp/zookeeper-1/myid
+(base) aditya@aditya-HP-Notebook:~$ echo 2 >> /tmp/zookeeper-2/myid
+(base) aditya@aditya-HP-Notebook:~$ echo 3 >> /tmp/zookeeper-3/myid
+				  
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/zooKeeper1/bin/zkServer.sh start
+ZooKeeper JMX enabled by default
+Using config: /home/aditya/apache_kafka/zooKeeper1/bin/../conf/zoo.cfg
+Starting zookeeper ... STARTED
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/zooKeeper2/bin/zkServer.sh start
+ZooKeeper JMX enabled by default
+Using config: /home/aditya/apache_kafka/zooKeeper2/bin/../conf/zoo.cfg
+Starting zookeeper ... STARTED
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/zooKeeper3/bin/zkServer.sh start
+ZooKeeper JMX enabled by default
+Using config: /home/aditya/apache_kafka/zooKeeper3/bin/../conf/zoo.cfg
+Starting zookeeper ... STARTED
+
+
+---------------------------------------------------------------------------
+
+Let there be 3 brokers kafka1, kafka2, kafka3. Getting kafka binaries into 3 directories corresponding to 3 brokers,
+
+(base) aditya@aditya-HP-Notebook:~/apache_kafka$ cp -r kafka_2.13-2.6.0/ kafka1/
+(base) aditya@aditya-HP-Notebook:~/apache_kafka$ cp -r kafka_2.13-2.6.0/ kafka2/
+(base) aditya@aditya-HP-Notebook:~/apache_kafka$ cp -r kafka_2.13-2.6.0/ kafka3/
+
+
+Make the following changes in the server.properties inside (Broker)/config/server.properties file of the individual brokers,
+
+
+broker.id=1									// Broker Id
+listeners=PLAINTEXT://localhost:9092						// kafka node listens at this url. 
+log.dirs=/tmp/kafka-logs-1
+zookeeper.connect=localhost:2181,localhost:2182,localhost:2183			// linearly checking if the broker can be connected to atleast
+										// one of the comma-separated zookeeper nodes.
+
+broker.id=2
+listeners=PLAINTEXT://localhost:9093
+log.dirs=/tmp/kafka-logs-2
+zookeeper.connect=localhost:2181,localhost:2182,localhost:2183
+
+
+broker.id=3
+listeners=PLAINTEXT://localhost:9094
+log.dirs=/tmp/kafka-logs-3
+zookeeper.connect=localhost:2181,localhost:2182,localhost:2183
+
+
+Launching all the three nodes inside the kafka cluster,
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka1/bin/kafka-server-start.sh ~/apache_kafka/kafka1/config/server.properties
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka2/bin/kafka-server-start.sh ~/apache_kafka/kafka2/config/server.properties
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka3/bin/kafka-server-start.sh ~/apache_kafka/kafka3/config/server.properties
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --create --topic topic01 --partitions 3 --replication-factor 3
+Created topic topic01.
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092,localhost:9092,localhost:9094 --describe --topic topic01
+Topic: topic01	PartitionCount: 3	ReplicationFactor: 3	Configs: segment.bytes=1073741824
+	Topic: topic01	Partition: 0	Leader: 3	Replicas: 3,1,2	Isr: 3,1,2
+	Topic: topic01	Partition: 1	Leader: 1	Replicas: 1,2,3	Isr: 1,2,3
+	Topic: topic01	Partition: 2	Leader: 2	Replicas: 2,3,1	Isr: 2,3,1
+
+
+---------------------------------------------------------------------------
+
+Internals of topics, partition and replications:
+
+Controller node is the broker which is responsible for managing the states of the partitions, replicas and for performing administrative tasks like reassigning partitions.
+
+Creating a new topic named 'topic02' with 3 partitions and 2 replication factor,
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092,localhost:9093,localhost:9094 --create --topic topic02 --partitions 3 --replication-factor 2
+Created topic topic02.
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092,localhost:9092,localhost:9094 --describe --topic topic02
+Topic: topic02	PartitionCount: 3	ReplicationFactor: 2	Configs: segment.bytes=1073741824
+	Topic: topic02	Partition: 0	Leader: 1	Replicas: 1,2	Isr: 1,2
+	Topic: topic02	Partition: 1	Leader: 2	Replicas: 2,3	Isr: 2,3
+	Topic: topic02	Partition: 2	Leader: 3	Replicas: 3,1	Isr: 3,1
+
+
+
+As described by the above command, the 3 created partitions got distributed among the brokers in a round robin fashion. Also one of the broker
+is considered the leader for that particular partition. And all other replica partions are present on other brokers.
+
+Partition states:
+
+i>  Non-Existent Partition: Partition was either never created or was created and then deleted.
+ii> New Partition: Partitions got created, have replicas assigned but the leader has not been decided.
+iii>Online Partition: Partitions are fully functional with leader election also done.
+iv> Offline Partition: If after the successful leader election, the leader of the partition dies.
+
+
+Replica States:
+
+i>   Non Existent Replica: Replica was either never created or was created and then deleted.
+ii>  New Replica: Replica just created, but can only be a follower.
+iii> Online Replica: Replica got created and can be transformed into a leader as well.
+iv>  Offline Replica: Replica dying because of the broker hosting the replica getting down.
+
+
+---------------------------------------------------------------------------
+
+Command to list down all the brokers,
+
+~/apache_kafka/apache-zookeeper-3.5.8-bin/bin/zkCli.sh  -server localhost:2181  			// Opens ZooKeeper CLI
+ls /brokers/ids												// lists down broker ids
+ls /brokers/topics											// lists topics 
+
+---------------------------------------------------------------------------
+
+Creating and describing a sample topic named 'test-topic',
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --topic test-topic --partitions 1 --replication-factor 1
+Created topic test-topic.
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test-topic
+Topic: test-topic	PartitionCount: 1	ReplicationFactor: 1	Configs: segment.bytes=1073741824
+	Topic: test-topic	Partition: 0	Leader: 2	Replicas: 2	Isr: 2
+
+
+
+Altering the partitions,
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --alter --topic test-topic --partitions 2
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test-topic
+Topic: test-topic	PartitionCount: 2	ReplicationFactor: 1	Configs: segment.bytes=1073741824
+	Topic: test-topic	Partition: 0	Leader: 2	Replicas: 2	Isr: 2
+	Topic: test-topic	Partition: 1	Leader: 3	Replicas: 3	Isr: 3
+
+
+Note: The partitions can only be increased as removing it may cause data loss.
+
+
+
+Partition reassignment,
+
+Create a json file with the test-topic description,
+
+(base) aditya@aditya-HP-Notebook:~$ cat topicsToMove.json 
+{"topics": [{"topic":"test-topic"}],
+"version":1
+}
+
+~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --topics-to-move-json-file topicsToMove.json --broker-list "1,2" --generate
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --topics-to-move-json-file topicsToMove.json --broker-list "1,2" --generate
+Warning: --zookeeper is deprecated, and will be removed in a future version of Kafka.
+Current partition replica assignment
+{"version":1,"partitions":[{"topic":"test-topic","partition":0,"replicas":[2],"log_dirs":["any"]},{"topic":"test-topic","partition":1,"replicas":[3],"log_dirs":["any"]}]}
+
+Proposed partition reassignment configuration
+{"version":1,"partitions":[{"topic":"test-topic","partition":0,"replicas":[1],"log_dirs":["any"]},{"topic":"test-topic","partition":1,"replicas":[2],"log_dirs":["any"]}]}
+
+
+(base) aditya@aditya-HP-Notebook:~$ touch suggested_change.json
+(base) aditya@aditya-HP-Notebook:~$ nano suggested_change.json 
+(base) aditya@aditya-HP-Notebook:~$ cat suggested_change.json 
+{"version":1,"partitions":[{"topic":"test-topic","partition":0,"replicas":[1]},{"topic":"test-topic","partition":1,"replicas":[2]}]}
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file suggested_change.json --execute
+Warning: --zookeeper is deprecated, and will be removed in a future version of Kafka.
+Current partition replica assignment
+
+{"version":1,"partitions":[{"topic":"test-topic","partition":0,"replicas":[2],"log_dirs":["any"]},{"topic":"test-topic","partition":1,"replicas":[3],"log_dirs":["any"]}]}
+
+Save this to use as the --reassignment-json-file option during rollback
+Successfully started partition reassignments for test-topic-0,test-topic-1
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file suggested_change.json --verify
+Warning: --zookeeper is deprecated, and will be removed in a future version of Kafka.
+Warning: because you are using the deprecated --zookeeper option, the results may be incomplete.  Use --bootstrap-server instead for more accurate results.
+Status of partition reassignment:
+Reassignment of partition test-topic-0 is complete.
+Reassignment of partition test-topic-1 is complete.
+Clearing broker-level throttles on brokers 1,2,3
+Clearing topic-level throttles on topic test-topic
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test-topic
+Topic: test-topic	PartitionCount: 2	ReplicationFactor: 1	Configs: segment.bytes=1073741824
+	Topic: test-topic	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: test-topic	Partition: 1	Leader: 2	Replicas: 2	Isr: 2
+
+
+
+
+Replica reassignment,
+
+(base) aditya@aditya-HP-Notebook:~$ cat suggested_change.json 
+{"version":1,"partitions":[{"topic":"test-topic","partition":0,"replicas":[1,2]},{"topic":"test-topic","partition":1,"replicas":[2,3]}]}
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file suggested_change.json --execute
+Warning: --zookeeper is deprecated, and will be removed in a future version of Kafka.
+Current partition replica assignment
+
+{"version":1,"partitions":[{"topic":"test-topic","partition":0,"replicas":[1],"log_dirs":["any"]},{"topic":"test-topic","partition":1,"replicas":[2],"log_dirs":["any"]}]}
+
+Save this to use as the --reassignment-json-file option during rollback
+Successfully started partition reassignments for test-topic-0,test-topic-1
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-reassign-partitions.sh --zookeeper localhost:2181 --reassignment-json-file suggested_change.json --verify
+Warning: --zookeeper is deprecated, and will be removed in a future version of Kafka.
+Warning: because you are using the deprecated --zookeeper option, the results may be incomplete.  Use --bootstrap-server instead for more accurate results.
+Status of partition reassignment:
+Reassignment of partition test-topic-0 is complete.
+Reassignment of partition test-topic-1 is complete.
+Clearing broker-level throttles on brokers 1,2,3
+Clearing topic-level throttles on topic test-topic
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic test-topic
+Topic: test-topic	PartitionCount: 2	ReplicationFactor: 2	Configs: segment.bytes=1073741824
+	Topic: test-topic	Partition: 0	Leader: 1	Replicas: 1,2	Isr: 1,2
+	Topic: test-topic	Partition: 1	Leader: 2	Replicas: 2,3	Isr: 2,3
+
+
+---------------------------------------------------------------------------
+
+Internals of kafka Producers,
+
+Lets say a producer has to send 10 messages (records) {a,b,c,d,e,f,g,h,i,j} on a single topic with 3 partitions with id P0, P1, P2. While getting assigned to a partion, the messages get split in a round-robin fashion. So following would be the message offset amongst partitions,
+
+
+
+Partions		Offset
+
+		0 1 2 3 4 5 6 7 8 9
+
+P0		a d g j
+P1		b e h
+P2		c f i
+
+
+
+Offset: The records in the partition are each assigned a sequential id number called offset than uniquely identifies each record withing the partition.
+
+Types:
+
+Log-end Offset: Offset of the last message written to a log/partition.
+Current Offset: Pointer to the last record that kafka hasalready sent to a consumer in the recent most poll.
+Committed Offset: Marking an offset as consumed is called committing an offset(Committed offset)
+
+
+Structure of the record that producer sends,
+
+Message:
+ key:				// the key can be anything, its used to send a message to a specific partition.
+ payload: 'a'
+
+Structure of the record that Kafka stores,
+
+Message:
+ key:				// same as the one that producer sends
+ payload: 'a'
+ topic:		
+ partition:
+ offset:
+ timestamp:			// the time of storing the message.
+
+---------------------------------------------------------------------------
+
+Internals of kafka Consumers,
+
+Consumers poll messages from brokers using consumer.poll() API. 'max.poll.record' configuration can be set at consumer level to limit the maximum number of records that can be polled.
+
+Consumers can use the consumer.commit() API to let the broker know about the committed/processed messages. This can be done in auto-commit or manual commit fashion.
+
+All the offsets mentioned above are maintained at consumer group level.
+
+---------------------------------------------------------------------------
+
+Internals of Consumer Group,
+
+Consumer Group is a logical entity in kafka ecosystem which mainly provides parallel processing/scalable consumption to consumer clients.
+
+i>   Each consumer must be associated with some consumer group.
+ii>  Makes sure there is no duplication within consumers who are part of the same consumer group i.e same partition cannot be polled by different consumers inside the same CG.
+iii> Consumer inside a consumer group may sit idle if the number of consumers are more than the number of partitions.
+
+The process of re-distributing partitions to the consumers within a consumer group is known as Consumer Group Rebalancing. Rebalancing of a consumer group happens in below cases,
+
+i>  A consumer joining the consumer group.
+ii> A consumer leaving the consumer group.
+iii>If partitions are added to the topics which of these consumers are intersted in.
+iv> If a partition goes in offline state. 
+
+---------------------------------------------------------------------------
+
+
+Group Coordinator:
+
+i>  Brokers in the kafka cluster are assigned as a group coordinator for a subset of consumer groups.
+ii> Group coordinator basically maintains/manages a list of consumer groups.
+iii>Group coordinator initiates a rebalance process call.
+iv> Group coordinator communicates the new assignment of partitions to all the consumers.
+
+Note: Until the rebalance process is not done, the consumers within the group will be blocked for any reads of the messages.
+
+
+Group Leader:
+
+i>  First Consumer to join a consumer group is elected as the group leader.
+ii> Group leader has the list of active members and the selected assignment strategy.
+iii>Group leader executes the rebalance process.
+iv> Group leader sends the new assignment of partitions to the Group coordinator.
+
+
+Process of a consumer joining a CG:
+
+i>  When a consumer starts, it sends FindCoordinator request to obtain the group coordinator which is responsible for its group.
+ii> Then, the consumer initiates the rebalance protocol by sending a JoinGroup request.
+iii>Next, all the members of that consumer group send a SyncGroup request to the coordinator.
+iv> Each consumer periodically sends a Heartbeat signal request to the group coordinator for keeping its connection alive.
+
+
+---------------------------------------------------------------------------
+
+
+
+
+

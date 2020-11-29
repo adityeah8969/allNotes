@@ -130,6 +130,9 @@ W(A)
 
 The above schedule is not conflict serializable. For making it serializable we need to swap R(A) & W(A) which are both conflicting.
 
+
+
+
 T1         T2
 -----     ------
           R(A)
@@ -167,7 +170,7 @@ Read vs Initial Read: You may be confused by the term initial read. Here initial
 
 2. Final Write: Final write operations on each data item must match in both the schedules. For example, a data item X is last written by Transaction T1 in schedule S1 then in S2, the last write operation on X should be performed by the transaction T1.
 
-3. Update Read: If in schedule S1, the transaction T1 is reading a data item updated by T2 then in schedule S2, T1 should read the value after the write operation of T2 on same data item. For example, In schedule S1, T1 performs a read operation on X after the write operation on X by T2 then in S2, T1 should read the X after T2 performs write on X. 
+3. Update Read: If in schedule S1, the transaction T1 is reading a data item updated by T2 then in schedule S2, T1 should read the value after the write operation of T2 on same data item. For example, In schedule S1, T2 performs a read operation on X after the write operation on X by T1 then in S2, T2 should read the X after T1 performs write on X. 
 
 
 S1(non serial)			S2(serial)
