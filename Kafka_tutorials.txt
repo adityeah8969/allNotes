@@ -349,7 +349,7 @@ Topic: topic02	PartitionCount: 3	ReplicationFactor: 2	Configs: segment.bytes=107
 
 
 As described by the above command, the 3 created partitions got distributed among the brokers in a round robin fashion. Also one of the broker
-is considered the leader for that particular partition. And all other replica partions are present on other brokers.
+is considered the leader for that particular partition. And all other replica partitions are present on other brokers.
 
 Partition states:
 
@@ -509,12 +509,12 @@ P2		c f i
 
 
 
-Offset: The records in the partition are each assigned a sequential id number called offset than uniquely identifies each record withing the partition.
+Offset: The records in the partition are each assigned a sequential id number called offset than uniquely identifies each record within the partition.
 
 Types:
 
 Log-end Offset: Offset of the last message written to a log/partition.
-Current Offset: Pointer to the last record that kafka hasalready sent to a consumer in the recent most poll.
+Current Offset: Pointer to the last record that kafka has already sent to a consumer in the recent most poll.
 Committed Offset: Marking an offset as consumed is called committing an offset(Committed offset)
 
 
@@ -591,6 +591,217 @@ iv> Each consumer periodically sends a Heartbeat signal request to the group coo
 
 
 ---------------------------------------------------------------------------
+
+
+Create a kafka cluster with 3 brokers, one topic named myTopic, one producer, and a consumer inside the consumer group 'myGroup'. 
+
+In the following command, all the partition have been assigned to a single consumer (same CONSUMER-ID ).
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group myGroup
+
+GROUP    TOPIC   PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG  CONSUMER-ID                    HOST        CLIENT-ID
+myGroup  myTopic 0          1               1               0    consumer-myGroup-1-02f1cfa1... /127.0.0.1  consumer-myGroup-1
+myGroup  myTopic 1          1               1               0    consumer-myGroup-1-02f1cfa1... /127.0.0.1  consumer-myGroup-1
+myGroup  myTopic 2          0               0               0    consumer-myGroup-1-02f1cfa1... /127.0.0.1  consumer-myGroup-1
+
+
+Running the same command after adding one more consumer to the same consumer group, notice one new CONSUMER-ID getting added.
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group myGroup
+
+GROUP    TOPIC   PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG  CONSUMER-ID                    HOST        CLIENT-ID
+myGroup  myTopic 0          1               1               0    consumer-myGroup-1-02f1cfa1... /127.0.0.1  consumer-myGroup-1
+myGroup  myTopic 1          1               1               0    consumer-myGroup-1-02f1cfa1... /127.0.0.1  consumer-myGroup-1
+myGroup  myTopic 2          0               0               0    consumer-myGroup-1-3bdadb1d... /127.0.0.1  consumer-myGroup-1
+
+Running the same command after adding one more consumer to the same consumer group again, notice one new CONSUMER-ID getting added.
+
+
+(base) aditya@aditya-HP-Notebook:~$ ~/apache_kafka/kafka_2.13-2.6.0/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group myGroup
+
+GROUP    TOPIC   PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG  CONSUMER-ID                    HOST        CLIENT-ID
+myGroup  myTopic 1          1               1               0    consumer-myGroup-1-3bdadb1d... /127.0.0.1  consumer-myGroup-1
+myGroup  myTopic 2          0               0               0    consumer-myGroup-1-db410b15... /127.0.0.1  consumer-myGroup-1
+myGroup  myTopic 0          1               1               0    consumer-myGroup-1-02f1cfa1... /127.0.0.1  consumer-myGroup-1
+
+
+The partitions get reassigned to different consumers on addition of consumers. Since there are 3 partitions adding any further consumer will
+make it sit idle.
+
+
+---------------------------------------------------------------------------
+
+Producer Configs:
+
+(base) aditya@aditya-HP-Notebook:~/apache_kafka/kafka_2.13-2.6.0/config$ cat producer.properties 
+
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# see org.apache.kafka.clients.producer.ProducerConfig for more details
+
+############################# Producer Basics #############################
+
+# list of brokers used for bootstrapping knowledge about the rest of the cluster
+# format: host1:port1,host2:port2 ...
+bootstrap.servers=localhost:9092
+
+# specify the compression codec for all data generated: none, gzip, snappy, lz4, zstd
+compression.type=none
+
+# name of the partitioner class for partitioning events; default partition spreads data randomly
+#partitioner.class=
+
+# the maximum amount of time the client will wait for the response of a request
+#request.timeout.ms=
+
+# how long `KafkaProducer.send` and `KafkaProducer.partitionsFor` will block for
+#max.block.ms=
+
+# the producer will wait for up to the given delay to allow other records to be sent so that the sends can be batched together
+#linger.ms=
+
+# the maximum size of a request in bytes
+#max.request.size=
+
+# the default batch size in bytes when batching multiple records sent to a partition
+#batch.size=
+
+# the total bytes of memory the producer can use to buffer records waiting to be sent to the server
+#buffer.memory=
+
+
+(base) aditya@aditya-HP-Notebook:
+
+
+---------------------------------------------------------------------------
+
+Following configurations can be added to the producer.properties file,
+
+# bootstrap.servers:
+
+Is a list of host/ports pair used for establishing initial connection with kafka cluster. The client will makes use of all the servers irrespective of which servers are specified here for bootstrapping - the list only impacts the initial listused to discover the full set of servers. It should be in the form of host1:port1,host2:port2,host3:port3, .... Since these servers are just used for the initial connection 
+to discover the full cluster membership, the list need not contain full set of servers (its advisable to have a few, in case some of them are down).
+
+
+# client.id:
+
+'client.id' is an id string used to track the source of the request beyond its ip/port by allowing a logical application name to be included in logs.
+
+# SERIALIZER:
+
+Serialization is the process of converting an object into a stream of bytes. Its done mostly for persistence and transmission across network.
+
+key.serializer & value.serializer: 
+
+Serializer class for key that implements the org.apache.kafka.common.serialization.Serializer interface.
+
+# CONNECTIONS.MAX.IDLE.MS:
+
+connections.max.idele.ms: Close idle conections after the number of milliseconds specified by the configs.
+
+# Acks:
+
+Ack stands for acknowledgement, that a kafka cluster returns when producer sends records. Three settings are possible:
+
+i> Acks=0: Producer does not wait for any acknowledgement, may lead to data loss.
+ii>Acks=1: Default behaviour, here leader writes the record and sends back the ack to producer immediately, without waiting for acks 		   confirming writes in replicas.
+iii>Acks=-1: Here the leader waits not only writes the record in its own partition but also waits for the same to happen in followers before 		     sending the fianal acks back to producer. This may bring slight bit of latency.
+
+
+# compression.type: 
+
+Used to compress record. Valid values are gzip, snappy, lz4, zstd. Compression is done on batches of data, so the effiacy pf batching will also come into play.
+
+# batch.size:
+
+The producer will attempt to batch records together into a fewer requests, leading to better performance and throughput. This config is based on batch size in bytes (default: 16KB).
+
+# buffer.memory:
+
+The total RAM the producer can use to buffer records to be sent.
+
+# linger.ms:
+
+While grouping the records together in RAM, rather than sending records immediately, Producer waits for a certain duration allowing other
+requests to be batched in the current batch. This duration is specified by 'linger.ms'.
+
+# max.request.size:
+
+The will limit the maximum batch size of the request.
+
+
+---------------------------------------------------------------------------
+
+Consumer Configs:
+
+
+(base) aditya@aditya-HP-Notebook:~/apache_kafka/kafka_2.13-2.6.0/config$ cat consumer.properties 
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+# 
+#    http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# see org.apache.kafka.clients.consumer.ConsumerConfig for more details
+
+# list of brokers used for bootstrapping knowledge about the rest of the cluster
+# format: host1:port1,host2:port2 ...
+bootstrap.servers=localhost:9092
+
+# consumer group id
+group.id=test-consumer-group
+
+# What to do when there is no initial offset in Kafka or if the current
+# offset does not exist any more on the server: latest, earliest, none
+#auto.offset.reset=
+
+(base) aditya@aditya-HP-Notebook:
+
+
+
+Following configurations can be added to the consumer.properties file,
+
+# bootstrap.servers: same as above
+# client.id:	     same as above
+
+# DESERIALIZER:
+
+key.deserializer & value.deserializer: for deserializing and getting the record back.
+
+
+# group.id: unique string used for identifying the consumer group this consumer belongs to.
+
+# fetch.min.bytes: minimum amount of data (in bytes) the consumer can accept. If the server has lesser data, it waits & accumulates till the 
+  accumulated data size is more than this config.
+
+# heartbeat.interval.ms: The time interval between heartbeats sent to the group coordinator. 
+# session.timeout.ms: If no heartbeats are received within this duration, then the client gets removed.
+# fetch.max.bytes: this will limit the maximum size of the record that can be fetched.
+# max.partition.fetch.bytes: this will limit the maximum size of the record that can be fetched from a partition.
+ 
+
+
 
 
 

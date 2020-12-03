@@ -1,0 +1,2636 @@
+IoC v/s DI:
+
+Inversion of control is the principle where the control flow of a program is inverted: instead of the programmer controlling the flow of a program, the external sources (framework, services, other components) take control of it. 
+
+Dependency Injection is a design pattern which implements IOC principle. Dependency Injection (DI) means that this is done without the object intervention, usually by a framework component that passes constructor parameters and set properties.
+
+--------------------------------------------------------------------------------------
+
+Spring IoC Container:
+
+The Spring container is at the core of the Spring Framework. The container will create the objects, wire them together, configure them, and manage their complete life cycle from creation till destruction. The Spring container uses DI to manage the components that make up an application. The container gets its instructions on what objects to instantiate, configure, and assemble by reading the configuration metadata provided. The configuration metadata can be represented either by XML, Java annotations, or Java code. 
+
+Spring provides the following two distinct types of containers:
+
+# Spring BeanFactory Container:
+This is the simplest container providing the basic support for DI and is defined by the org.springframework.beans.factory.BeanFactory interface.
+
+# Spring ApplicationContext Container:
+This container adds more enterprise-specific functionality such as the ability to resolve textual messages from a properties file and the ability to publish application events to interested event listeners. This container is defined by the org.springframework.context.ApplicationContext interface. The ApplicationContext container includes all functionality of the BeanFactorycontainer, so it is generally recommended over BeanFactory.
+
+
+--------------------------------------------------------------------------------------
+
+Setter injection:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+		
+		
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		Triangle triangle = (Triangle) context.getBean("triangle");
+		triangle.draw();
+		
+				
+	}
+
+}
+
+
+package org.aditya.javabrains;
+
+public class Triangle {
+	
+	private String type;
+	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {					// uses setter injection
+		this.type = type;
+	}
+
+	public void draw() {
+		System.out.println(getType() + "Triangle drawn");
+	}
+
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle">
+		<property name="type" value="Equilateral" />				 //'property' tag gets used for setter injection
+	</bean>
+</beans>
+
+
+
+O/P:
+
+EquilateralTriangle drawn
+
+--------------------------------------------------------------------------------------
+
+Constructor injection:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		Triangle triangle = (Triangle) context.getBean("triangle");
+		triangle.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+public class Triangle {
+	
+	private String type;
+	
+	private int height;
+	
+	public int getHeight() {
+		return height;
+	}
+
+//	public void setHeight(int height) {
+//		this.height = height;
+//	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Triangle(String type, int height) {
+		super();
+		this.type = type;
+		this.height = height;
+	}
+
+	public Triangle(String type) {
+		super();
+		this.type = type;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+//	public void setType(String type) {
+//		this.type = type;
+//	}
+
+	public void draw() {
+		System.out.println(getHeight()+" " +getType() + " Triangle drawn");
+	}
+
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle">
+		<constructor-arg type="String" value="Equilateral" />				// 'constructor-arg' tag is used for 
+		<constructor-arg type="int" value="20" />					// constructor injection.
+	</bean>											// 'type' is used to distinguish between
+</beans>											// parameter types of constructor arguments.
+
+
+--------------------------------------------------------------------------------------
+
+Injecting Objects:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		Triangle triangle = (Triangle) context.getBean("triangle");
+		triangle.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+public class Triangle {
+	
+	
+	private Point pointA;
+	private Point pointB;
+	private Point pointC;
+	
+	public Point getPointA() {
+		return pointA;
+	}
+
+	public void setPointA(Point pointA) {
+		this.pointA = pointA;
+	}
+
+	public Point getPointB() {
+		return pointB;
+	}
+
+	public void setPointB(Point pointB) {
+		this.pointB = pointB;
+	}
+
+	public Point getPointC() {
+		return pointC;
+	}
+
+	public void setPointC(Point pointC) {
+		this.pointC = pointC;
+	}
+
+	public void draw() {
+		System.out.println("pointA: "+getPointA().getX()+","+getPointA().getY());
+		System.out.println("pointB: "+getPointB().getX()+","+getPointB().getY());
+		System.out.println("pointC: "+getPointC().getX()+","+getPointC().getY());
+	}
+
+}
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle">
+		<property name = "pointA" ref = "zeroPoint" />					// 'ref' is used reference other beans
+		<property name = "pointB" ref = "point2" />
+		<property name = "pointC" ref = "point3" />
+	</bean>
+	
+	<bean id = "zeroPoint" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "point2" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "point3" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+</beans>
+
+--------------------------------------------------------------------------------------
+
+Inner beans:
+
+
+<beans>
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle">
+		<property name = "pointA" ref = "zeroPoint" />					
+		<property name = "pointB">						// no 'ref' or 'id' is used for initializing 
+			<bean class="org.aditya.javabrains.Point">			// inner beans
+				<property name = "x" value="-20" />
+				<property name = "y" value="0" />
+			</bean>
+		</property>
+		<property name = "pointC">
+			<bean class="org.aditya.javabrains.Point">
+				<property name = "x" value="20" />
+				<property name = "y" value="0" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id = "zeroPoint" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+</beans>
+
+
+--------------------------------------------------------------------------------------
+
+Injecting Collections:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		Triangle triangle = (Triangle) context.getBean("triangle");
+		triangle.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+
+package org.aditya.javabrains;
+
+import java.util.List;
+
+public class Triangle {
+	
+	private List<Point> points;
+	
+	public List<Point> getPoints() {
+		return points;
+	}
+
+	public void setPoints(List<Point> points) {
+		this.points = points;
+	}
+
+	public void draw() {
+		
+		for(Point point : points) {
+			System.out.println(point.getX()+", "+point.getY());
+		}
+		
+	}
+
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle">
+		<property name = "points">
+			<list>
+				<ref bean = "zeroPoint" />
+				<ref bean = "point2" />
+				<ref bean = "point3" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id = "zeroPoint" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "point2" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "point3" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+</beans>
+
+
+--------------------------------------------------------------------------------------
+
+beans autowiring:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		Triangle triangle = (Triangle) context.getBean("triangle");
+		triangle.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import java.util.List;
+
+public class Triangle {
+	
+	private Point pointA;
+	private Point pointB;
+	private Point pointC;
+		
+	public Point getPointA() {
+		return pointA;
+	}
+
+	public void setPointA(Point pointA) {
+		this.pointA = pointA;
+	}
+
+	public Point getPointB() {
+		return pointB;
+	}
+
+	public void setPointB(Point pointB) {
+		this.pointB = pointB;
+	}
+
+	public Point getPointC() {
+		return pointC;
+	}
+
+	public void setPointC(Point pointC) {
+		this.pointC = pointC;
+	}
+
+	public void draw() {
+		
+		System.out.println("pointA: "+getPointA().getX()+", "+getPointA().getY());
+		System.out.println("pointB: "+getPointB().getX()+", "+getPointB().getY());
+		System.out.println("pointC: "+getPointC().getX()+", "+getPointC().getY());
+	
+	}
+
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">		// byName matches the bean id with the 
+	</bean>											// member variable name.
+	
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+</beans>
+
+O/P:
+
+pointA: 0, 0
+pointB: -20, 0
+pointC: 20, 0
+
+
+
+# autowire="byType"
+
+This is used to autowire by type (class of the member field). The only constraint being there should be only one bean in the xml file corresponding to each type.
+
+
+# autowire="constructor"
+
+This is used to autowire by constructor. The only constraint being there should be only one bean in the xml file corresponding to each type of the constructor parameters.
+
+
+--------------------------------------------------------------------------------------
+
+
+Spring Bean Scopes:
+	
+singleton: 	This scopes the bean definition to a single instance per Spring IoC container (default).	
+prototype: 	This scopes a single bean definition to have any number of object instances.	
+request:   	This scopes a bean definition to an HTTP request. Only valid in the context of a web-aware Spring ApplicationContext.	
+session:   	This scopes a bean definition to an HTTP session. Only valid in the context of a web-aware Spring ApplicationContext.	
+global-session: This scopes a bean definition to a global HTTP session. Only valid in the context of a web-aware Spring ApplicationContext.
+
+
+--------------------------------------------------------------------------------------
+
+ApplicationContextAware:
+
+The ApplicationContextAware Interface:
+
+In Spring beans, you might require access to the ApplicationContext. For example, if your bean needs to look up some other beans. Spring provides an ApplicationContextAware interface that allows beans access to the ApplicationContext. This interface provides a single setApplicationContext method.
+
+
+public class A implements ApplicationContextAware{
+	
+	private ApplicationContext context = null;
+
+	void setApplicationContext(ApplicationContext applicationContext) throws BeansException{
+		this.context = applicationContext;
+	}
+
+}
+
+--------------------------------------------------------------------------------------
+
+Bean Definition Inheritance:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		Triangle triangle = (Triangle) context.getBean("triangle1");
+		triangle.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import java.util.List;
+
+public class Triangle {
+	
+	private Point pointA;
+	private Point pointB;
+	private Point pointC;
+		
+	public Point getPointA() {
+		return pointA;
+	}
+
+	public void setPointA(Point pointA) {
+		this.pointA = pointA;
+	}
+
+	public Point getPointB() {
+		return pointB;
+	}
+
+	public void setPointB(Point pointB) {
+		this.pointB = pointB;
+	}
+
+	public Point getPointC() {
+		return pointC;
+	}
+
+	public void setPointC(Point pointC) {
+		this.pointC = pointC;
+	}
+
+	public void draw() {
+		
+		System.out.println("pointA: "+getPointA().getX()+", "+getPointA().getY());
+		System.out.println("pointB: "+getPointB().getX()+", "+getPointB().getY());
+		System.out.println("pointC: "+getPointC().getX()+", "+getPointC().getY());
+	
+	}
+
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	
+	<bean id = "parenttriangle" class="org.aditya.javabrains.Triangle">
+		<property name = "pointA" ref = "pointA" />
+	</bean>
+
+	<bean id = "triangle1" class="org.aditya.javabrains.Triangle" parent="parenttriangle">		// takes default members from 
+		<property name = "pointB" ref = "pointB" />						// parent bean. Overriding is allowed
+		<property name = "pointC" ref = "pointC" />
+	</bean>
+	
+	<bean id = "triangle2" class="org.aditya.javabrains.Triangle" parent="parenttriangle">		// property pointC wil be null
+		<property name = "pointB" ref = "pointB" />				
+	</bean>
+	
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+</beans>
+
+
+--------------------------------------------------------------------------------------
+
+
+bean definition can also be made abstract in the following way,
+
+	<bean id = "parenttriangle" class="org.aditya.javabrains.Triangle" abstract="true">		// cannot be instantiated, used only
+		<property name = "pointA" ref = "pointA" />						// as a template.
+	</bean>
+
+
+
+--------------------------------------------------------------------------------------
+
+Lifecycle Callbacks:
+
+
+# Approach 1:
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Triangle triangle = (Triangle) context.getBean("triangle");
+		triangle.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import java.util.List;
+
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+
+public class Triangle implements InitializingBean, DisposableBean{		// InitializingBean interface has a method called 
+										// 'afterPropertiesSet', which the spring application
+	private Point pointA;							// calls right after initializing the bean. Similarly
+	private Point pointB;							// DisposableBean has 'destroy' method to be called right
+	private Point pointC;							// at the time of destroying/cleaning-up beans. 
+		
+	public Point getPointA() {
+		return pointA;
+	}
+
+	public void setPointA(Point pointA) {
+		this.pointA = pointA;
+	}
+
+	public Point getPointB() {
+		return pointB;
+	}
+
+	public void setPointB(Point pointB) {
+		this.pointB = pointB;
+	}
+
+	public Point getPointC() {
+		return pointC;
+	}
+
+	public void setPointC(Point pointC) {
+		this.pointC = pointC;
+	}
+
+	public void draw() {
+		
+		System.out.println("pointA: "+getPointA().getX()+", "+getPointA().getY());
+		System.out.println("pointB: "+getPointB().getX()+", "+getPointB().getY());
+		System.out.println("pointC: "+getPointC().getX()+", "+getPointC().getY());
+	
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		System.out.println("InitializingBean init method called for Triangle");
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		System.out.println("DisposableBean destroy method called for Triangle");
+		
+	}
+
+}
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+	
+	</bean>
+	
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+</beans>
+
+
+O/P:
+
+InitializingBean init method called for Triangle
+pointA: 0, 0
+pointB: -20, 0
+pointC: 20, 0
+DisposableBean destroy method called for Triangle
+
+
+
+# Approach 2:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Triangle triangle = (Triangle) context.getBean("triangle");
+		triangle.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+public class Triangle {
+	
+	private Point pointA;
+	private Point pointB;
+	private Point pointC;
+		
+	public Point getPointA() {
+		return pointA;
+	}
+
+	public void setPointA(Point pointA) {
+		this.pointA = pointA;
+	}
+
+	public Point getPointB() {
+		return pointB;
+	}
+
+	public void setPointB(Point pointB) {
+		this.pointB = pointB;
+	}
+
+	public Point getPointC() {
+		return pointC;
+	}
+
+	public void setPointC(Point pointC) {
+		this.pointC = pointC;
+	}
+
+	public void draw() {
+		
+		System.out.println("pointA: "+getPointA().getX()+", "+getPointA().getY());
+		System.out.println("pointB: "+getPointB().getX()+", "+getPointB().getY());
+		System.out.println("pointC: "+getPointC().getX()+", "+getPointC().getY());
+	
+	}
+
+	public void myInit() {
+		System.out.println("myInit method called for Triangle");
+	}
+	
+	public void cleanUp() {
+		System.out.println("cleanUp method called for Triangle");
+	}
+	
+}
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName" init-method="myInit" destroy-method="cleanUp">
+	
+	</bean>
+	
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+</beans>
+
+
+O/P:
+myInit method called for Triangle
+pointA: 0, 0
+pointB: -20, 0
+pointC: 20, 0
+cleanUp method called for Triangle
+
+
+Note: If all the beans have the same init and destroy method names then 'init-method' & 'destroy-method' can be defined at a global level like below,
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans default-init-method="myInit" default-destroy-method="cleanUp">
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+	
+	</bean>
+	
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+</beans>
+
+
+# Approach 3:
+
+If both init-method/destroy-method of spring configuration as well as overriding afterPropertiesSet()/destroy() methods of InitializingBean, DisposableBean interface are declared, then the methods of InitializingBean, DisposableBean interface get executed prior to corresponding methods in the spring.xml file. 
+
+--------------------------------------------------------------------------------------
+
+BeanPostProcessor:
+
+If a common set of task (may be bean configuration) has to be performed at the time of initialization for all the beans, the BeanPostProcessor
+interface gets used.
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Triangle triangle = (Triangle) context.getBean("triangle");
+		triangle.draw();
+				
+	}
+}
+
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+public class Triangle {
+	
+	private Point pointA;
+	private Point pointB;
+	private Point pointC;
+		
+	public Point getPointA() {
+		return pointA;
+	}
+
+	public void setPointA(Point pointA) {
+		this.pointA = pointA;
+	}
+
+	public Point getPointB() {
+		return pointB;
+	}
+
+	public void setPointB(Point pointB) {
+		this.pointB = pointB;
+	}
+
+	public Point getPointC() {
+		return pointC;
+	}
+
+	public void setPointC(Point pointC) {
+		this.pointC = pointC;
+	}
+
+	public void draw() {
+		
+		System.out.println("pointA: "+getPointA().getX()+", "+getPointA().getY());
+		System.out.println("pointB: "+getPointB().getX()+", "+getPointB().getY());
+		System.out.println("pointC: "+getPointC().getX()+", "+getPointC().getY());
+	
+	}
+	
+}
+
+
+
+package org.aditya.javabrains;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+
+public class DisplayNameBeanPostProcessor implements BeanPostProcessor{
+
+	@Override
+	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		System.out.println("After initialization method, Bean name is "+beanName);
+		return bean;
+	}
+
+	@Override
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		System.out.println("Before initialization method, Bean name is "+beanName);
+		return bean;
+	}
+
+}
+
+
+
+--------------------------------------------------------------------------------------
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+	
+	</bean>
+	
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean class = "org.aditya.javabrains.DisplayNameBeanPostProcessor" />				// bean declaration is important
+	
+</beans>
+
+
+O/P:
+
+
+Before initialization method, Bean name is pointA
+After initialization method, Bean name is pointA
+Before initialization method, Bean name is pointB
+After initialization method, Bean name is pointB
+Before initialization method, Bean name is pointC
+After initialization method, Bean name is pointC
+Before initialization method, Bean name is triangle
+After initialization method, Bean name is triangle
+pointA: 0, 0
+pointB: -20, 0
+pointC: 20, 0	
+
+
+--------------------------------------------------------------------------------------
+
+Interface BeanFactoryPostProcessor
+
+Factory hook that allows for custom modification of an application context's bean definitions, adapting the bean property values of the context's underlying bean factory. Useful for custom config files targeted at system administrators that override bean properties configured in the application context. A BeanFactoryPostProcessor may interact with and modify bean definitions, but never bean instances.
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Triangle triangle = (Triangle) context.getBean("triangle");
+		triangle.draw();
+				
+	}
+}
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+
+package org.aditya.javabrains;
+
+public class Triangle {
+	
+	private Point pointA;
+	private Point pointB;
+	private Point pointC;
+		
+	public Point getPointA() {
+		return pointA;
+	}
+
+	public void setPointA(Point pointA) {
+		this.pointA = pointA;
+	}
+
+	public Point getPointB() {
+		return pointB;
+	}
+
+	public void setPointB(Point pointB) {
+		this.pointB = pointB;
+	}
+
+	public Point getPointC() {
+		return pointC;
+	}
+
+	public void setPointC(Point pointC) {
+		this.pointC = pointC;
+	}
+
+	public void draw() {
+		
+		System.out.println("pointA: "+getPointA().getX()+", "+getPointA().getY());
+		System.out.println("pointB: "+getPointB().getX()+", "+getPointB().getY());
+		System.out.println("pointC: "+getPointC().getX()+", "+getPointC().getY());
+	
+	}
+	
+}
+
+
+
+
+
+package org.aditya.javabrains;
+
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+
+public class MyBeanFactoryPP implements BeanFactoryPostProcessor {			
+
+	@Override
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		System.out.println("My Bean Factory Post processor is called");
+	}
+
+}
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+	
+	</bean>
+	
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean class = "org.aditya.javabrains.MyBeanFactoryPP" />					// bean declaration is important
+	
+</beans>
+
+
+
+O/P:
+
+My Bean Factory Post processor is called
+Dec 01, 2020 1:15:42 PM org.springframework.beans.factory.support.DefaultListableBeanFactory preInstantiateSingletons
+INFO: Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@246ae04d: defining beans [triangle,pointA,pointB,pointC,org.aditya.javabrains.MyBeanFactoryPP#0]; root of factory hierarchy
+pointA: 0, 0
+pointB: -20, 0
+pointC: 20, 0
+
+
+
+--------------------------------------------------------------------------------------
+
+
+@Required annotation
+
+This is used if initialization of certain member fields is a must. We can use this upon setter methods as well. If the setter method does not 
+get executed (if marked with @Required), then spring throws a BeanCreationException.
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");			// shape interface pointing to a Circle class bean
+		shape.draw();
+				
+	}
+}
+
+
+
+package org.aditya.javabrains;
+
+public interface Shape {
+	
+	public void draw();
+	
+}
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+
+package org.aditya.javabrains;
+
+import org.springframework.beans.factory.annotation.Required;
+
+public class Circle implements Shape{
+	
+	private Point center;
+	
+	public Point getCenter() {
+		return center;
+	}
+	
+	@Required
+	public void setCenter(Point center) {
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+	}
+	
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />
+		<property name = "pointC" ref = "pointC" />
+	</bean>
+
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+		
+	<bean id = "circle" class="org.aditya.javabrains.Circle">			// no property setting getting done inside circle bean
+			
+	</bean>
+	
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor" />		// Imp
+	
+</beans>
+
+
+O/P:
+
+Exception in thread "main" org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'circle' defined in class path resource [spring.xml]: Initialization of bean failed; nested exception is org.springframework.beans.factory.BeanInitializationException: Property 'center' is required for bean 'circle'
+
+
+--------------------------------------------------------------------------------------
+
+@Autowired annotation:
+
+While injecting dependency using @Autowired no additional annotations are to be used if there is only one bean definition in spring.xml corresponding to the type of member field where injection has to occur.
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");
+		shape.draw();
+				
+	}
+}
+
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
+
+public class Circle implements Shape{
+	
+	private Point center;
+	
+	public Point getCenter() {
+		return center;
+	}
+	
+	@Autowired
+	public void setCenter(Point center) {
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+	}
+	
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+
+<!-- 	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />					
+		<property name = "pointC" ref = "pointC" />
+	</bean> 
+
+-->
+
+	
+	
+<!-- 	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean> 
+
+-->
+	
+
+	<bean id = "pointA" class="org.aditya.javabrains.Point">				// bean definitions mentioned above have 
+		<property name = "x" value="0" />						// been commented out. This is the only bean 
+		<property name = "y" value="0" />						// of type Point. 
+	</bean>
+		
+	<bean id = "circle" class="org.aditya.javabrains.Circle">
+			
+	</bean>
+	
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />	// Imp
+</beans>
+
+
+O/P:
+
+Priting Cirle ....
+center of the circle: (0, 0)
+
+
+
+# Approach 2:
+
+At first spring looks out for beans with same type (matching byType). If it fails owing to multiple beans of same type, it looks for matching byName. So the following spring.xml will also work (Note none of the Point bean definitions are commented out now)
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+"http://www.springframework.org/dtd/spring-beans.dtd">
+
+
+<beans>
+
+<!-- 	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />					
+		<property name = "pointC" ref = "pointC" />
+	</bean> 
+
+-->
+
+	<bean id = "center" class="org.aditya.javabrains.Point">			// note here the name 			
+		<property name = "x" value="0" />					// of the bean has been changed to 'center'
+		<property name = "y" value="0" />					// which is the member field name of the Circle class.
+	</bean>										// Autowiring byName will take place here.
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+	</bean> 
+
+
+	<bean id = "circle" class="org.aditya.javabrains.Circle">
+			
+	</bean>
+	
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />	// Imp
+</beans>
+
+
+# Approach 3:
+
+@Qualifier annotation:
+
+A qualifier tag can be associated with bean to let spring know which bean is to be injected.
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");
+		shape.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+public class Point {
+	
+	int x;
+	int y;
+	
+	public int getX() {
+		return x;
+	}
+	public void setX(int x) {
+		this.x = x;
+	}
+	public int getY() {
+		return y;
+	}
+	public void setY(int y) {
+		this.y = y;
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+public interface Shape {
+	
+	public void draw();
+	
+}
+
+
+package org.aditya.javabrains;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+public class Circle implements Shape{
+	
+	private Point center;
+	
+	public Point getCenter() {
+		return center;
+	}
+	
+	@Autowired
+	@Qualifier("circleRelated")							// the bean havingqualifier tag with value 
+	public void setCenter(Point center) {						// 'circleRelated' will be injected	
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+	}
+	
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />
+		<property name = "pointC" ref = "pointC" />
+	</bean> 
+
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<qualifier value="circleRelated" />						// the bean with required qualifier tag
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+ 	</bean> 
+	
+		
+	<bean id = "circle" class="org.aditya.javabrains.Circle">
+			
+	</bean>
+	
+	<context:annotation-config/>								// this tag takes care of all annotations
+</beans>											
+
+
+
+--------------------------------------------------------------------------------------
+
+@Qualifier can also be used to autowire byName. e.g,
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");
+		shape.draw();
+				
+	}
+}
+
+
+
+package org.aditya.javabrains;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+public class Circle implements Shape{
+	
+	private Point center;
+	
+	public Point getCenter() {
+		return center;
+	}
+	
+	@Autowired
+	@Qualifier("pointC")							// injects the bean byName. (No need of qualifier tag)
+	public void setCenter(Point center) {
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+	}
+	
+}
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />
+		<property name = "pointC" ref = "pointC" />
+	</bean> 
+
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+ 	</bean> 
+	
+		
+	<bean id = "circle" class="org.aditya.javabrains.Circle">
+			
+	</bean>
+	
+	<context:annotation-config/>
+</beans>
+
+
+--------------------------------------------------------------------------------------
+
+@Resource annotation:
+
+The @Resource annotation is part of the JSR-250 annotation collection and is packaged with Jakarta EE. This annotation has the following execution paths, listed by precedence:
+
+Match by Name
+Match by Type
+Match by Qualifier
+
+These execution paths are applicable to both setter and field injection.
+
+
+Approach 1:
+
+By using the name tag inside @Resource annotation.
+
+
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");
+		shape.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+public class Circle implements Shape{
+	
+	private Point center;
+	
+	public Point getCenter() {
+		return center;
+	}
+	
+	@Autowired
+	@Resource(name = "pointC")							// matches by bean name 
+	public void setCenter(Point center) {
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+	}
+	
+}
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />
+		<property name = "pointC" ref = "pointC" />
+	</bean> 
+
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+ 	</bean> 
+	
+		
+	<bean id = "circle" class="org.aditya.javabrains.Circle">
+			
+	</bean>
+	
+	<context:annotation-config/>
+</beans>
+
+
+
+Approach 2:
+
+Letting @Resource match byName of the member variable (Default behaviour).
+
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");
+		shape.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+public class Circle implements Shape{
+	
+	private Point center;
+	
+	public Point getCenter() {
+		return center;
+	}
+	
+	@Autowired
+	@Resource							// matches by member variable name (here 'center')
+	public void setCenter(Point center) {
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+	}
+	
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+<!-- 	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName"> -->
+<!-- 		<property name = "pointA" ref = "pointA" /> -->
+<!-- 		<property name = "pointB" ref = "pointB" /> -->
+<!-- 		<property name = "pointC" ref = "pointC" /> -->
+<!-- 	</bean>  -->
+
+<!-- 	<bean id = "pointA" class="org.aditya.javabrains.Point"> -->
+<!-- 		<property name = "x" value="0" /> -->
+<!-- 		<property name = "y" value="0" /> -->
+<!-- 	</bean> -->
+	
+<!-- 	<bean id = "pointB" class="org.aditya.javabrains.Point"> -->
+<!-- 		<property name = "x" value="-20" /> -->
+<!-- 		<property name = "y" value="0" /> -->
+<!-- 	</bean> -->
+	
+	<bean id = "center" class="org.aditya.javabrains.Point">				// bean name defined 'center'
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+ 	</bean> 
+	
+		
+	<bean id = "circle" class="org.aditya.javabrains.Circle">
+			
+	</bean>
+	
+	<context:annotation-config/>
+</beans>
+
+
+--------------------------------------------------------------------------------------
+
+@PostConstruct & @PreDestroy
+
+@PostConstruct : gets executed after the spring bean is initialized
+@PreDestroy    : gets called when bean instance is getting removed from the context
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");
+		shape.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+public class Circle implements Shape{
+	
+	private Point center;
+	
+	public Point getCenter() {
+		return center;
+	}
+	
+	@Autowired
+	@Qualifier("pointA")
+	public void setCenter(Point center) {
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+	}
+	
+	@PostConstruct
+	public void circleConstruct() {
+		System.out.println("constructing circle bean ....");
+	}
+	
+	@PreDestroy
+	public void circleDestroy() {
+		System.out.println("destroying circle bean ....");
+	}
+	
+	
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />
+		<property name = "pointC" ref = "pointC" />
+	</bean> 
+
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+ 	</bean> 
+	
+		
+	<bean id = "circle" class="org.aditya.javabrains.Circle">
+			
+	</bean>
+	
+	<context:annotation-config/>
+</beans>
+
+
+O/P:
+
+constructing circle bean ....
+Priting Cirle ....
+center of the circle: (0, 0)
+destroying circle bean ....
+
+
+--------------------------------------------------------------------------------------
+
+Component and Stereotype Annotations:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");
+		shape.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+@Component										// creates a bean by name 'circle' in the context.
+public class Circle implements Shape{
+	
+	private Point center;
+	
+	public Point getCenter() {
+		return center;
+	}
+	
+	@Autowired
+	@Qualifier("pointA")
+	public void setCenter(Point center) {
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+	}
+	
+	@PostConstruct
+	public void circleConstruct() {
+		System.out.println("constructing circle bean ....");
+	}
+	
+	@PreDestroy
+	public void circleDestroy() {
+		System.out.println("destroying circle bean ....");
+	}
+	
+	
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />
+		<property name = "pointC" ref = "pointC" />
+	</bean> 
+
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+ 	</bean> 
+	
+		
+<!-- 	<bean id = "circle" class="org.aditya.javabrains.Circle"> -->				// bean declaration commevted out
+			
+<!-- 	</bean> -->
+	
+	<context:annotation-config/>
+	
+	<context:component-scan base-package="org.aditya.javabrains" />				// allows omponent scanning
+	
+	
+</beans>
+
+
+
+O/P:
+
+constructing circle bean ....
+Priting Cirle ....
+center of the circle: (0, 0)
+destroying circle bean ....
+
+
+--------------------------------------------------------------------------------------
+
+ApplicationListener interface:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");
+		shape.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyEventListener implements ApplicationListener {					// this ApplicationListener bean will listen 
+												// to any event (published or framework 
+	@Override										// related). 
+	public void onApplicationEvent(ApplicationEvent eventObject) {
+		System.out.println(eventObject.toString());
+	}
+
+}
+
+
+package org.aditya.javabrains;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Circle implements Shape{
+	
+	private Point center;
+	
+	public Point getCenter() {
+		return center;
+	}
+	
+	@Autowired
+	@Qualifier("pointA")
+	public void setCenter(Point center) {
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+	}
+	
+	@PostConstruct
+	public void circleConstruct() {
+		System.out.println("constructing circle bean ....");
+	}
+	
+	@PreDestroy
+	public void circleDestroy() {
+		System.out.println("destroying circle bean ....");
+	}
+	
+	
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />
+		<property name = "pointC" ref = "pointC" />
+	</bean> 
+
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+ 	</bean> 
+	
+		
+<!-- 	<bean id = "circle" class="org.aditya.javabrains.Circle"> -->
+			
+<!-- 	</bean> -->
+	
+	<context:annotation-config/>
+	
+	<context:component-scan base-package="org.aditya.javabrains" />
+	
+	
+</beans>
+
+
+O/P:
+
+constructing circle bean ....
+
+org.springframework.context.event.ContextRefreshedEvent[source=org.springframework.context.support.ClassPathXmlApplicationContext@7e0b37bc, started on Wed Dec 02 01:46:15 IST 2020]
+
+Priting Cirle ....
+center of the circle: (0, 0)
+
+org.springframework.context.event.ContextClosedEvent[source=org.springframework.context.support.ClassPathXmlApplicationContext@7e0b37bc, started on Wed Dec 02 01:46:15 IST 2020]
+
+destroying circle bean ....
+
+
+--------------------------------------------------------------------------------------
+
+
+Event handling in Spring:
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class DrawingApp {
+
+	public static void main(String[] args) {
+			
+		AbstractApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		context.registerShutdownHook();
+		Shape shape = (Shape) context.getBean("circle");
+		shape.draw();
+				
+	}
+}
+
+
+package org.aditya.javabrains;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Circle implements Shape, ApplicationEventPublisherAware{ 		// 'ApplicationEventPublisherAware' is the interface which
+										// provides 'setApplicationEventPublisher(
+	private Point center;							// ApplicationEventPublisher publisher)' method to set the
+	private ApplicationEventPublisher publisher;				// publisher member field. This 'publisher' field is of
+										// type 'ApplicationEventPublisher' which in itself is 
+	public Point getCenter() {						// a super-interface for ApplicationContext'
+		return center;							
+	}
+	
+	@Autowired
+	@Qualifier("pointA")
+	public void setCenter(Point center) {
+		this.center = center;
+	}
+
+	@Override
+	public void draw() {
+		
+		System.out.println("Priting Cirle ....");
+		System.out.println("center of the circle: ("+center.getX()+", "+center.getY()+")");
+		DrawEvent drawEvent = new DrawEvent(this);					    // Creating a custom event
+		publisher.publishEvent(drawEvent);						    // publishing the custom event
+		
+	}	
+	
+	@PostConstruct
+	public void circleConstruct() {
+		System.out.println("constructing circle bean ....");
+	}
+	
+	@PreDestroy
+	public void circleDestroy() {
+		System.out.println("destroying circle bean ....");
+	}
+
+	@Override
+	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
+		// TODO Auto-generated method stub
+		this.publisher = publisher;
+	}
+	
+	
+}
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyEventListener implements ApplicationListener {			// Custom listener will listen to both framework related as
+										// well as custom generated event (any event).
+	@Override
+	public void onApplicationEvent(ApplicationEvent eventObject) {
+		System.out.println(eventObject.toString());
+	}
+
+}
+
+
+package org.aditya.javabrains;
+
+import org.springframework.context.ApplicationEvent;
+
+public class DrawEvent extends ApplicationEvent{				// Custom event to be published inside draw method.
+
+	public DrawEvent(Object source) {					// takes in the object, which calls the event, as parameter
+		super(source);
+		// TODO Auto-generated constructor stub
+	}
+		
+	public String toString() {						// Listener is going to execute the toString() method.
+		return "Draw Event Occured";
+	}
+	
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<bean id = "triangle" class="org.aditya.javabrains.Triangle" autowire="byName">
+		<property name = "pointA" ref = "pointA" />
+		<property name = "pointB" ref = "pointB" />
+		<property name = "pointC" ref = "pointC" />
+	</bean> 
+
+	<bean id = "pointA" class="org.aditya.javabrains.Point">
+		<property name = "x" value="0" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointB" class="org.aditya.javabrains.Point">
+		<property name = "x" value="-20" />
+		<property name = "y" value="0" />
+	</bean>
+	
+	<bean id = "pointC" class="org.aditya.javabrains.Point">
+		<property name = "x" value="20" />
+		<property name = "y" value="0" />
+ 	</bean> 
+	
+		
+<!-- 	<bean id = "circle" class="org.aditya.javabrains.Circle"> -->
+			
+<!-- 	</bean> -->
+	
+	<context:annotation-config/>
+	
+	<context:component-scan base-package="org.aditya.javabrains" />
+	
+	
+</beans>
+
+
+O/P:
+
+constructing circle bean ....
+org.springframework.context.event.ContextRefreshedEvent[source=org.springframework.context.support.ClassPathXmlApplicationContext@7e0b37bc, started on Wed Dec 02 20:01:41 IST 2020]
+Priting Cirle ....
+center of the circle: (0, 0)
+Draw Event Occured
+org.springframework.context.event.ContextClosedEvent[source=org.springframework.context.support.ClassPathXmlApplicationContext@7e0b37bc, started on Wed Dec 02 20:01:41 IST 2020]
+destroying circle bean ....
+
+
+--------------------------------------------------------------------------------------
+
+
+
+
+
