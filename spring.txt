@@ -2629,8 +2629,1101 @@ destroying circle bean ....
 
 
 --------------------------------------------------------------------------------------
+Spring AOP
+--------------------------------------------------------------------------------------
+
+Spring AOP enables Aspect-Oriented Programming in spring applications. In AOP, aspects enable the modularization of concerns such as transaction management, logging or security that cut across multiple types and objects (often termed crosscutting concerns).
+
+AOP provides the way to dynamically add the cross-cutting concern before, after or around the actual logic using simple pluggable configurations. It makes easy to maintain code in the present and future as well. You can add/remove concerns without recompiling complete sourcecode simply by changing configuration files (if you are applying aspects using XML configuration).
+
+
+# Aspect:
+
+A module which has a set of APIs providing cross-cutting requirements. For example, a logging module would be called AOP aspect for logging. An application can have any number of aspects depending on the requirement.
+
+# Join point:
+
+This represents a point in your application where you can plug-in AOP aspect. You can also say, it is the actual place in the application where an action will be taken using Spring AOP framework.
+
+# Advice:
+
+This is the actual action to be taken either before or after the method execution. This is the actual piece of code that is invoked during program execution by Spring AOP framework.
+
+# PointCut:
+
+This is a set of one or more joinpoints where an advice should be executed. You can specify PointCuts using expressions or patterns as we will see in our AOP examples.	
+
+# Introduction:
+
+An introduction allows you to add new methods or attributes to existing classes.
+
+
+--------------------------------------------------------------------------------------
+
+@Aspect annotation:
+
+package org.aditya.javabrains.service;
+
+import org.aditya.javabrains.model.Circle;
+import org.aditya.javabrains.model.Triangle;
+
+public class ShapeService {
+	
+	private Circle circle;
+	private Triangle triangle;
+	
+	public Circle getCircle() {
+		return circle;
+	}
+	public void setCircle(Circle circle) {
+		this.circle = circle;
+	}
+	public Triangle getTriangle() {
+		return triangle;
+	}
+	public void setTriangle(Triangle triangle) {
+		this.triangle = triangle;
+	}
+	
+}
+
+
+
+package org.aditya.javabrains.model;
+
+public class Triangle {
+	private String name;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+}
+
+
+
+package org.aditya.javabrains.model;
+
+public class Circle {
+	private String name;
+
+	public String getName() {							       // JoinPoint (declaration ahead)
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+}
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+
+@Aspect												// Aspect
+public class LoggingAspect {
+	
+	@Before("execution(public String org.aditya.javabrains.model.Circle.getName())")	
+	public void LoggingAdvice() {
+		System.out.println("Advice run. Get Method called");				// Advice
+	}
+	
+}
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		System.out.println(shapeService.getCircle().getName());
+	}
+
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:aop="http://www.springframework.org/schema/aop"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+    http://www.springframework.org/schema/aop   
+    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">  
+    
+    <aop:aspectj-autoproxy />  
+    
+	<bean name = "triangle" class = "org.aditya.javabrains.model.Triangle">
+		<property name = "name" value = "Triangle Name"/>
+	</bean>
+
+	<bean name = "circle" class = "org.aditya.javabrains.model.Circle">
+		<property name = "name" value = "Circle Name"/>
+	</bean>
+
+	<bean name = "shapeService" class = "org.aditya.javabrains.service.ShapeService" autowire = "byName"/>
+  	
+  	<bean name = "loggingAspect" class = "org.aditya.javabrains.aspect.LoggingAspect" />
+  	
+</beans>  
+
+
+O/P:
+
+Advice run. Get Method called
+Circle Name
+
+--------------------------------------------------------------------------------------
+
+
+In the above sample, the expression for join points can have wild cards,
+
+package org.aditya.javabrains.aspect;
+
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+
+@Aspect
+public class LoggingAspect {
+	
+	@Before("execution(* get*())")					
+	public void LoggingAdvice() {
+		System.out.println("Advice run. Get Method called");
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		System.out.println(shapeService.getCircle().getName());
+	}
+
+}
+
+
+O/P:
+
+Advice run. Get Method called				// 'get*' getting called twice in the main method.
+Advice run. Get Method called
+Circle Name
+ 
+
+--------------------------------------------------------------------------------------
+
+Pointcut is a set of one or more joinpoints where an advice should be executed. You can specify PointCuts using expressions or patterns as we will see in our AOP examples.
+
+@Pointcut annotation:
+
+Pointcuts can be used to call multiple advices for a single join point expression.
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+	
+	@Before("allGetters()")
+	public void LoggingAdvice() {
+		System.out.println("Advice run. Get Method called");
+	}
+	
+	@Before("allGetters()")
+	public void secondAdvice() {
+		System.out.println("Second Advice executed");
+	}
+	
+	@Pointcut("execution(* get*())")
+	public void allGetters() {}
+	
+}
+
+
+O/P:
+
+Advice run. Get Method called
+Second Advice executed
+Advice run. Get Method called
+Second Advice executed
+Circle Name
+
+--------------------------------------------------------------------------------------
+
+execution() deals with expressions related to methods.
+within() deals with expressions related to classes and packages.
+
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+	
+	@Before("allCircleMethods() && allGetters()")				// logical AND operation
+	public void LoggingAdvice() {
+		System.out.println("Advice run. Get Method called");
+	}
+	
+	@Before("allGetters()")
+	public void secondAdvice() {
+		System.out.println("Second Advice executed");
+	}
+	
+	@Pointcut("execution(* get*())")
+	public void allGetters() {}
+	
+	@Pointcut("within(org.aditya.javabrains.model.Circle)")
+	public void allCircleMethods() {}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		System.out.println(shapeService.getCircle().getName());			     // getCircle() -> secondAdvice + LoggingAdvice
+	}										     // getName() -> secondAdvice
+											     
+}
+
+
+O/P:
+
+Second Advice executed
+Advice run. Get Method called
+Second Advice executed
+Circle Name
+
+
+--------------------------------------------------------------------------------------
+
+JoinPoint represents a point in your application where you can plug-in AOP aspect. You can also say, it is the actual place in the application where an action will be taken using Spring AOP framework.
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aditya.javabrains.model.Circle;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+	
+	@Before("allCircleMethods()")
+	public void LoggingAdvice(JoinPoint joinPoint) {
+		System.out.println("joinPoint.toString(): "+joinPoint.toString());
+		Circle circleObject = (Circle) joinPoint.getTarget();				// .getTarget() returns the object for which
+		System.out.println("Object calling joinPoint: "+circleObject.toString());	// this advice was called.
+	}
+	
+//	@Before("allGetters()")
+//	public void secondAdvice() {
+//		System.out.println("Second Advice executed");
+//	}
+//	
+	@Pointcut("execution(* get*())")
+	public void allGetters() {}
+	
+	@Pointcut("within(org.aditya.javabrains.model.Circle)")
+	public void allCircleMethods() {}
+	
+}
+
+
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		System.out.println(shapeService.getCircle().getName());
+	}
+
+}
+
+
+O/P:
+
+joinPoint.toString(): execution(String org.aditya.javabrains.model.Circle.getName())
+Object calling joinPoint: Circle [name=Circle Name]
+Circle Name
+
+
+--------------------------------------------------------------------------------------
+
+args() example:
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aditya.javabrains.model.Circle;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+	
+//	@Before("allCircleMethods()")
+//	public void LoggingAdvice(JoinPoint joinPoint) {
+//		System.out.println("joinPoint.toString(): "+joinPoint.toString());
+//		Circle circleObject = (Circle) joinPoint.getTarget();
+//		System.out.println("Object calling joinPoint: "+circleObject.toString());
+//	}
+	
+//	@Before("allGetters()")
+//	public void secondAdvice() {
+//		System.out.println("Second Advice executed");
+//	}
+//	
+	
+	@Before("args(String)")								// This advice runs whenever a method which requires
+	public void stringArgumentsMethod() {						// a String parameter gets called.
+		System.out.println("A method that takes in string argument got called");
+	}
+	
+	@Pointcut("execution(* get*())")
+	public void allGetters() {}
+	
+	@Pointcut("within(org.aditya.javabrains.model.Circle)")
+	public void allCircleMethods() {}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		shapeService.getCircle().setName("Dummy Circle");
+		System.out.println(shapeService.getCircle().getName());
+	}
+
+}
+
+
+O/P:
+
+A method that takes in string argument got called
+Dummy Circle
+
+
+--------------------------------------------------------------------------------------
+
+Fetching the exact parameter in the advice,
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aditya.javabrains.model.Circle;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+	
+//	@Before("allCircleMethods()")
+//	public void LoggingAdvice(JoinPoint joinPoint) {
+//		System.out.println("joinPoint.toString(): "+joinPoint.toString());
+//		Circle circleObject = (Circle) joinPoint.getTarget();
+//		System.out.println("Object calling joinPoint: "+circleObject.toString());
+//	}
+	
+//	@Before("allGetters()")
+//	public void secondAdvice() {
+//		System.out.println("Second Advice executed");
+//	}
+//	
+	
+	@Before("args(name)")								// name of the argument is 'name'
+	public void stringArgumentsMethod(String name) {				// type of the argument is String
+		System.out.println("Method called with the argument: "+name);		// printing the argument in the advice
+	}
+	
+	@Pointcut("execution(* get*())")
+	public void allGetters() {}
+	
+	@Pointcut("within(org.aditya.javabrains.model.Circle)")
+	public void allCircleMethods() {}
+	
+}
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		shapeService.getCircle().setName("Dummy Circle");
+		System.out.println(shapeService.getCircle().getName());
+	}
+
+}
+
+
+O/P:
+
+Method called with the argument: Dummy Circle
+Dummy Circle
+
+
+--------------------------------------------------------------------------------------
+
+@After Advice type.
+
+Note: All the advice types are applicable on the method calls inside the application (not on the beans getting initialized using xml config, while application boot-up). 
+
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aditya.javabrains.model.Circle;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+	
+//	@Before("allCircleMethods()")
+//	public void LoggingAdvice(JoinPoint joinPoint) {
+//		System.out.println("joinPoint.toString(): "+joinPoint.toString());
+//		Circle circleObject = (Circle) joinPoint.getTarget();
+//		System.out.println("Object calling joinPoint: "+circleObject.toString());
+//	}
+	
+//	@Before("allGetters()")
+//	public void secondAdvice() {
+//		System.out.println("Second Advice executed");
+//	}
+//	
+	
+	@After("args(name)")								// this advice gets post the method calls which take
+	public void stringArgumentsMethod(String name) {				// parameters. Pls note that the setter used during
+		System.out.println("Method called with the argument: "+name);		// beans initialization does not get considered as a 
+	}										// JoinPoint. Only the method calls inside the 												// application is considered a JoinPoint.
+	
+	@Pointcut("execution(* get*())")
+	public void allGetters() {}
+	
+	@Pointcut("within(org.aditya.javabrains.model.Circle)")
+	public void allCircleMethods() {}
+	
+}
+
+package org.aditya.javabrains.model;
+
+public class Circle {
+	private String name;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+		System.out.println("Setter's method called");
+	}
+
+	@Override
+	public String toString() {
+		return "Circle [name=" + name + "]";
+	}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		shapeService.getCircle().setName("Dummy Name");
+		
+	}
+
+}
+
+
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:aop="http://www.springframework.org/schema/aop"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+    http://www.springframework.org/schema/aop   
+    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">  
+    
+    <aop:aspectj-autoproxy />  
+    
+	<bean name = "triangle" class = "org.aditya.javabrains.model.Triangle">
+		<property name = "name" value = "Triangle Name"/>
+	</bean>
+
+	<bean name = "circle" class = "org.aditya.javabrains.model.Circle">
+		<property name = "name" value = "Circle Name"/>
+	</bean>
+
+	<bean name = "shapeService" class = "org.aditya.javabrains.service.ShapeService" autowire = "byName"/>
+  	
+  	<bean name = "loggingAspect" class = "org.aditya.javabrains.aspect.LoggingAspect" />
+  	
+</beans>  
+
+
+
+O/P:
+
+Setter's method called				
+Setter's method called
+Method called with the argument: Dummy Name						// Advice called inly for setter called inside the app
+											// and not for setter call during the bean initializat-
+											// ion done by spring container.
+
+--------------------------------------------------------------------------------------
+
+@AfterReturning annotated methods run after the method (matching with pointcut expression) is executed normally and do no throw any error/exception.
+
+
+@AfterThrowing annotated methods run after the method (matching with pointcut expression) exits by throwing an exception.
+
+
+package org.aditya.javabrains.model;
+
+public class Circle {
+	private String name;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+		System.out.println("Setter's method called");
+		throw new RuntimeException();						// intentionally throwing exception to be caught
+	}
+	
+	public String demoSetName(String name) {					// a random method with a return String to be caught.
+		this.name = name;
+		System.out.println("demoSetName method called");
+		return name;
+	}
+
+	@Override
+	public String toString() {
+		return "Circle [name=" + name + "]";
+	}
+	
+}
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aditya.javabrains.model.Circle;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+	
+	
+	@AfterReturning(pointcut = "args(name)", returning = "returnString")		// catching return type of 'demoSetName' method 
+	public void stringArgumentsMethod(String name, String returnString) {	
+		System.out.println("Method called with the argument: "+name+ "and return value is  "+returnString);
+	}
+	
+	@AfterThrowing(pointcut = "args(name)", throwing = "ex")
+	public void exceptionAdvive(String name, RuntimeException ex) {			// catching exception of 'setName' method.
+		System.out.println("Method called with the argument: "+name+ "and caught exception is  "+ex);
+	}
+	
+	@Pointcut("execution(* get*())")
+	public void allGetters() {}
+	
+	@Pointcut("within(org.aditya.javabrains.model.Circle)")
+	public void allCircleMethods() {}
+	
+}
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   
+    xmlns:aop="http://www.springframework.org/schema/aop"  
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd   
+    http://www.springframework.org/schema/aop   
+    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">  
+    
+    <aop:aspectj-autoproxy />  
+    
+	<bean name = "triangle" class = "org.aditya.javabrains.model.Triangle">
+		<property name = "name" value = "Triangle Name"/>
+	</bean>
+
+	<bean name = "circle" class = "org.aditya.javabrains.model.Circle">				
+												// No initialization getting done
+	</bean>											// so thate setName throws exception only 
+												// when application calls setName.
+	<bean name = "shapeService" class = "org.aditya.javabrains.service.ShapeService" autowire = "byName"/>
+  	
+  	<bean name = "loggingAspect" class = "org.aditya.javabrains.aspect.LoggingAspect" />
+  	
+</beans>  
+
+
+Case 1: demonstration of AfterReturning, 
+
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+//		shapeService.getCircle().setName("Dummy Name");
+		shapeService.getCircle().demoSetName("Dummy Name");
+		
+	}
+
+}
+
+O/P:
+
+demoSetName method called
+Method called with the argument: Dummy Nameand return value is  Dummy Name
 
 
 
 
+Case 2: demonstration of AfterThrowing,
 
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		shapeService.getCircle().setName("Dummy Name");
+//		shapeService.getCircle().demoSetName("Dummy Name");
+		
+	}
+
+}
+
+
+O/P:
+
+Setter's method called
+Method called with the argument: Dummy Nameand caught exception is  java.lang.RuntimeException
+Exception in thread "main" java.lang.RuntimeException
+
+
+--------------------------------------------------------------------------------------
+
+
+@Around annotation:
+
+@Around advice surrounds a joinpoint such as a method invocation. This is the most powerful kind of advice. Around advice can perform custom behavior before and after the method invocation. It is also responsible for choosing whether to proceed to the join point or to shortcut the advised method execution by returning its own return value or throwing an exception.
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aditya.javabrains.model.Circle;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+	
+//	@Before("allCircleMethods()")
+//	public void LoggingAdvice(JoinPoint joinPoint) {
+//		System.out.println("joinPoint.toString(): "+joinPoint.toString());
+//		Circle circleObject = (Circle) joinPoint.getTarget();
+//		System.out.println("Object calling joinPoint: "+circleObject.toString());
+//	}
+	
+//	@Before("allGetters()")
+//	public void secondAdvice() {
+//		System.out.println("Second Advice executed");
+//	}
+//	
+	
+	@AfterReturning(pointcut = "args(name)", returning = "returnString")
+	public void stringArgumentsMethod(String name, String returnString) {
+		System.out.println("Method called with the argument: "+name+ "and return value is  "+returnString);
+	}
+	
+	@AfterThrowing(pointcut = "args(name)", throwing = "ex")
+	public void exceptionAdvive(String name, RuntimeException ex) {
+		System.out.println("Method called with the argument: "+name+ "and caught exception is  "+ex);
+	}
+	
+	@Around("allGetters()")
+	public Object myAroundAdvice(ProceedingJoinPoint proceedingJoinPoint) {
+		
+		Object returnValue = null;
+		
+		try {
+			
+			System.out.println("Before Advice");
+			returnValue = proceedingJoinPoint.proceed();		// makes the 'JoinPoint' method execute
+			System.out.println("After Returning");
+			
+		}
+		catch(Throwable e) {
+			System.out.println("After throwing");			// exceptions related to 'JoinPoint' method execution
+		}								// can be caught.
+		
+		System.out.println("After finally");
+		return returnValue;						// modified returnValue can also be returned
+	}
+	
+	@Pointcut("execution(* get*())")
+	public void allGetters() {}
+	
+	@Pointcut("within(org.aditya.javabrains.model.Circle)")
+	public void allCircleMethods() {}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		shapeService.getCircle();
+	}
+
+}
+
+
+O/P:
+
+Before Advice
+After Returning
+After finally
+
+
+--------------------------------------------------------------------------------------
+
+Custom Advice Annotations,
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		shapeService.getCircle().getName();
+	}
+
+}
+
+
+package org.aditya.javabrains.aspect;
+
+public @interface Loggable {								// creating custom annotation
+
+}
+
+
+
+package org.aditya.javabrains.model;
+
+import org.aditya.javabrains.aspect.Loggable;
+
+public class Circle {
+	private String name;
+	
+	@Loggable									// using custom annotation
+	public String getName() {							
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return "Circle [name=" + name + "]";
+	}
+	
+}
+
+
+package org.aditya.javabrains.aspect;
+
+import org.aditya.javabrains.model.Circle;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+
+@Aspect
+public class LoggingAspect {
+	
+	
+	@AfterReturning(pointcut = "args(name)", returning = "returnString")
+	public void stringArgumentsMethod(String name, String returnString) {
+		System.out.println("Method called with the argument: "+name+ "and return value is  "+returnString);
+	}
+	
+	@AfterThrowing(pointcut = "args(name)", throwing = "ex")
+	public void exceptionAdvive(String name, RuntimeException ex) {
+		System.out.println("Method called with the argument: "+name+ "and caught exception is  "+ex);
+	}
+	
+	@Around("@annotation(org.aditya.javabrains.aspect.Loggable)")				// using custom annotation named 'Logable'
+	public Object myAroundAdvice(ProceedingJoinPoint proceedingJoinPoint) {			// for advice
+		
+		Object returnValue = null;
+		
+		try {
+			
+			System.out.println("Before Advice");
+			returnValue = proceedingJoinPoint.proceed();
+			System.out.println("After Returning");
+			
+		}
+		catch(Throwable e) {
+			System.out.println("After throwing");
+		}
+		
+		System.out.println("After finally");
+		return returnValue;
+	}
+	
+	@Pointcut("execution(* get*())")
+	public void allGetters() {}
+	
+	@Pointcut("within(org.aditya.javabrains.model.Circle)")
+	public void allCircleMethods() {}
+	
+}
+
+
+package org.aditya.javabrains;
+
+import org.aditya.javabrains.service.ShapeService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class AopMain {
+
+	public static void main(String[] args) {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
+		ShapeService shapeService = ctx.getBean("shapeService", ShapeService.class);
+		shapeService.getCircle().getName();
+	}
+
+}
+
+
+O/P:
+
+Before Advice
+After Returning
+After finally
+
+
+--------------------------------------------------------------------------------------
+
+AOP Proxy:
+
+We can create a proxy programmatically as well as invoke the aspects programmatically using the proxy object.
+
+sample:
+
+
+package com.tutorialspoint;
+
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.PointCut;
+import org.aspectj.lang.annotation.Before;
+
+@Aspect
+public class Logging {
+
+   @PointCut("execution(* com.tutorialspoint.Student.getAge(..))")
+   private void selectGetAge(){}
+
+   @Before("selectGetAge()")
+   public void beforeAdvice(){
+      System.out.println("Going to setup student profile.");
+   }  
+
+}
+
+
+package com.tutorialspoint;
+
+public class Student {
+   private Integer age;
+  
+   public void setAge(Integer age) {
+      this.age = age;
+   }
+   
+   public Integer getAge() {
+      System.out.println("Age : " + age );
+      return age;
+   }   
+}
+
+
+package com.tutorialspoint;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
+
+public class MainApp {
+   public static void main(String[] args) {
+      ApplicationContext context = new ClassPathXmlApplicationContext("Beans.xml");
+         
+      Student student = (Student) context.getBean("student");
+
+      AspectJProxyFactory proxyFactory = new AspectJProxyFactory(student);		//Create the Proxy Factory
+      proxyFactory.addAspect(Logging.class);					      	//Add Aspect class to the factory
+      Student proxyStudent = proxyFactory.getProxy();					//Get the proxy object
+      proxyStudent.getAge();								//Invoke the proxied method.
+ 
+   }
+}
+
+
+
+<?xml version = "1.0" encoding = "UTF-8"?>
+<beans xmlns = "http://www.springframework.org/schema/beans"
+   xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance" 
+   xmlns:aop = "http://www.springframework.org/schema/aop"
+   xsi:schemaLocation = "http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+   http://www.springframework.org/schema/aop 
+   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd ">
+
+   <!-- Definition for student bean -->
+   <bean id = "student" class = "com.tutorialspoint.Student">
+      <property name = "age"  value = "11"/>      
+   </bean>
+
+   <!-- Definition for logging aspect -->
+   <bean id = "logging" class = "com.tutorialspoint.Logging"/> 
+      
+</beans>
+
+
+O/P:
+
+Going to setup student profile.
+Age : 11
+
+--------------------------------------------------------------------------------------
