@@ -1,0 +1,165 @@
+Every java class extends java.lang.Object, thereby they have default implmentation of the following methods,
+
+1. protected Object clone()  : 		This method creates and returns a copy of this object.
+
+2. boolean equals(Object obj): 		This method indicates whether some other object is "equal to" this one.
+
+3. protected void finalize() : 		This method is called by the garbage collector on an object when garbage collection determines that 						there are no more references to the object.
+
+4. Class<?> getClass()       : 		This method returns the runtime class of this Object.
+
+5. int hashCode()            : 		This method returns a hash code value for the object.
+
+6. void notify()             : 		This method wakes up a single thread that is waiting on this object's monitor.
+
+7. void notifyAll()	     : 		This method wakes up all threads that are waiting on this object's monitor.
+
+8. String toString()	     : 		This method returns a string representation of the object.
+
+9. void wait()	 	     : 		This method causes the current thread to wait until another thread invokes the notify() method or the 						notifyAll() method for this object.
+
+10. void wait(long timeout)  : 		This method causes the current thread to wait until either another thread invokes the notify() method 						or the notifyAll() method for this object, or a specified amount of time has elapsed. 						
+11. void wait(long timeout, int nanos): This method causes the current thread to wait until another thread invokes the notify() method or the 					    	notifyAll() method for this object, or some other thread interrupts the current thread, or a certain 					    	amount of real time has elapsed.
+
+
+Basically even without explicit decalration all the classes will have a default 'int hashCode()' & 'boolean equals(Object obj)' mentioned.
+
+
+# native keyword in java:
+
+A native method in Java is a method whose implementation is written in other languages such as c and c++.The ‘native’ keyword is used before a method to indicate that it is implemented in other language.
+
+The main objectives of native keyword are:
+
+i>  To improve performance of the system.
+ii> To achieve machine level/memory level communication.
+iii>To use already existing legacy non-java code.
+
+Object Class implementation:
+
+
+public class Object {
+
+	private static native void registerNatives();
+
+    	static { registerNatives(); }	
+	
+	public final native Class<?> getClass();
+
+	public native int hashCode();						
+										
+	public boolean equals(Object obj) { return (this == obj); }
+
+	protected native Object clone() throws CloneNotSupportedException;
+
+	public String toString() {  return getClass().getName() + "@" + Integer.toHexString(hashCode());  }
+
+	public final native void notify();
+
+	public final native void notifyAll();
+
+	public final native void wait(long timeout) throws InterruptedException;
+
+
+
+	public final void wait(long timeout, int nanos) throws InterruptedException {
+
+        if (timeout < 0) {  throw new IllegalArgumentException("timeout value is negative"); }
+            
+        if (nanos < 0 || nanos > 999999) {
+            throw new IllegalArgumentException("nanosecond timeout value out of range");                      
+        }
+
+        if (nanos >= 500000 || (nanos != 0 && timeout == 0)) {  timeout++;  }
+          
+        wait(timeout);
+
+        }
+
+
+	public final void wait() throws InterruptedException { wait(0); }
+
+	protected void finalize() throws Throwable { }
+        	
+}
+
+
+# public native int hashCode();
+
+
+i>   Its a native method, so implemented by other language mostly C/C++.
+ii>  Cannot be guaranteed but the implementation should attempt to create unique integers per object.
+iii> It does not return the memory address of the object, although memory address is processed to get the hashCode of the object.
+iv>  If two objects are equal, there hashCode should be the same. But If the hashCode of two objects match, that does not necessarily mean
+     that they both are equal.
+
+
+# public boolean equals(Object obj) { return (this == obj); }
+
+i>   The default equals definition of the Object class only checks for the equality of references.
+ii>  String class equals method overrides the default equals implementation and does content comparison. The same has to be done for all
+     the custom classes in case content comparison has to be made (logic varies with business need).
+
+
+public class Human{
+
+	public int aadhaarNumber;
+	public String name;
+
+	public Human (int aadhaarNumber, String name){
+		this.aadhaarNumber = aadhaarNumber;
+		this.name = name;
+	}
+
+	@Override
+	public boolean equals(Object obj){
+		
+		if(this == obj){return true;}
+
+		if(obj == null){return false;}
+		if(getClass() != obj.getClass()){return false;}
+
+		Human other = (Human)obj;
+		
+		if(aadhaarNumber != other.aadhaarNumber){return false;}
+
+		if(name == null){
+			if(other.name!=null){return false;}		
+		}
+		else
+		if(!name.equals(other.name)){return false;}
+
+		return true;
+	}
+
+}
+
+
+# Working of HashMap
+
+put Operation:
+
+The hashCode of the key gets processed to find the bucket index into which the key-value pair has to be inserted. If the hashCode of the objects are same then the same bucket will be picked and its termed as collision. To handle collision the key-value pairs get stored as 
+nodes inside the linked list starting at the index calculated by the hashCode of the key. Now if the key to be inserted at a particular
+index is unique amongst all the keys present as key-value nodes linked list at that location, the new key-value pair gets appended to the list.
+If the key is not unique amongst the keys present as key-value nodes linked list at that location (bucket index), then the node with same key gets updated with incoming key-value node.
+
+
+i>  hashCode method is used to determine the bucket index.
+ii> equals is used to check if a node with same key is present inside the list or not.
+
+get Operation:
+
+The hashCode of the key is processed to find the bucket index. While looping through the linked list present at the index, the equals method
+is used to match the key to be found against the keys present in the list. If the match is successful at a node, the value corresponding to that node gets returned, otherwise null gets returned.
+
+
+Note: if the key is null, hashCode method returns 0 and bucket index wil also be 0.
+
+
+The default size of a hashMap is 16 (bucket size indexed from 0 to 15). The default load factor is 0.75 . When the load factor threshold is
+reached the size doubles itself. 
+
+ 
+
+

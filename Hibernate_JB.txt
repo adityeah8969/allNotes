@@ -1,0 +1,1235 @@
+Problems Hibernate is solving:
+
+i>  Mapping member variable to columns.
+ii> Mapping relationships.
+iii>Handling data types.
+iv> Managing changes to object state. 
+
+
+Sample Hibernate:
+
+
+
+
+package org.javabrains.aditya;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.util.Date;
+
+@Entity(name = "USER_DETAILS")
+public class UserDetails {
+
+    @Id
+    @Column(name = "USER_ID")
+    private Integer userId;
+
+    @Column(name = "USER_NAME")
+    private String userName;
+
+    private String address;
+    private String description;
+    private Date joinedDate;
+
+    public UserDetails(){}
+
+    public UserDetails(Integer userId, String userName, String address, String description, Date joinedDate) {
+        this.userId = userId;
+        this.userName = userName;
+        this.address = address;
+        this.description = description;
+        this.joinedDate = joinedDate;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getJoinedDate() {
+        return joinedDate;
+    }
+
+    public void setJoinedDate(Date joinedDate) {
+        this.joinedDate = joinedDate;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+}
+
+
+
+
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+
+        <!-- Database connection settings -->
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/test</property>
+        <property name="connection.username">root</property>
+        <property name="connection.password">password</property>
+
+        <!-- JDBC connection pool (use the built-in) -->
+        <property name="connection.pool_size">1</property>
+
+        <!-- SQL dialect -->										// Exact SQL language as per the 
+        <property name="dialect">org.hibernate.dialect.MySQL57Dialect</property>			// DB.
+
+        <!-- Disable the second-level cache  -->
+        <property name="cache.provider_class">org.hibernate.cache.internal.NoCachingRegionFactory</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">true</property>
+
+        <!-- 'create' will drop and re-create scema & 'update' will append to the existing schema -->
+        <property name="hbm2ddl.auto">create</property>
+
+        <!-- Names the annotated entity class -->
+        <mapping class="org.javabrains.aditya.UserDetails"/>
+
+    </session-factory>
+
+</hibernate-configuration>
+
+
+
+
+package org.aditya.hibernate;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.javabrains.aditya.UserDetails;
+
+import java.util.Date;
+
+
+public class HibernateTest {
+
+    public static void main(String[] args){
+
+        UserDetails user = new UserDetails();
+
+        user.setUserId(4);
+        user.setUserName("4rd User");
+        user.setAddress("4th Cross");
+        user.setDescription("Description");
+        user.setJoinedDate(new Date());
+
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();     // uses hibernate.cfg.xml to build 
+        Session session = sessionFactory.openSession();						   // a session factory. Its an expe-
+        session.beginTransaction();								   // nsive operation and supposed to
+        session.save(user);									   // be done once. session objects
+        session.getTransaction().commit();							   // can be created from here.
+
+    }
+
+}
+
+
+-------------------------------------------------------------------------------------------------
+
+
+Annotations:
+
+@Transient: @Transient annotation in JPA or Hibernate is used to indicate that a field is not to be persisted or ignore fields to save in the database. 
+
+@Lob: @Lob annotation specifies that the database should store the property as Large Object.
+
+The datatype has two variants:
+
+CLOB – Character Large Object will store large text data				// If @Lob applied over String
+BLOB – Binary Large Object is for storing binary data like image, audio, or video	// If @Lob applied over ByteStream
+
+
+
+-------------------------------------------------------------------------------------------------
+
+
+Retrieving Objects:
+
+
+	session = sessionFactory.openSession();
+        session.beginTransaction();
+        user = (UserDetails) session.get(UserDetails.class, 4);				// parameters: ClassName, PrimaryKey
+        System.out.println("username: "+user.getUserName());
+
+
+O/P:
+
+	username: 4rd User
+
+
+-------------------------------------------------------------------------------------------------
+
+Natural Key v/s Surrogate Key:
+
+The primary key is a unique value that identifies each record.  Sometimes the primary key is made up of real data (as in, in relation to business logic, for e.g an app having emailId as the primary key) and these are normally referred to as natural keys, while other times the key is generated when a new record is inserted into a table.  When a primary key is generated at runtime, it is called a surrogate key.
+
+
+For surrogate keys, hibernate offers different primary key generation strategies,
+
+AUTO:  	The persistence provider will determine values based on the type of the primary key attribute. This type can be numerical or UUID.
+     	For numeric values, the generation is based on a sequence or table generator, while UUID values will use the UUIDGenerator.
+
+	e.g
+
+	@Id @GeneratedValue(strategy = GenerationType.AUTO)
+    	@Column(name = "USER_ID")
+    	private Integer userId;
+
+IDENTITY: This type of generation relies on the IdentityGenerator which expects values generated by an identity column in the database, 	  meaning they are auto-incremented. One thing to note is that IDENTITY generation disables batch updates.
+	  
+          e.g
+
+	  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    	  @Column(name = "USER_ID")
+    	  private Integer userId;
+
+SEQUENCE: This generator uses sequences if they're supported by our database, and switches to table generation if they aren't. Recommended by 		  the Hibernate documentation. To customize the sequence name, we can use the @GenericGenerator annotation with SequenceStyleGenerator 		  strategy,
+
+	  @Entity
+	  public class User {
+    		@Id
+    		@GeneratedValue(generator = "sequence-generator")
+    		@GenericGenerator(
+      		name = "sequence-generator",
+      		strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator",
+      		parameters = {
+        		@Parameter(name = "sequence_name", value = "user_sequence"),
+        		@Parameter(name = "initial_value", value = "4"),
+        		@Parameter(name = "increment_size", value = "1")
+        	}
+    		)
+    		private long userId;
+    
+    		// ...
+	 }
+
+
+TABLE: The TableGenerator uses an underlying database table that holds segments of identifier generation values. Rarely used.
+
+-------------------------------------------------------------------------------------------------
+
+Value Objects:
+
+These are the objects which do not have meaning in itself (they are not DB entities), but belong to other DB entities. '@Embeddable' 
+annotation can be used over the value object class so that their members can be treated as members of parent-entity class holding them.
+'@Embedded' is used insode the parent-entity class to mark the value object class. 
+
+
+e.g,
+
+package org.javabrains.aditya;
+
+import javax.persistence.Embeddable;
+
+@Embeddable										  
+public class Address {									// value object class
+
+    private String city;
+    private String state;
+    private String street;
+    private String pincode;
+
+    public Address(String city, String state, String street, String pincode) {
+        this.city = city;
+        this.state = state;
+        this.street = street;
+        this.pincode = pincode;
+    }
+
+    public Address(){}
+
+}
+
+
+package org.javabrains.aditya;
+
+import javax.persistence.*;
+import java.util.Date;
+
+@Entity(name = "USER_DETAILS")
+public class UserDetails {
+
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "USER_ID")
+    private Integer userId;
+
+    @Column(name = "USER_NAME")
+    private String userName;
+
+    @Embedded										// marking value object class
+    private Address address;								// ACtual value Object
+
+    public UserDetails(){}
+
+    public UserDetails(Integer userId, String userName, Address address) {
+        this.userId = userId;
+        this.userName = userName;
+        this.address = address;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Address getAddress() {return address;}
+    public void setAddress(Address address) {this.address = address;}
+}
+
+
+package org.aditya.hibernate;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.javabrains.aditya.Address;
+import org.javabrains.aditya.UserDetails;
+
+import java.util.Date;
+
+public class HibernateTest {
+
+    public static void main(String[] args){
+
+        UserDetails user1 = new UserDetails();
+        Address address = new Address("Bangalore","Karnataka","4th Cross","560100");
+
+        user1.setUserName("1st User");
+        user1.setAddress(address);
+
+        UserDetails user2 = new UserDetails();
+
+        user2.setUserName("2nd User");
+        user2.setAddress(address);
+
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(user1);
+        session.save(user2);
+        session.getTransaction().commit();
+
+
+    }
+
+}
+
+
+Inside DB:
+
+mysql> select * FROM USER_DETAILS;
++---------+-----------+---------+-----------+-----------+-----------+
+| USER_ID | city      | pincode | state     | street    | USER_NAME |
++---------+-----------+---------+-----------+-----------+-----------+
+|       1 | Bangalore | 560100  | Karnataka | 4th Cross | 1st User  |
+|       2 | Bangalore | 560100  | Karnataka | 4th Cross | 2nd User  |
++---------+-----------+---------+-----------+-----------+-----------+
+2 rows in set (0.00 sec)
+
+
+-------------------------------------------------------------------------------------------------
+
+'@Column' annotation can be used to modiy the name of the member fields inside the embedded object as well.
+
+e.g,
+
+package org.javabrains.aditya;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class Address {
+
+    @Column(name = "CITY")
+    private String city;
+    @Column(name = "STATE")
+    private String state;
+    @Column(name = "STREET")
+    private String street;
+    @Column(name = "PINCODE")
+    private String pincode;
+
+    public Address(String city, String state, String street, String pincode) {
+        this.city = city;
+        this.state = state;
+        this.street = street;
+        this.pincode = pincode;
+    }
+
+    public Address(){}
+
+}
+
+
+
+Inside DB:
+
+mysql> select * FROM USER_DETAILS;
++---------+-----------+---------+-----------+-----------+-----------+
+| USER_ID | CITY      | PINCODE | STATE     | STREET    | USER_NAME |
++---------+-----------+---------+-----------+-----------+-----------+
+|       1 | Bangalore | 560100  | Karnataka | 4th Cross | 1st User  |
+|       2 | Bangalore | 560100  | Karnataka | 4th Cross | 2nd User  |
++---------+-----------+---------+-----------+-----------+-----------+
+
+
+If we had multiple different embedded objects of the same type, then we must define the column names explicitly in the parent-entuty class,
+
+
+e.g,
+
+package org.javabrains.aditya;
+
+import javax.persistence.*;
+import java.util.Date;
+
+@Entity(name = "USER_DETAILS")
+public class UserDetails {
+
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "USER_ID")
+    private Integer userId;
+
+    @Column(name = "USER_NAME")
+    private String userName;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "street", column = @Column(name = "HOME_STREET_HOME")),
+            @AttributeOverride(name = "city", column = @Column(name = "HOME_CITY_HOME")),
+            @AttributeOverride(name = "state", column = @Column(name = "HOME_STATE_HOME")),
+            @AttributeOverride(name = "pincode", column = @Column(name = "HOME_PINCODE_HOME"))
+    })
+    private Address homeAddress;
+
+    @Embedded
+    private Address officeAddress;
+
+    public UserDetails(){}
+
+    public UserDetails(Integer userId, String userName, Address homeAddress, Address officeAddress) {
+        this.userId = userId;
+        this.userName = userName;
+        this.homeAddress = homeAddress;
+        this.officeAddress = officeAddress;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Address getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
+    }
+
+    public Address getOfficeAddress() {
+        return officeAddress;
+    }
+
+    public void setOfficeAddress(Address officeAddress) {
+        this.officeAddress = officeAddress;
+    }
+}
+
+
+
+
+package org.javabrains.aditya;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class Address {
+
+    @Column(name = "CITY")
+    private String city;
+    @Column(name = "STATE")
+    private String state;
+    @Column(name = "STREET")
+    private String street;
+    @Column(name = "PINCODE")
+    private String pincode;
+
+    public Address(String city, String state, String street, String pincode) {
+        this.city = city;
+        this.state = state;
+        this.street = street;
+        this.pincode = pincode;
+    }
+
+    public Address(){}
+
+}
+
+
+package org.aditya.hibernate;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.javabrains.aditya.Address;
+import org.javabrains.aditya.UserDetails;
+
+import java.util.Date;
+
+public class HibernateTest {
+
+    public static void main(String[] args){
+
+        UserDetails user1 = new UserDetails();
+        Address address = new Address("Bangalore","Karnataka","4th Cross","560100");
+
+        user1.setUserName("1st User");
+        user1.setHomeAddress(address);
+        user1.setOfficeAddress(address);
+
+
+        UserDetails user2 = new UserDetails();
+
+        user2.setUserName("2nd User");
+        user2.setHomeAddress(address);
+        user2.setOfficeAddress(address);
+
+
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(user1);
+        session.save(user2);
+        session.getTransaction().commit();
+
+
+    }
+
+}
+
+
+
+inside db:
+
+mysql> select * FROM USER_DETAILS;
++---------+----------------+-------------------+-----------------+------------------+-----------+---------+-----------+-----------+-----------+
+| USER_ID | HOME_CITY_HOME | HOME_PINCODE_HOME | HOME_STATE_HOME | HOME_STREET_HOME | CITY      | PINCODE | STATE     | STREET    | USER_NAME |
++---------+----------------+-------------------+-----------------+------------------+-----------+---------+-----------+-----------+-----------+
+|       1 | Bangalore      | 560100            | Karnataka       | 4th Cross        | Bangalore | 560100  | Karnataka | 4th Cross | 1st User  |
+|       2 | Bangalore      | 560100            | Karnataka       | 4th Cross        | Bangalore | 560100  | Karnataka | 4th Cross | 2nd User  |
++---------+----------------+-------------------+-----------------+------------------+-----------+---------+-----------+-----------+-----------+
+2 rows in set (0.00 sec)
+
+
+Note: similarly '@EmbeddedId' can be used if the primary key itself is composed of multiple columns. But we cannot have any generation strategy for them.
+
+-------------------------------------------------------------------------------------------------
+
+'@ElementCollection' can be used to store the collection of value objects. A separate table gets created for the annotated members which gets linked by the primary key of parent-entity class as Foreign key.  
+
+
+
+package org.javabrains.aditya;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class Address {
+
+    @Column(name = "CITY")
+    private String city;
+    @Column(name = "STATE")
+    private String state;
+    @Column(name = "STREET")
+    private String street;
+    @Column(name = "PINCODE")
+    private String pincode;
+
+    public Address(String city, String state, String street, String pincode) {
+        this.city = city;
+        this.state = state;
+        this.street = street;
+        this.pincode = pincode;
+    }
+
+    public Address(){}
+
+}
+
+
+
+
+package org.javabrains.aditya;
+
+import javax.persistence.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity(name = "USER_DETAILS")
+public class UserDetails {
+
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "USER_ID")
+    private Integer userId;
+
+    @Column(name = "USER_NAME")
+    private String userName;
+
+    @ElementCollection										// collection
+    private Set<Address> listOfAddresses = new HashSet<>();
+
+    public UserDetails(){}
+
+    public UserDetails(Integer userId, String userName, Set<Address> listOfAddresses) {
+        this.userId = userId;
+        this.userName = userName;
+        this.listOfAddresses = listOfAddresses;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Set<Address> getListOfAddresses() { return listOfAddresses; }
+    public void setListOfAddresses(Set<Address> listOfAddresses) { this.listOfAddresses = listOfAddresses; }
+}
+
+
+
+
+package org.aditya.hibernate;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.javabrains.aditya.Address;
+import org.javabrains.aditya.UserDetails;
+
+import java.util.Date;
+import java.util.HashSet;
+
+public class HibernateTest {
+
+    public static void main(String[] args){
+
+        UserDetails user1 = new UserDetails();
+        Address address1 = new Address("Bangalore","Karnataka","4th Cross","560100");
+        Address address2 = new Address("Patns","Bihar","5th Cross","560111");
+
+        HashSet<Address> addressesSet = new HashSet<>();
+        addressesSet.add(address1);
+        addressesSet.add(address2);
+
+        user1.setUserName("1st User");
+        user1.setListOfAddresses(addressesSet);
+
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(user1);
+        session.getTransaction().commit();
+
+    }
+}
+
+
+
+mysql> show tables;									// a new table named 'USER_DETAILS_listOfAddresses'
++------------------------------+							// got created.
+| Tables_in_test               |
++------------------------------+
+| USER_DETAILS                 |
+| USER_DETAILS_listOfAddresses |                 
+| hibernate_sequence           |
++------------------------------+
+3 rows in set (0.00 sec)
+
+
+mysql> mysql> select * FROM USER_DETAILS;						// 'listOfAddresses' not getting stored.
++---------+-----------+
+| USER_ID | USER_NAME |
++---------+-----------+
+|       1 | 1st User  |
++---------+-----------+
+1 row in set (0.00 sec)
+
+
+mysql> select * from USER_DETAILS_listOfAddresses;					// 'USER_DETAILS_listOfAddresses' storing the	
++----------------------+-----------+---------+-----------+-----------+			// actual records. Referencing the parent-entity
+| USER_DETAILS_USER_ID | CITY      | PINCODE | STATE     | STREET    |			// records using their primary key as Foreign key.
++----------------------+-----------+---------+-----------+-----------+
+|                    1 | Patns     | 560111  | Bihar     | 5th Cross |
+|                    1 | Bangalore | 560100  | Karnataka | 4th Cross |
++----------------------+-----------+---------+-----------+-----------+
+2 rows in set (0.00 sec)
+
+
+-------------------------------------------------------------------------------------------------
+
+
+package org.javabrains.aditya;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class Address {									// note that there is no ID field
+											// but it will be custom generated.
+    @Column(name = "CITY")
+    private String city;
+    @Column(name = "STATE")
+    private String state;
+    @Column(name = "STREET")
+    private String street;
+    @Column(name = "PINCODE")
+    private String pincode;
+
+    public Address(String city, String state, String street, String pincode) {
+        this.city = city;
+        this.state = state;
+        this.street = street;
+        this.pincode = pincode;
+    }
+
+    public Address(){}
+
+}
+
+
+
+
+package org.javabrains.aditya;
+
+import org.hibernate.annotations.CollectionId;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+
+import javax.persistence.*;
+import java.util.*;
+
+@Entity(name = "USER_DETAILS")
+public class UserDetails {
+
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "USER_ID")
+    private Integer userId;
+
+    @Column(name = "USER_NAME")
+    private String userName;
+
+    @ElementCollection										// Collection of value object
+    @JoinTable(name = "USER_ADDRESS", joinColumns = @JoinColumn(name = "USER_ID"))		// customizing join table name and join columns
+    @GenericGenerator(name = "sequencegen", strategy = "sequence")				// generator for ADDRESS_ID generation
+    @CollectionId(columns = {@Column(name = "ADDRESS_ID")}, generator = "sequencegen", type = @Type(type = "long"))
+    private Collection<Address> listOfAddresses = new ArrayList<>();				
+
+    public UserDetails(Integer userId, String userName, Collection<Address> listOfAddresses) {
+        this.userId = userId;
+        this.userName = userName;
+        this.listOfAddresses = listOfAddresses;
+    }
+
+    public UserDetails(){}
+
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Collection<Address> getListOfAddresses() { return listOfAddresses; }
+    public void setListOfAddresses(Collection<Address> listOfAddresses) { this.listOfAddresses = listOfAddresses; }
+}
+
+
+
+package org.aditya.hibernate;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.javabrains.aditya.Address;
+import org.javabrains.aditya.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+
+public class HibernateTest {
+
+    public static void main(String[] args){
+
+        UserDetails user1 = new UserDetails();
+        user1.setUserName("1st User");
+
+        UserDetails user2 = new UserDetails();
+        user2.setUserName("2nd User");
+
+        Address address1 = new Address("Bangalore","Karnataka","4th Cross","560100");
+        Address address2 = new Address("Patns","Bihar","5th Cross","560111");
+
+        ArrayList<Address> addressesSet = new ArrayList<>();
+        addressesSet.add(address1);
+        addressesSet.add(address2);
+
+        user1.setListOfAddresses(addressesSet);
+        user2.setListOfAddresses(addressesSet);
+
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(user1);
+	session.save(user2);
+        session.getTransaction().commit();
+
+    }
+}
+
+
+O/P:
+
+
+mysql> show tables;
++--------------------+
+| Tables_in_test     |
++--------------------+
+| USER_ADDRESS       |
+| USER_DETAILS       |
+| hibernate_sequence |
+| sequencegen        |
++--------------------+
+4 rows in set (0.00 sec)
+
+
+mysql> select * from USER_DETAILS;
++---------+-----------+
+| USER_ID | USER_NAME |
++---------+-----------+
+|       5 | 1st User  |
+|       6 | 2nd User  |
++---------+-----------+
+2 rows in set (0.00 sec)
+
+
+mysql> select * from USER_ADDRESS;								// note ADDRESS_ID primary key generated
++---------+-----------+---------+-----------+-----------+------------+
+| USER_ID | CITY      | PINCODE | STATE     | STREET    | ADDRESS_ID |
++---------+-----------+---------+-----------+-----------+------------+
+|       5 | Bangalore | 560100  | Karnataka | 4th Cross |          1 |
+|       5 | Patns     | 560111  | Bihar     | 5th Cross |          2 |
+|       6 | Bangalore | 560100  | Karnataka | 4th Cross |          3 |
+|       6 | Patns     | 560111  | Bihar     | 5th Cross |          4 |
++---------+-----------+---------+-----------+-----------+------------+
+4 rows in set (0.00 sec)
+
+
+-------------------------------------------------------------------------------------------------
+
+Lazy and eager initialization:
+
+Whenever a fetch operation has to occur, a proxy object gets created & returned by hibernate which extends the entity class. This proxy object has all the first level member values, but not the member type like collections. Hibernate does that to ensure all the heavy objects like a 
+lists do not get fetched in the first call unnecessarily. If at all getter methods corresponding to unfetched members get called, hibernate
+makes another call to DB and get the required result. This is called lazy initialization.
+
+Eager initialization on the other hand fetches all the member values inside the entity in a single call. This is not the default behaviour and has to specified explicitly.
+
+Sample demo:
+
+package org.javabrains.aditya;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@Embeddable
+public class Address {
+
+    @Column(name = "CITY")
+    private String city;
+    @Column(name = "STATE")
+    private String state;
+    @Column(name = "STREET")
+    private String street;
+    @Column(name = "PINCODE")
+    private String pincode;
+
+    public Address(String city, String state, String street, String pincode) {
+        this.city = city;
+        this.state = state;
+        this.street = street;
+        this.pincode = pincode;
+    }
+
+    public Address(){}
+
+}
+
+
+
+package org.javabrains.aditya;
+
+import org.hibernate.annotations.CollectionId;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+
+import javax.persistence.*;
+import java.util.*;
+
+@Entity(name = "USER_DETAILS")
+public class UserDetails {
+
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "USER_ID")
+    private Integer userId;
+
+    @Column(name = "USER_NAME")
+    private String userName;
+
+    @ElementCollection
+    @JoinTable(name = "USER_ADDRESS", joinColumns = @JoinColumn(name = "USER_ID"))
+    private Collection<Address> listOfAddresses = new ArrayList<>();
+
+    public UserDetails(Integer userId, String userName, Collection<Address> listOfAddresses) {
+        this.userId = userId;
+        this.userName = userName;
+        this.listOfAddresses = listOfAddresses;
+    }
+
+    public UserDetails(){}
+
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Collection<Address> getListOfAddresses() { return listOfAddresses; }
+    public void setListOfAddresses(Collection<Address> listOfAddresses) { this.listOfAddresses = listOfAddresses; }
+}
+
+
+
+package org.aditya.hibernate;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.javabrains.aditya.Address;
+import org.javabrains.aditya.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+
+public class HibernateTest {
+
+    public static void main(String[] args){
+
+        UserDetails user1 = new UserDetails();
+        user1.setUserName("1st User");
+
+        UserDetails user2 = new UserDetails();
+        user2.setUserName("2nd User");
+
+        Address address1 = new Address("Bangalore","Karnataka","4th Cross","560100");
+        Address address2 = new Address("Patns","Bihar","5th Cross","560111");
+
+        ArrayList<Address> addressesSet = new ArrayList<>();
+        addressesSet.add(address1);
+        addressesSet.add(address2);
+
+        user1.setListOfAddresses(addressesSet);
+        user2.setListOfAddresses(addressesSet);
+
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(user1);
+        session.save(user2);
+        session.getTransaction().commit();
+
+    }
+}
+
+
+
+O/P:	Inside DB
+
+
+mysql> show tables;
++--------------------+
+| Tables_in_test     |
++--------------------+
+| USER_ADDRESS       |
+| USER_DETAILS       |
+| hibernate_sequence |
+| sequencegen        |
++--------------------+
+4 rows in set (0.00 sec)
+
+
+mysql> select * from USER_DETAILS;
++---------+-----------+
+| USER_ID | USER_NAME |
++---------+-----------+
+|       1 | 1st User  |
+|       2 | 2nd User  |
++---------+-----------+
+2 rows in set (0.00 sec)
+
+
+mysql> select * from USER_ADDRESS;
++---------+-----------+---------+-----------+-----------+
+| USER_ID | CITY      | PINCODE | STATE     | STREET    |
++---------+-----------+---------+-----------+-----------+
+|       1 | Bangalore | 560100  | Karnataka | 4th Cross |
+|       1 | Patns     | 560111  | Bihar     | 5th Cross |
+|       2 | Bangalore | 560100  | Karnataka | 4th Cross |
+|       2 | Patns     | 560111  | Bihar     | 5th Cross |
++---------+-----------+---------+-----------+-----------+
+4 rows in set (0.00 sec)
+
+
+
+Note:
+
+# Lazy initialization:
+
+public class HibernateTest {
+
+    public static void main(String[] args){
+
+        // ...
+	
+        session = sessionFactory.openSession();
+        UserDetails userDetails = (UserDetails) session.get(UserDetails.class, 1);
+        System.out.println("size: "+userDetails.getListOfAddresses().size());			// this getListOfAddresses() internally
+												// makes another call to DB.
+    }
+}
+
+
+if we close the session before getter call, it results in error,
+
+public class HibernateTest {
+
+    public static void main(String[] args){
+
+        // ...
+
+ 	session = sessionFactory.openSession();
+        UserDetails userDetails = (UserDetails) session.get(UserDetails.class, 1);
+        session.close();									// closing session before getter call 
+        System.out.println("size: "+userDetails.getListOfAddresses().size());
+
+    }
+}
+
+
+O/P:
+
+failed to lazily initialize a collection of role: org.javabrains.aditya.UserDetails.listOfAddresses, could not initialize proxy - no Session
+  at org.hibernate.collection.internal.AbstractPersistentCollection.throwLazyInitializationException(AbstractPersistentCollection.java606)
+  at org.hibernate.collection.internal.AbstractPersistentCollection.withTemporarySessionIfNeeded(AbstractPersistentCollection.java:218)
+  at org.hibernate.collection.internal.AbstractPersistentCollection.readSize(AbstractPersistentCollection.java:162)
+  at org.hibernate.collection.internal.PersistentBag.size(PersistentBag.java:371)
+  at org.aditya.hibernate.HibernateTest.main(HibernateTest.java:43)
+
+
+# Eager initialization:
+
+
+package org.javabrains.aditya;
+
+import org.hibernate.annotations.CollectionId;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+
+import javax.persistence.*;
+import java.util.*;
+
+@Entity(name = "USER_DETAILS")
+public class UserDetails {
+
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "USER_ID")
+    private Integer userId;
+
+    @Column(name = "USER_NAME")
+    private String userName;
+
+    @ElementCollection(fetch = FetchType.EAGER)								// Eager initialization
+    @JoinTable(name = "USER_ADDRESS", joinColumns = @JoinColumn(name = "USER_ID"))
+    private Collection<Address> listOfAddresses = new ArrayList<>();
+
+    public UserDetails(Integer userId, String userName, Collection<Address> listOfAddresses) {
+        this.userId = userId;
+        this.userName = userName;
+        this.listOfAddresses = listOfAddresses;
+    }
+
+    public UserDetails(){}
+
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Collection<Address> getListOfAddresses() { return listOfAddresses; }
+    public void setListOfAddresses(Collection<Address> listOfAddresses) { this.listOfAddresses = listOfAddresses; }
+}	
+
+
+package org.aditya.hibernate;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.javabrains.aditya.Address;
+import org.javabrains.aditya.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+
+public class HibernateTest {
+
+    public static void main(String[] args){
+
+        UserDetails user1 = new UserDetails();
+        user1.setUserName("1st User");
+
+        UserDetails user2 = new UserDetails();
+        user2.setUserName("2nd User");
+
+        Address address1 = new Address("Bangalore","Karnataka","4th Cross","560100");
+        Address address2 = new Address("Patns","Bihar","5th Cross","560111");
+
+        ArrayList<Address> addressesSet = new ArrayList<>();
+        addressesSet.add(address1);
+        addressesSet.add(address2);
+
+        user1.setListOfAddresses(addressesSet);
+        user2.setListOfAddresses(addressesSet);
+
+        SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(user1);
+        session.save(user2);
+        session.getTransaction().commit();
+
+        session = sessionFactory.openSession();
+        UserDetails userDetails = (UserDetails) session.get(UserDetails.class, 1);
+        session.close();									// closing session does not have any impact
+        System.out.println("size: "+userDetails.getListOfAddresses().size());			// as the 'listOfAddresses' is eagerly 
+												// initiliazed, userDetailsobject fetched
+    }												// 'listOfAddresses' in the first call itself.
+}
+								
+
+
+O/P:
+
+size: 2
+
+

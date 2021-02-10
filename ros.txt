@@ -1,0 +1,83 @@
+Creating a catkin workspace:
+
+$ mkdir -p ~/catkin_ws/src
+$ cd ~/catkin_ws/
+$ catkin_make
+
+-------------------------------------------------------------------
+
+Navigation in ROS:
+
+(base) aditya@aditya-HP-Notebook:~$ rospack find roscpp
+/opt/ros/melodic/share/roscpp
+
+(base) aditya@aditya-HP-Notebook:~$ roscd roscpp
+(base) aditya@aditya-HP-Notebook:/opt/ros/melodic/share/roscpp$ 
+
+(base) aditya@aditya-HP-Notebook:~$ echo $ROS_PACKAGE_PATH
+/opt/ros/melodic/share
+
+(base) aditya@aditya-HP-Notebook:~/apache_kafka$ rosls
+apache-zookeeper-3.5.8-bin         kafka2                kafka3      zooKeeper3
+apache-zookeeper-3.5.8-bin.tar.gz  kafka_2.13-2.6.0      zooKeeper1
+kafka1                             kafka_2.13-2.6.0.tgz  zooKeeper2
+
+-------------------------------------------------------------------
+
+Creating a ros package:
+
+$ cd ~/catkin_ws/src
+$ catkin_create_pkg beginner_tutorials std_msgs rospy roscpp	// catkin_create_pkg <package_name> [depend1] [depend2] [depend3]
+
+
+
+$ cd ~/catkin_ws
+$ catkin_make							// BUilding the package
+
+
+aditya@aditya-HP-Notebook:~/catkin_ws/src/beginner_tutorials$ rospack depends1 beginner_tutorials 	// listing first-order dependencies
+roscpp
+rospy
+std_msgs
+
+
+aditya@aditya-HP-Notebook:~/catkin_ws/src/beginner_tutorials$ rospack depends1 rospy			// package might be depended on another
+genpy													// dependency
+roscpp													
+rosgraph
+rosgraph_msgs
+roslib
+std_msgs
+
+
+aditya@aditya-HP-Notebook:~/catkin_ws/src/beginner_tutorials$ rospack depends beginner_tutorials	// recursively fetching all the nested
+cpp_common												// dependencies
+rostime
+roscpp_traits
+roscpp_serialization
+catkin
+genmsg
+genpy
+message_runtime
+gencpp
+geneus
+gennodejs
+genlisp
+message_generation
+rosbuild
+rosconsole
+std_msgs
+rosgraph_msgs
+xmlrpcpp
+roscpp
+rosgraph
+ros_environment
+rospack
+roslib
+rospy
+
+
+-------------------------------------------------------------------
+
+
+
